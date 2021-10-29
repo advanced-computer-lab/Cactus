@@ -8,22 +8,23 @@ const Flight = require('../Schemas/Flight')
 //    // res.render(addFlight) //TODO
 // })
 
-addFlightRouter.get('/',(req,res)=>{
-    const flight = {
+addFlightRouter.get('/', (req, res) => {
+    const flight = new Flight({
+        '_id': 'check000',
         'flightNumber': 'D40',
         'departureTime': '5:22',
         'arrivalTime': '10:00',
-        'departureDate': '25/4/2000',
-        'arrivalDate':'25/4/2000' ,
+        'departureDate': '4/25/2000',
+        'arrivalDate': '4/25/2000',
         'airport': 'Egypt',
-        'economySeats': 10, 
+        'economySeats': 10,
         'businessSeats': 5
-    }
-    Flight.save(flight)
-        .then((result)=>{
+    });
+    flight.save()
+        .then((result) => {
             res.send(result)
         })
-        .catch((err)=>{
+        .catch((err) => {
             console.log(err)
         })
 })
