@@ -1,34 +1,48 @@
-import React from 'react'
-import axios from "axios";
+import React, { Component } from 'react';
+import axios from 'axios';
+import DataTable from '../Components/data-table'
 
+export default class Flights extends Component {
 
-export const GetFlights = () => {
-    const flights = [];
-
-    axios.get("http://localhost:3000/findFlight")
-        .then((result)=>{
-            const flightData = result.data
-            this.setState({ flights: flightData })
-            console.log("Data fetched");
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
-    
-    displayFlights = (flights) =>{
-        if(!flights.lenght) return null;
-        return flights.map((flight, index)=>{
-            <div key={index}>
-                <h2>{flight.flightNumber}</h2>
-                <p>{flight.arrivalTime}</p>
-                <p>{flight.departureTime}</p>
-            </div>
-        })
+    constructor(props) {
+        super(props);
+        this.state = { flightsCollection: [] };
     }
 
-    return (
-        <div>
-            {this.displayFlights(this.state.flights)}
-        </div>
-    )
+    componentDidMount() {
+        axios.get('http://localhost:3000/findFlight')
+            .then(res => {
+                this.setState({ flightsCollection: res.data });
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    dataTable() {
+        return this.state.flightsCollection.map((data, i) => {
+            return <DataTable obj={data} key={i} />;
+        });
+    }
+
+    render() {
+        return (
+            <div className="wrapper-Flights">
+                <div className="container">
+                    <table className="table table-striped table-dark">
+                        <thead className="thead-dark">
+                            <tr>
+                                <td>Flight Number</td>
+                                <td>Arrival Time</td>
+                                <td>Departure Time</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.dataTable()}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )
+    }
 }
