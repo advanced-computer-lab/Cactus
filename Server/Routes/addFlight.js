@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const Flight = require('../Schemas/Flight')
 
 
-addFlightRouter.get('/',(req,res)=>{
+addFlightRouter.get('/',(req,res)=>{ //TODO:
    
 })
 
