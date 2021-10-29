@@ -1,10 +1,10 @@
-import Flights from "./Views/GetFlights";
+import GetFlightsTest from "./Views/GetFlightsTest";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-       <Flights />
+       <GetFlightsTest />
       </header>
     </div>
   );
