@@ -7,6 +7,7 @@ const Flight = require('./Schemas/Flight')
 
 //Routers
 const addFlightRoute = require('./Routes/addFlight')
+const findFlightRoute = require('./Routes/findFlight')
 
 //App
 const app = express()
@@ -30,3 +31,5 @@ app.get('/', (req, res) => {
 })
 
 app.use('/addflight', addFlightRoute)
+
+app.use('/findFlight', findFlightRoute)
