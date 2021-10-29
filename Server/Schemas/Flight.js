@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const flightSchema = new Schema({
+    _id: {},
     flightNumber: {
-        type:String,
+        type: String,
         required: true
     },
     departureTime: {
@@ -22,7 +23,7 @@ const flightSchema = new Schema({
         type: Date,
         required: true
     },
-    airport:{
+    airport: {
         type: String,
         required: true
     },
@@ -34,7 +35,7 @@ const flightSchema = new Schema({
         type: Number,
         required: true
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 //flightNo, DeparTime, ArrivalTime, Dates, airport, number seats
 
