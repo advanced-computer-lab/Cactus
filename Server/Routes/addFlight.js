@@ -4,11 +4,11 @@ const mongoose = require('mongoose')
 const Flight = require('../Schemas/Flight')
 
 
-// addFlightRouter.get('/',(req,res)=>{
-//    // res.render(addFlight) //TODO
-// })
+addFlightRouter.get('/',(req,res)=>{
+   
+})
 
-addFlightRouter.get('/', (req, res) => {
+addFlightRouter.post('/', (req, res) => {
     const flight = new Flight({
         '_id': 'check000',
         'flightNumber': 'D40',
