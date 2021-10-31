@@ -3,7 +3,7 @@ const findFlightRouter = express.Router()
 const mongoose = require('mongoose')
 const Flight = require('../Schemas/Flight')
 const bp = require('body-parser')
-findFlightRouter.use(bp.json())
+findFlightRouter.use(express.json())
 findFlightRouter.use(bp.urlencoded({extended: true}))
 
 findFlightRouter.post('/',(req,res) =>{
@@ -42,6 +42,7 @@ findFlightRouter.post('/',(req,res) =>{
   Flight.find(f1)
     .then((result)=>{
       res.send(result)
+      console.log(result)
     })
     .catch((err)=>{
       console.log(err)
@@ -51,15 +52,7 @@ findFlightRouter.post('/',(req,res) =>{
 
 
 findFlightRouter.get('/',(req,res)=>{ //TODO:
-    Flight.find({
-      "_id": "check000"
-      //"flightNumber": ,
-      // "departureTime": ,
-      // "arrivalTime":,
-      // "departureDate": ,
-      // "arrivalDate":,
-      // "airport":
-    })
+    Flight.find()
       .then((result)=>{
         res.send(result)
       })
