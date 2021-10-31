@@ -1,11 +1,17 @@
-import GetFlightsTest from "./Views/GetFlightsTest";
+import React from "react";
+import GetFlights from "./Components/getFlights";
+import AddFlights from "./Components/addFlights";
 
 function App() {
+
   return (
     <div className="App">
       <header className="App-header">
-       <GetFlightsTest />
+        <h1>Flights</h1>
+        <AddFlights />
+        <GetFlights />
       </header>
+      
     </div>
   );
 }
