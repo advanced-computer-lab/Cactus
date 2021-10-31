@@ -10,15 +10,15 @@ addFlightRouter.get('/',(req,res)=>{ //TODO:
 
 addFlightRouter.post('/', (req, res) => {
     const flight = new Flight({
-        '_id': 'check000',
-        'flightNumber': 'D40',
-        'departureTime': '5:22',
+        '_id': 'check002',
+        'flightNumber': 'D20',
+        'departureTime': '6:22',
         'arrivalTime': '10:00',
-        'departureDate': '4/25/2000',
-        'arrivalDate': '4/25/2000',
+        'departureDate': '7/25/2000',
+        'arrivalDate': '8/25/2000',
         'airport': 'Egypt',
-        'economySeats': 10,
-        'businessSeats': 5
+        'economySeats': 80,
+        'businessSeats': 15
     });
     flight.save()
         .then((result) => {

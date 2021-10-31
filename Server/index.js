@@ -1,6 +1,7 @@
 //Middlewares
 const express = require('express')
 const mongoose = require('mongoose')
+const cors = require('cors')
 require('dotenv').config();
 //Schemas
 const Flight = require('./Schemas/Flight')
@@ -11,6 +12,7 @@ const findFlightRoute = require('./Routes/findFlight')
 
 //App
 const app = express()
+app.use(cors())
 const mongoURI = process.env.MONGOURI
 const PORT = process.env.PORT
 
