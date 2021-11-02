@@ -36,7 +36,6 @@ const flightSchema = new Schema({
     }
 }, { timestamps: true });
 
-//flightNo, DeparTime, ArrivalTime, Dates, airport, number seats
 
 const Flight = mongoose.model('Flight', flightSchema)
 

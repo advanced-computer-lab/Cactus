@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { DataGrid } from '@mui/x-data-grid';
 
-export function GetFlight(){
+
+function FindFlight() {
     const [flights,SetFlights] = useState([]);
     const [columns,setColumns] = useState([]);
     useEffect(()=>{
         const fetchFlights = async () =>{
-            const response = await axios.get("/findFlight")
+            const response = await axios.get("/Flight/findFlight")
             SetFlights(response.data)
             setColumns(response.data.keys());
         };
@@ -29,5 +29,4 @@ export function GetFlight(){
     )
 }
 
-
-export default GetFlight
+export default FindFlight

@@ -1,26 +1,25 @@
-//Middlewares
+//___________Middleware___________
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 require('dotenv').config();
-//Schemas
-const Flight = require('./Schemas/Flight')
 
-//Routers
-const addFlightRoute = require('./Routes/addFlight')
-const findFlightRoute = require('./Routes/findFlight')
-const deleteFlightRoute = require('./Routes/deleteFlight')
+//___________Routers___________
+const FlightRouter = require('./Routes/Flight/Flight')
 
-//App
+//___________App___________
 const app = express()
 app.use(cors())
+
+//___________ENV___________
 const mongoURI = process.env.MONGOURI
 const PORT = process.env.PORT
 
+//___________Connection to MongoDB___________
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         app.listen(PORT, () => {
-            console.log(`listening on port https://localhost:${PORT}/`)
+            console.log(`listening on port http://localhost:${PORT}/`)
         })
         console.log("MongoDB is now connected")
 
@@ -30,11 +29,7 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello</h1>')
+    res.send('<h1>Cactus Airlines - Server Homepage</h1>')
 })
 
-app.use('/addFlight', addFlightRoute)
-
-app.use('/findFlight', findFlightRoute)
-
-app.use('/deleteFlight', deleteFlightRoute)
+app.use('/Flight',FlightRouter);
