@@ -7,7 +7,7 @@ export function GetFlight(){
     const [columns,setColumns] = useState([]);
     useEffect(()=>{
         const fetchFlights = async () =>{
-            const response = await axios.get("/findFlight")
+            const response = await axios.get("/flight/findFlight")
             SetFlights(response.data)
             setColumns(response.data.keys());
         };

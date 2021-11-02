@@ -1,16 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+//Middlewares
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+require('dotenv').config();
+//Schemas
+const Flight = require('./Schemas/Flight')
+
+//Routers
+// const addFlightRoute = require('./Routes/addFlight')
+// const findFlightRoute = require('./Routes/findFlight')
+// const deleteFlightRoute = require('./Routes/deleteFlight')
+const FlightRoute = require('./Routes/Flight')
+
+//App
+const app = express()
+app.use(cors())
+const mongoURI = process.env.MONGOURI
+const PORT = process.env.PORT
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`listening on port https://localhost:${PORT}/`)
+        })
+        console.log("MongoDB is now connected")
+
+    })
+    .catch(err => console.log(err));
 
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+app.get('/', (req, res) => {
+    res.send('<h1>Hello</h1>')
+})
 
+app.use('/flight', FlightRoute)
+
+// app.use('/addflight', addFlightRoute)
+
+// app.use('/findFlight', findFlightRoute)
+
+// app.use('/deleteFlight', deleteFlightRoute)

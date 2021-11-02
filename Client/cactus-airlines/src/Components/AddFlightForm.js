@@ -54,7 +54,7 @@ export function AddFlightForm() {
   }
    const handleClick = (e) =>{
      e.preventDefault()
-     axios.post('/addFlight',data)
+     axios.post('/flight/addFlight',data)
       .then((response)=>{
         console.log(response)
       })
