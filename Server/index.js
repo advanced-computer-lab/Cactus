@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello</h1>')
 })
 
-app.use('/addflight', addFlightRoute)
+app.use('/addFlight', addFlightRoute)
 
 app.use('/findFlight', findFlightRoute)
 

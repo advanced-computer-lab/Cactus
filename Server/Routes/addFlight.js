@@ -2,6 +2,7 @@ const express = require('express')
 const addFlightRouter = express.Router()
 const mongoose = require('mongoose')
 const Flight = require('../Schemas/Flight')
+addFlightRouter.use(express.json())
 
 
 addFlightRouter.get('/',(req,res)=>{ //TODO:
@@ -9,17 +10,18 @@ addFlightRouter.get('/',(req,res)=>{ //TODO:
 })
 
 addFlightRouter.post('/', (req, res) => {
+    console.log(req.body)
     const flight = new Flight({
-        '_id': 'check002',
-        'flightNumber': 'D20',
-        'departureTime': '6:22',
-        'arrivalTime': '10:00',
-        'departureDate': '7/25/2000',
-        'arrivalDate': '8/25/2000',
-        'airport': 'Egypt',
-        'economySeats': 80,
-        'businessSeats': 15
+        'flightNumber': req.body.flightNumber,
+        'departureTime': req.body.departureTime,
+        'arrivalTime': req.body.arrivalTime,
+        'departureDate': req.body.departureDate,
+        'arrivalDate': req.body.arrivalDate,
+        'airport': req.body.airport,
+        'economySeats': req.body.economySeats,
+        'businessSeats': req.body.businessSeats
     });
+   
     flight.save()
         .then((result) => {
             res.send(result)

@@ -1,22 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import useAxios from 'axios-hooks'
+import { DataGrid } from '@mui/x-data-grid';
 
 export function GetFlight(){
-    const [{data, loading, error, response}, refetch] = useAxios({
-        method: 'GET',
-        url: 'http://localhost:3000/findFlight',
-    });
-
-    if(loading) return <p>Loading...</p>
-    if(error) return <p>Couldn't fetch data! :(</p>
-    
-    const stringifiedData = JSON.stringify(data, null, 2);
-   
+    const [flights,SetFlights] = useState([]);
+    const [columns,setColumns] = useState([]);
+    useEffect(()=>{
+        const fetchFlights = async () =>{
+            const response = await axios.get("/findFlight")
+            SetFlights(response.data)
+            setColumns(response.data.keys());
+        };
+        fetchFlights();
+    },[])
     return (
         <div>
-            <button onClick={refetch}>Refresh</button>
-            <pre>{(stringifiedData)}</pre>
+            <pre>{JSON.stringify(flights, null, 2)}</pre>
+           {/* <DataGrid 
+            rows={flights}
+            getRowId={(row)=> row._id}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            checkboxSelection
+            disableSelectionOnClick
+           /> */}
         </div>
     )
 }

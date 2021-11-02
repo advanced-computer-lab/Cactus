@@ -1,5 +1,11 @@
 import React from "react";
 // import './../src/App.css'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+}from 'react-router-dom';
 //Components
 import AddFlights from "./Components/AddFlights";
 import GetFlight from "./Components/GetFlight";
@@ -14,16 +20,20 @@ function App() {
 
   return (
     <div>
-      <header>
-        <h1>Flight Data</h1>
-        {/* <AddFlights /> */}
-        <GetFlight />
-        <AddFlight />
-      </header>
-{/* //         <NavBar/>
-//         <LoginForm/>
-//         <AddFlightForm/>
-//         <EditFlightForm/> */}
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <h1>HomePage</h1>
+          </Route>
+          <Route path="/Flights">
+            <GetFlight />
+          </Route>
+          <Route path="/AddFlights">
+            <h1>Add Flight</h1>
+            <AddFlightForm />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
