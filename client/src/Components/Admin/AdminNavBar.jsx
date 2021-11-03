@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
 
 
@@ -14,19 +14,14 @@ function AdminNavBar() {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" component="div" align="left" sx={{ flexGrow: 1 }}>
-              LogoHere
-            </Typography>
-            <Link to="/AddFlight">
-              <Button color="inherit">Add Flight</Button>
+            <Link color="inherit" href="/AdminHome" style={{ textDecoration: 'none' }}>
+                <Typography variant="h6" component="div" align="left">
+                  Cactus Airlines
+                </Typography>
+              </Link>
+            <Link color="inherit" href="/Login" style={{ textDecoration: 'none' }}>
+              <Button color="inherit" variant="outlined" align="right">Login</Button>
             </Link>
-            <Link to="/EditFlight">
-              <Button color="inherit">Edit Flight</Button>
-            </Link>
-            <Link to="/FindFlight">
-              <Button color="inherit">ind Flight</Button>
-            </Link>
-            <Button color="inherit">Login</Button>
           </Toolbar>
         </AppBar>
       </Box>

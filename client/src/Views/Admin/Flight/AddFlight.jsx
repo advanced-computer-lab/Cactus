@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Container } from '@mui/material';
+import { Container, Divider } from '@mui/material';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axios from 'axios'
+import AdminNavBar from '../../../Components/Admin/AdminNavBar'
+import Alert from '@mui/material/Alert';
+import { Snackbar } from '@mui/material';
 
 function AddFlight() {
     const [flightNum, setFlightNum] = useState();
@@ -11,9 +14,11 @@ function AddFlight() {
     const [arrivalDate, setArrivalDate] = useState();
     const [departureTime, setDepartureTime] = useState();
     const [departureDate, setDepartureDate] = useState();
-    const [airport, setAirport] = useState();
+    const [desAirport, setdesAirport] = useState();
+    const [depAirport, setdepAirport] = useState();
     const [economy, setEconomy] = useState();
     const [business, setBusiness] = useState();
+    const [open, setOpen] = React.useState(false);
 
     const flightNumChange = (e) => {
         setFlightNum(e.target.value)
@@ -30,8 +35,11 @@ function AddFlight() {
     const DepartureDateChange = (e) => {
         setDepartureDate(e.target.value)
     }
-    const AirportChange = (e) => {
-        setAirport(e.target.value)
+    const DepAirportChange = (e) => {
+        setdepAirport(e.target.value)
+    }
+    const DesAirportChange = (e) => {
+        setdesAirport(e.target.value)
     }
     const EconomyChange = (e) => {
         setEconomy(e.target.value)
@@ -45,14 +53,17 @@ function AddFlight() {
         arrivalTime: arrivalTime,
         departureDate: departureDate,
         arrivalDate: arrivalDate,
-        airport: airport,
+        destinationAirport: desAirport,
+        departureAirport: depAirport,
         economySeats: economy,
         businessSeats: business
     }
     const handleClick = (e) => {
+        
         e.preventDefault()
         axios.post('/Flight/addFlight', data)
             .then((response) => {
+                setOpen(true);
                 console.log(response)
             })
             .catch((err) => {
@@ -60,14 +71,23 @@ function AddFlight() {
             })
         console.log(data)
     }
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+      };
     return (
         <div>
             <Container>
+                <AdminNavBar />
+                <br/>
                 <h1>Add Flight Info</h1>
                 <Box
                     component="form"
                     sx={{
-                        '& .MuiTextField-root': { m: 1, width: '50%' },
+                        '& .MuiTextField-root': { m: 1, width: '50ch' },
                     }}
                     noValidate
                     autoComplete="off"
@@ -76,12 +96,11 @@ function AddFlight() {
                         <TextField
                             id="outlined-multiline-flexible"
                             label="Flight Number"
-                            //Can Added Pre added value with Value Attribute
-                            fullWidth
                             placeholder="Flight Number"
                             required
                             onChange={flightNumChange}
                         />
+                        <br />
                         <TextField
                             id="outlined-textarea"
                             label="Departure Time"
@@ -129,14 +148,28 @@ function AddFlight() {
                         />
                         <TextField
                             id="outlined-textarea"
-                            label="Airport"
+                            label="Departure Airport"
                             fullWidth
-                            placeholder="Airport"
-                            onChange={AirportChange}
+                            placeholder="Departure Airport"
+                            onChange={DepAirportChange}
+                        />
+                        <TextField
+                            id="outlined-textarea"
+                            label="Destination Airport"
+                            fullWidth
+                            placeholder="Destination Airport"
+                            onChange={DesAirportChange}
                         />
                     </div>
-                    <Button variant="contained" color="primary" onClick={handleClick}>Add Flight</Button>
                 </Box>
+                <Divider />
+                <br/>
+                <Button variant="contained" color="secondary" onClick={handleClick} size="large">Add Flight</Button>
+                <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+                    Flight Added Successfully!
+                    </Alert>
+                </Snackbar>
             </Container>
         </div>
     )

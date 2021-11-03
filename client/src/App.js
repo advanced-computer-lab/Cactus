@@ -12,6 +12,7 @@ import HomePage from './Views/HomePage'
 import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
+import Login from './Components/Main/Login/Login'
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
             </Route>
             <Route path="/findFlight">
               <FindFlight />
+            </Route>
+            <Route path="/login">
+              <Login />
             </Route>
           </Switch>
         </Router>
