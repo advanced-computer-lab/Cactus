@@ -1,41 +1,96 @@
-import React, {useState} from 'react';
-import { Container, Divider } from '@mui/material';
+import React, { useState } from 'react';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import AdminNavBar from '../../../Components/Admin/AdminNavBar'
 import Alert from '@mui/material/Alert';
-import { Snackbar } from '@mui/material';
+import { Snackbar, Typography, Container, Divider } from '@mui/material';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import HomeIcon from '@mui/icons-material/Home';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
 
 function EditFlight() {
     const [open, setOpen] = React.useState(false);
     const handleClick = (e) => {
         e.preventDefault()
         setOpen(true);
-        
+
     }
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
-    
+
         setOpen(false);
-      };
+    };
     return (
         <div>
+            <AdminNavBar />
             <Container>
-                <AdminNavBar />
+
                 <br />
-                <h1>Edit Flight Info</h1>
                 <Box
-                    component="form"
                     sx={{
-                        '& .MuiTextField-root': { m: 1, width: '50ch' },
+                        my: 8,
+                        mx: 4,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                     }}
-                    noValidate
-                    autoComplete="off"
                 >
-                    <div>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link
+                            underline="hover"
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                            color="inherit"
+                            href="/adminHome"
+                        >
+                            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                            Home
+                        </Link>
+                        <Link
+                            underline="hover"
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                            color="inherit"
+                            href="/AddFlight"
+                        >
+                            <AddCircleIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                            Add Flight
+                        </Link>
+                        <Link
+                            underline="hover"
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                            color="inherit"
+                            href="/FindFlight"
+                        >
+                            <SearchIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                            View All Flights
+                        </Link>
+                        <Typography
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                            color="secondary"
+                        >
+                            <EditIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                            Edit Flight
+                        </Typography>
+                    </Breadcrumbs>
+                    <br/>
+                    <Typography component="h1" variant="h5">
+                        Edit Flight
+                    </Typography>
+
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { m: 1, width: '50ch' },
+                        }}
+                        noValidate
+                        autoComplete="off"
+                    >
+
                         <TextField
                             id="outlined-multiline-flexible"
                             label="Flight Number"
@@ -52,6 +107,9 @@ function EditFlight() {
                             placeholder="Departure Time"
                             type="time"
                             value=""
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -59,6 +117,9 @@ function EditFlight() {
                             fullWidth
                             type="date"
                             value=""
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -67,6 +128,9 @@ function EditFlight() {
                             placeholder="Arrival Time"
                             type="time"
                             value=""
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -74,6 +138,9 @@ function EditFlight() {
                             fullWidth
                             type="date"
                             value=""
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -81,6 +148,10 @@ function EditFlight() {
                             fullWidth
                             placeholder="Number Of Economy Seats"
                             value=""
+                            type="number"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -88,6 +159,10 @@ function EditFlight() {
                             fullWidth
                             placeholder="Number Of Business Seats"
                             value=""
+                            type="number"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                         />
                         <TextField
                             id="outlined-textarea"
@@ -101,18 +176,18 @@ function EditFlight() {
                             fullWidth
                             placeholder="Destination Airport"
                         />
-                    </div>
+                    </Box>
+                    <Divider />
+                    <br />
+                    <Button variant="contained" color="info" size="large" onClick={handleClick}>Save Changes</Button>
                 </Box>
-                <Divider/>
-                <br/>
-                <Button variant="contained" color="info" size="large" onClick={handleClick}>Save Changes</Button>
                 <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
-                    Flight Has Been Edited Successfully!
+                        Flight Has Been Edited Successfully!
                     </Alert>
                 </Snackbar>
             </Container>
-        </div>
+        </div >
     )
 }
 

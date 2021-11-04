@@ -2,7 +2,9 @@
 import './App.css';
 
 //___________Middleware___________
-import {BrowserRouter as Router, Switch, Route, Link}from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from './Context/AuthContext';
 
 
 //___________Views___________
@@ -14,9 +16,34 @@ import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
 import Login from './Components/Main/Login/Login'
 
+//___________Theme__________
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#804000'
+    },
+    secondary: {
+      main: '#004080'
+    },
+    error: {
+      main: '#800000'
+    },
+    info: {
+      main: '#b8d52d'
+    },
+    success: {
+      main: '#008040'
+    }
+  },
+});
+
 function App() {
+  const { user } = useContext(AuthContext)
   return (
     <div className="App">
+      <ThemeProvider theme={theme}>
         <Router>
           <Switch>
             <Route exact path="/">
@@ -42,6 +69,7 @@ function App() {
             </Route>
           </Switch>
         </Router>
+      </ThemeProvider>
     </div>
   );
 }

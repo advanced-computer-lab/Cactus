@@ -12,6 +12,9 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { loginCall } from './LoginApiCall';
+import { AuthContext } from '../../../Context/AuthContext';
+import { CircularProgress } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -29,15 +32,21 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
+  const [username, setUsername] = React.useState();
+  const [userPass, setPassword] = React.useState();
+
+  const usernameChange = (e) => {
+    setUsername(e.target.value)
+  }
+  const passwordChange = (e) => {
+    setPassword(e.target.value)
+  }
+  const { user, isFetching, error, dispatch } = React.useContext(AuthContext)
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    loginCall({ username: username, password: userPass }, dispatch)
+  }
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -78,10 +87,10 @@ export default function SignInSide() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="Username"
+                name="username"
+                onChange={usernameChange}
                 autoFocus
               />
               <TextField
@@ -92,6 +101,7 @@ export default function SignInSide() {
                 label="Password"
                 type="password"
                 id="password"
+                onChange={passwordChange}
                 autoComplete="current-password"
               />
               <FormControlLabel
@@ -104,7 +114,7 @@ export default function SignInSide() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
+               {isFetching ? <CircularProgress color="inherit"/> : "Login" }
               </Button>
               <Grid container>
                 <Grid item xs>

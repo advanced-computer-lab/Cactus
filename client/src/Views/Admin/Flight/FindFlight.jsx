@@ -62,7 +62,7 @@ function FindFlight() {
 
           console.log(thisRow.id);
         };
-        return <Button color="primary" variant="contained" onClick={onClick}>Edit</Button>;
+        return <Button color="secondary" variant="contained" onClick={onClick}>Edit</Button>;
       }
     }, {
       field: 'Delete', headerName: 'Delete', sortable: false,

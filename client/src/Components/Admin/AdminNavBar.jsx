@@ -8,13 +8,14 @@ import Link from '@mui/material/Link';
 
 
 
+
 function AdminNavBar() {
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-            <Link color="inherit" href="/AdminHome" style={{ textDecoration: 'none' }}>
+            <Link color="inherit" href="/AdminHome" style={{ textDecoration: 'none', flexGrow: 1 }}>
                 <Typography variant="h6" component="div" align="left">
                   Cactus Airlines
                 </Typography>
