@@ -17,13 +17,20 @@ FlightRouter.post('/addFlight', (req, res) => {
         'arrivalTime': req.body.arrivalTime,
         'departureDate': req.body.departureDate,
         'arrivalDate': req.body.arrivalDate,
-        'airport': req.body.airport,
+        'destinationAirport': req.body.destinationAirport,
+        'departureAirport': req.body.departureAirport,
         'economySeats': req.body.economySeats,
         'businessSeats': req.body.businessSeats
     });
     flight.save()
         .then((result) => {
-            res.send(result)
+            result.id = result._id 
+            result.save().then((res2) =>{
+                res.send(res2)    
+            })
+            .catch((err) => {
+                console.log(err.message)
+            })
         })
         .catch((err) => {
             console.log(err)
@@ -55,9 +62,13 @@ FlightRouter.post('/findFlight',(req,res) =>{
         field = "arrivalDate"
         f1[field]=req.body.arrivalDate
     }
-    if(req.body.airport){
+    if(req.body.destinationAirport){
         field = "airport"
-        f1[field]=req.body.airport
+        f1[field]=req.body.destinationAirport
+    }
+    if(req.body.departureAirport){
+        field = "airport"
+        f1[field]=req.body.departureAirport
     }
 
     Flight.find(f1)
@@ -108,11 +119,15 @@ FlightRouter.put('/updateFlight/:id',(req,res) =>{
     if(req.body.arrivalDate){ 
         flight.arrivalDate= req.body.arrivalDate
     }
-    if(req.body.airport){
-        flight.airport= req.body.airport
+    if(req.body.destinationAirport){
+        flight.destinationAirport= req.body.destinationAirport
     }
-        flight.save().then(() => res.json({success: true}))})
-    .catch(er => res.status(404).json({success: false}))
+    if(req.body.departureAirport){
+        flight.departureAirport= req.body.departureAirport
+    }
+    flight.save()
+     .then(() => res.json({success: true}))})
+     .catch(er => res.status(404).json({success: false}))
 })
 
 
