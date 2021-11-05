@@ -9,6 +9,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import { useHistory } from 'react-router';
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -17,6 +19,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function FindFlight() {
   const [flights, SetFlights] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const [id, setId] = useState([])
+  const history = useHistory()
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -25,13 +29,22 @@ function FindFlight() {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleDelete = () => {
+
+    axios.delete('Flight/deleteFlight/'+id)
+    .then(()=> { 
+      })
+    .catch((err) => console.log(err))
+    setOpen(false);
+  };
   useEffect(()=>{
     const fetchFlights = async () =>{
         const response = await axios.get("/Flight/findFlight")
+        if(response.data !== [])
         SetFlights(response.data)
     };
     fetchFlights();
-  },[])
+  },[flights])
 
   const columns = [
     { field: 'id', headerName: 'ID' },
@@ -60,6 +73,12 @@ function FindFlight() {
               (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
             );
 
+            const pathto = "/EditFlight:/"+thisRow;
+            history.push({
+              pathname: "/EditFlight",
+              search: '?query=abc',
+              state: {detail:  thisRow}
+            })
           console.log(thisRow.id);
         };
         return <Button color="secondary" variant="contained" onClick={onClick}>Edit</Button>;
@@ -81,7 +100,7 @@ function FindFlight() {
             .forEach(
               (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
             );
-
+            setId(thisRow.id);  
           console.log(thisRow.id);
         };
         return <Button color="error" variant="contained" onClick={onClick}>Delete</Button>;
@@ -112,6 +131,7 @@ function FindFlight() {
           TransitionComponent={Transition}
           keepMounted
           onClose={handleClose}
+          onClose={handleDelete}
           aria-describedby="alert-dialog-slide-description"
         >
           <DialogTitle>{"Delete Flight?"}</DialogTitle>
@@ -121,8 +141,8 @@ function FindFlight() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancle</Button>
-            <Button onClick={handleClose} color="error">Delete</Button>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleDelete} color="error">Delete</Button>
           </DialogActions>
         </Dialog>
       </div>

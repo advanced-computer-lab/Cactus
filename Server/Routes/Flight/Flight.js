@@ -24,7 +24,13 @@ FlightRouter.post('/addFlight', (req, res) => {
     });
     flight.save()
         .then((result) => {
-            res.send(result)
+            result.id = result._id 
+            result.save().then((res2) =>{
+                res.send(res2)    
+            })
+            .catch((err) => {
+                console.log(err.message)
+            })
         })
         .catch((err) => {
             console.log(err)
