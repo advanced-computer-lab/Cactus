@@ -34,7 +34,8 @@ export default function FlightTable() {
             <TableCell>Departure Time</TableCell>
             <TableCell>Economy Seats</TableCell>
             <TableCell>Business Seats</TableCell>
-            <TableCell>Airport</TableCell>
+            <TableCell>From</TableCell>
+            <TableCell>To</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -47,7 +48,8 @@ export default function FlightTable() {
               <TableCell>{flight.departureTime}</TableCell>
               <TableCell>{flight.economySeats}</TableCell>
               <TableCell>{flight.businessSeats}</TableCell>
-              <TableCell>{flight.airport}</TableCell>
+              <TableCell>{flight.departureAirport}</TableCell>
+              <TableCell>{flight.destinationAirport}</TableCell>
             </TableRow>
           ))}
         </TableBody>

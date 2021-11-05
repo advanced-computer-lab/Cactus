@@ -13,12 +13,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Grid, Paper } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
-import {useLocation} from "react-router-dom"
+import {useLocation} from "react-router-dom";
+import axios from 'axios';
+import { useHistory } from 'react-router';
 
 function EditFlight() {
+    const history = useHistory()
     const location = useLocation()
     const flightData = location.state.detail
-    console.log(flightData.id)
+    console.log(flightData)
     const [arrivalTime, setArrivalTime] = useState(flightData.arrivalTime);
     const [arrivalDate, setArrivalDate] = useState(flightData.arrivalDate);
     const [departureTime, setDepartureTime] = useState(flightData.departureTime);
@@ -55,6 +58,7 @@ function EditFlight() {
         setBusiness(e.target.value)
     }
     const data = {
+        flightNumber: flightData.flightNumber,
         departureTime: departureTime,
         arrivalTime: arrivalTime,
         departureDate: departureDate,
@@ -67,10 +71,12 @@ function EditFlight() {
     const handleClick = (e) => {
         e.preventDefault()
         setLoading(true);
+        console.log(data)
         axios.put('/Flight/updateFlight/'+flightData.id, data)
             .then((response) => {
                 setOpen(true);
                 setLoading(false);
+                history.goBack();
                 console.log(response)
             })
             .catch((err) => {
@@ -176,7 +182,7 @@ function EditFlight() {
                                 fullWidth
                                 placeholder="Departure Time"
                                 type="time"
-                                value= {flightData.departureTime}
+                                defaultValue= {flightData.departureTime}
                                 onChange = {DepartureTimeChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -189,7 +195,7 @@ function EditFlight() {
                                 label="Departure Date"
                                 fullWidth
                                 type="date"
-                                value={flightData.departureDate}
+                                defaultValue={flightData.departureDate}
                                 onChange = {DepartureDateChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -205,7 +211,7 @@ function EditFlight() {
                                 fullWidth
                                 placeholder="Arrival Time"
                                 type="time"
-                                value={flightData.arrivalTime}
+                                defaultValue={flightData.arrivalTime}
                                 onChange= {ArrivalTimeChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -218,7 +224,7 @@ function EditFlight() {
                                 label="Arrival Date"
                                 fullWidth
                                 type="date"
-                                value={flightData.arrivalDate}
+                                defaultValue={flightData.arrivalDate}
                                 onChange= {ArrivalDateChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -233,7 +239,7 @@ function EditFlight() {
                                 label="Number Of Economy Seats"
                                 fullWidth
                                 placeholder="Number Of Economy Seats"
-                                value={flightData.economySeats}
+                                defaultValue={flightData.economySeats}
                                 onChange={EconomyChange}
                                 type="number"
                                 InputLabelProps={{
@@ -247,7 +253,7 @@ function EditFlight() {
                                 label="Number Of Business Seats"
                                 fullWidth
                                 placeholder="Number Of Business Seats"
-                                value={flightData.businessSeats}
+                                defaultValue={flightData.businessSeats}
                                 onChange={BusinessChange}
                                 type="number"
                                 InputLabelProps={{
@@ -263,7 +269,7 @@ function EditFlight() {
                                 label="Departure Airport"
                                 fullWidth
                                 placeholder="Departure Airport"
-                                value = {flightData.departureAirport}
+                                defaultValue = {flightData.departureAirport}
                                 onChange = {DepAirportChange}
                             />
                         </Grid>
@@ -273,7 +279,7 @@ function EditFlight() {
                                 label="Destination Airport"
                                 fullWidth
                                 placeholder="Destination Airport"
-                                value = {flightData.destinationAirport}
+                                defaultValue = {flightData.destinationAirport}
                                 onChange= {DesAirportChange}
                             />
 

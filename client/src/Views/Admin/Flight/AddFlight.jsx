@@ -15,8 +15,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { Grid } from '@mui/material';
+import { useHistory } from 'react-router';
 
 function AddFlight() {
+    const history = useHistory();
     const [flightNum, setFlightNum] = useState();
     const [arrivalTime, setArrivalTime] = useState();
     const [arrivalDate, setArrivalDate] = useState();
@@ -74,6 +76,7 @@ function AddFlight() {
         axios.post('/Flight/addFlight', data)
             .then((response) => {
                 setOpen(true);
+                history.goBack();
                 setLoading(false)
                 console.log(response)
             })

@@ -55,7 +55,8 @@ function FindFlight() {
     { field: 'arrivalDate', headerName: 'Arrival Date', width: 100 },
     { field: 'economySeats', headerName: 'Economy Seats #', width: 140 },
     { field: 'businessSeats', headerName: 'Business Seats #', width: 140 },
-    { field: 'airport', headerName: 'Airport', width: 70 },
+    { field: 'departureAirport', headerName: 'From', width: 70 },
+    { field: 'destinationAirport', headerName: 'To', width: 70 },
     {
       field: 'Edit', headerName: 'Edit', sortable: false,
       renderCell: (params) => {
@@ -107,7 +108,9 @@ function FindFlight() {
       }
     },
   ];
-  // var rowsvalue = flights;
+  // flights.departureDate = moment(flights.departureDate).format('MM DD YYYY')
+  // flights.arrivalDate = moment(flights.arrivalDate).format('MM DD YYYY')
+  var rowsvalue = flights;
 
   function preventDefault(event) {
     event.preventDefault();
@@ -117,7 +120,7 @@ function FindFlight() {
     <div>
       <AdminNavBar />
       <DataGrid
-        rows={flights}
+        rows={rowsvalue}
         columns={columns}
         components={{
           Toolbar: GridToolbar,
