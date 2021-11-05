@@ -14,7 +14,7 @@ import {useLocation} from "react-router-dom"
 function EditFlight() {
     const location = useLocation()
     const flightData = location.state.detail
-    console.log(flightData.id)
+    console.log(flightData)
     const [arrivalTime, setArrivalTime] = useState(flightData.arrivalTime);
     const [arrivalDate, setArrivalDate] = useState(flightData.arrivalDate);
     const [departureTime, setDepartureTime] = useState(flightData.departureTime);
@@ -28,27 +28,43 @@ function EditFlight() {
 
     const ArrivalTimeChange = (e) => {
         setArrivalTime(e.target.value)
+        if(e.target.value !== "")
+        setArrivalTime(flightData.arrivalTime)
     }
     const DepartureTimeChange = (e) => {
         setDepartureTime(e.target.value)
+        if(e.target.value !== "")
+        setDepartureTime(flightData.departureTime)
     }
     const ArrivalDateChange = (e) => {
         setArrivalDate(e.target.value)
+        if(e.target.value !== "")
+        setArrivalDate(flightData.arrivalDate)
     }
     const DepartureDateChange = (e) => {
         setDepartureDate(e.target.value)
+        if(e.target.value !== "")
+        setDepartureDate(flightData.departureDate)
     }
     const DepAirportChange = (e) => {
         setdepAirport(e.target.value)
+        if(e.target.value !== "")
+        setdepAirport(flightData.departureAirport)
     }
     const DesAirportChange = (e) => {
         setdesAirport(e.target.value)
+        if(e.target.value !== "")
+        setdesAirport(flightData.destinationAirport)
     }
     const EconomyChange = (e) => {
         setEconomy(e.target.value)
+        if(e.target.value !== "")
+        setEconomy(flightData.economySeats)
     }
     const BusinessChange = (e) => {
         setBusiness(e.target.value)
+        if(e.target.value !== "")
+        setBusiness(flightData.businessSeats)
     }
     
 
@@ -112,7 +128,7 @@ function EditFlight() {
                             fullWidth
                             placeholder="Departure Time"
                             type="time"
-                            value= {flightData.departureTime}
+                            defaultValue= {flightData.departureTime}
                             onChange = {DepartureTimeChange}
                         />
                         <TextField
@@ -120,7 +136,7 @@ function EditFlight() {
                             label="Departure Date"
                             fullWidth
                             type="date"
-                            value={flightData.departureDate}
+                            defaultValue={flightData.departureDate}
                             onChange = {DepartureDateChange}
                         />
                         <TextField
@@ -129,7 +145,7 @@ function EditFlight() {
                             fullWidth
                             placeholder="Arrival Time"
                             type="time"
-                            value={flightData.arrivalTime}
+                            defaultValue={flightData.arrivalTime}
                             onChange= {ArrivalTimeChange}
                         />
                         <TextField
@@ -137,7 +153,7 @@ function EditFlight() {
                             label="Arrival Date"
                             fullWidth
                             type="date"
-                            value={flightData.arrivalDate}
+                            defaultValue={flightData.arrivalDate}
                             onChange= {ArrivalDateChange}
                         />
                         <TextField
@@ -145,7 +161,7 @@ function EditFlight() {
                             label="Number Of Economy Seats"
                             fullWidth
                             placeholder="Number Of Economy Seats"
-                            value={flightData.economySeats}
+                            defaultValue={flightData.economySeats}
                             onChange={EconomyChange}
                         />
                         <TextField
@@ -153,7 +169,7 @@ function EditFlight() {
                             label="Number Of Business Seats"
                             fullWidth
                             placeholder="Number Of Business Seats"
-                            value={flightData.businessSeats}
+                            defaultValue={flightData.businessSeats}
                             onChange={BusinessChange}
                         />
                         <TextField
@@ -169,7 +185,7 @@ function EditFlight() {
                             label="Destination Airport"
                             fullWidth
                             placeholder="Destination Airport"
-                            value = {flightData.destinationAirport}
+                            defaultValue = {flightData.destinationAirport}
                             onChange= {DesAirportChange}
                         />
                     </div>

@@ -55,7 +55,8 @@ const history = useHistory()
     { field: 'arrivalDate', headerName: 'Arrival Date', width: 100 },
     { field: 'economySeats', headerName: 'Economy Seats #', width: 140 },
     { field: 'businessSeats', headerName: 'Business Seats #', width: 140 },
-    { field: 'destinationAirport', headerName: 'Airport', width: 70 },
+    { field: 'destinationAirport', headerName: 'Destination', width: 70 },
+    {field: 'departureAirport', headerName: 'Departure', width: 70},
     {
       field: 'Edit', headerName: 'Edit', sortable: false,
       renderCell: (params) => {
