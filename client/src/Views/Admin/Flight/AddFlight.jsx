@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Container, Divider, Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios'
 import AdminNavBar from '../../../Components/Admin/AdminNavBar'
 import Alert from '@mui/material/Alert';
 import { Snackbar } from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
+import { Paper } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
+import { Grid } from '@mui/material';
 
 function AddFlight() {
     const [flightNum, setFlightNum] = useState();
@@ -24,6 +27,7 @@ function AddFlight() {
     const [economy, setEconomy] = useState();
     const [business, setBusiness] = useState();
     const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false)
 
     const flightNumChange = (e) => {
         setFlightNum(e.target.value)
@@ -66,9 +70,11 @@ function AddFlight() {
     const handleClick = (e) => {
 
         e.preventDefault()
+        setLoading(true)
         axios.post('/Flight/addFlight', data)
             .then((response) => {
                 setOpen(true);
+                setLoading(false)
                 console.log(response)
             })
             .catch((err) => {
@@ -87,56 +93,64 @@ function AddFlight() {
         <div>
 
             <AdminNavBar />
-            <Container>
-                <Box
-                    sx={{
-                        my: 8,
-                        mx: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link
-                            underline="hover"
-                            sx={{ display: 'flex', alignItems: 'center' }}
-                            color="inherit"
-                            href="/adminHome"
-                        >
-                            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-                            Home
-                        </Link>
-                        <Link
-                            underline="hover"
-                            sx={{ display: 'flex', alignItems: 'center' }}
-                            color="inherit"
-                            href="/FindFlight"
-                        >
-                            <SearchIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-                            View All Flights
-                        </Link>
-                        <Typography
-                            sx={{ display: 'flex', alignItems: 'center' }}
-                            color="secondary"
-                        >
-                            <AddCircleIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-                            Add Flight
-                        </Typography>
-                    </Breadcrumbs>
+            <Box
+                sx={{
+                    my: 8,
+                    mx: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <br />
+                <Paper
+                    elevation={3}
+                    variant="outlined"
+                    square
+                    style={{ borderRadius: '2rem' }}>
                     <br />
-                    <Typography component="h1" variant="h5">
-                        Add Flight
-                    </Typography>
                     <Box
-                        component="form"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '50ch' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'start',
+                            marginLeft: '25px',
+                            marginBottom: '10px'
                         }}
-                        noValidate
-                        autoComplete="off"
                     >
-                        <div>
+                        <Breadcrumbs aria-label="breadcrumb">
+                            <Link
+                                underline="hover"
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                                color="inherit"
+                                href="/adminHome"
+                            >
+                                <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                                Home
+                            </Link>
+                            <Link
+                                underline="hover"
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                                color="inherit"
+                                href="/FindFlight"
+                            >
+                                <SearchIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                                View All Flights
+                            </Link>
+                            <Typography
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                                color="secondary"
+                            >
+                                <AddCircleIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                                Add Flight
+                            </Typography>
+                        </Breadcrumbs>
+                    </Box>
+                    <Divider variant="middle" />
+                    <br />
+                    <Grid container spacing={2}>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-multiline-flexible"
                                 label="Flight Number"
@@ -145,8 +159,12 @@ function AddFlight() {
                                 onChange={flightNumChange}
                                 fullWidth
                             />
-                        </div>
-                        <div>
+                        </Grid>
+                    </Grid>
+                    <br />
+                    <Grid container spacing={2}>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Departure Time"
@@ -159,6 +177,8 @@ function AddFlight() {
                                 }}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Departure Date"
@@ -170,6 +190,10 @@ function AddFlight() {
                                 }}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Arrival Time"
@@ -182,7 +206,8 @@ function AddFlight() {
                                 }}
                                 required
                             />
-
+                        </Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Arrival Date"
@@ -194,6 +219,10 @@ function AddFlight() {
                                 }}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Number Of Economy Seats"
@@ -206,6 +235,8 @@ function AddFlight() {
                                 }}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Number Of Business Seats"
@@ -218,6 +249,10 @@ function AddFlight() {
                                 }}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Departure Airport"
@@ -226,6 +261,9 @@ function AddFlight() {
                                 onChange={DepAirportChange}
                                 required
                             />
+                        </Grid>
+                        <Grid item xs={4}>
+
                             <TextField
                                 id="outlined-textarea"
                                 label="Destination Airport"
@@ -234,19 +272,34 @@ function AddFlight() {
                                 onChange={DesAirportChange}
                                 required
                             />
-                        </div>
-                    </Box>
-                    <Divider />
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={6}></Grid>
+                        <Grid item xs={4}>
+                            <LoadingButton
+                                color="secondary"
+                                onClick={handleClick}
+                                loading={loading}
+                                loadingPosition="start"
+                                startIcon={<SaveIcon />}
+                                variant="contained"
+                                style={{ maxHeight: 'inherit' }}
+                                fullWidth
+                            >
+                                Save
+                            </LoadingButton>
+                        </Grid>
+                    </Grid>
                     <br />
-                    <Button variant="contained" color="secondary" onClick={handleClick} size="large">Add Flight</Button>
-                </Box>
-                <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                    <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-                        Flight Added Successfully!
-                    </Alert>
-                </Snackbar>
-            </Container>
-        </div>
+                </Paper>
+            </Box>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+                    Flight Added Successfully!
+                </Alert>
+            </Snackbar>
+
+        </div >
     )
 }
 

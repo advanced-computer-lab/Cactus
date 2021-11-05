@@ -9,12 +9,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 
-// Generate Order Data
-
-
-// function preventDefault(event) {
-//   event.preventDefault();
-// }
 
 export default function FlightTable() {
   const [flights,SetFlights] = useState([]);

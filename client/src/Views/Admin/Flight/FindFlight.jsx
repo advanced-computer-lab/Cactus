@@ -25,13 +25,13 @@ function FindFlight() {
   const handleClose = () => {
     setOpen(false);
   };
-  useEffect(() => {
-    const fetchFlights = async () => {
-      const response = await axios.get("/Flight/findFlight")
-      SetFlights(response.data)
+  useEffect(()=>{
+    const fetchFlights = async () =>{
+        const response = await axios.get("/Flight/findFlight")
+        SetFlights(response.data)
     };
     fetchFlights();
-  }, [flights])
+  },[])
 
   const columns = [
     { field: 'id', headerName: 'ID' },
@@ -88,7 +88,7 @@ function FindFlight() {
       }
     },
   ];
-  const rowsvalue = flights;
+  // var rowsvalue = flights;
 
   function preventDefault(event) {
     event.preventDefault();
@@ -98,7 +98,7 @@ function FindFlight() {
     <div>
       <AdminNavBar />
       <DataGrid
-        rows={rowsvalue}
+        rows={flights}
         columns={columns}
         components={{
           Toolbar: GridToolbar,

@@ -9,16 +9,11 @@ const User = require('../Schemas/Users')
 
 //Login
 AuthRouter.post("/Login",async (req,res)=>{
-    var user =new User();
-    if(req.body.flightNumber){
-        var field = "username"
-        user[field]=req.body.username
+    var user = {
+        "username": req.body.username,
+        "password": req.body.password
     }
-    if(req.body.departureTime){
-        field = "password"
-        user[field]=req.body.password
-    }
-    User.find(user)
+    User.findOne(user).exec()
         .then((result)=>{
         res.send(result)
         console.log(result)
@@ -26,7 +21,16 @@ AuthRouter.post("/Login",async (req,res)=>{
         .catch((err)=>{
         console.log(err)
         })
-
 })
+AuthRouter.get('/users',(req,res)=>{
+    User.find()
+        .then((result)=>{
+            res.send(result)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+})
+
 
 module.exports = AuthRouter

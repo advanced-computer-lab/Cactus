@@ -3,8 +3,6 @@ import './App.css';
 
 //___________Middleware___________
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
-import { useContext } from 'react';
-import { AuthContext } from './Context/AuthContext';
 
 
 //___________Views___________
@@ -40,7 +38,6 @@ const theme = createTheme({
 });
 
 function App() {
-  const { user } = useContext(AuthContext)
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
