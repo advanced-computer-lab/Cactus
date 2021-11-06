@@ -73,8 +73,6 @@ function FindFlight() {
             .forEach(
               (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
             );
-
-            const pathto = "/EditFlight:/"+thisRow;
             history.push({
               pathname: "/EditFlight",
               search: '?query=abc',
@@ -112,9 +110,6 @@ function FindFlight() {
   // flights.arrivalDate = moment(flights.arrivalDate).format('MM DD YYYY')
   var rowsvalue = flights;
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
 
   return (
     <div>
@@ -133,7 +128,6 @@ function FindFlight() {
           open={open}
           TransitionComponent={Transition}
           keepMounted
-          onClose={handleClose}
           onClose={handleDelete}
           aria-describedby="alert-dialog-slide-description"
         >

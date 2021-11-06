@@ -19,12 +19,12 @@ export default function FlightTable() {
             SetFlights(response.data)
         };
         fetchFlights();
-    },[])
+    },[flights])
 
   return (
     <React.Fragment>
       <Title>Available Flights</Title>
-      <Table size="small">
+      <Table size="small" >
         <TableHead>
           <TableRow>
             <TableCell>Flight #</TableCell>

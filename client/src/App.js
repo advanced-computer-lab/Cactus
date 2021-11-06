@@ -2,13 +2,13 @@
 import './App.css';
 
 //___________Middleware___________
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 
 //___________Views___________
 import AdminHome from './Views/Admin/AdminHome'
 import UserHome from './Views/User/UserHome'
-import HomePage from './Views/HomePage'
+// import HomePage from './Views/HomePage'
 import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
@@ -44,7 +44,8 @@ function App() {
         <Router>
           <Switch>
             <Route exact path="/">
-              <HomePage />
+              <Login />
+              {/* <HomePage /> */}
             </Route>
             <Route path="/homepage">
               <UserHome />

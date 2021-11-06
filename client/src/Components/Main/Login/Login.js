@@ -59,16 +59,18 @@ export default function SignInSide() {
     setFetching(true)
     axios.post('/Authentication/Login', user)
       .then((res) => {
-        if(res.data.length == 0){
+        if(res.data.username === undefined || res.data.password === undefined){
           setFetching(false)
           setOpen(true)
         }
-        if (res.data.isAdmin) {
-          setFetching(false)
-          history.push("/adminHome")
-        }
-        else{
-          history.push("/homepage")
+        else
+        {  if (res.data.isAdmin) {
+            setFetching(false)
+            history.push("/adminHome")
+          }
+          else{
+            history.push("/homepage")
+          }
         }
       })
       .catch((err) => {

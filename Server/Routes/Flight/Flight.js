@@ -39,32 +39,35 @@ FlightRouter.post('/addFlight', (req, res) => {
 
 // ________Find All Flights and Filter________
 FlightRouter.post('/findFlight',(req,res) =>{
-    var f1=new Flight()
+    var f1={}
 
 
-    if(req.body.flightNumber){
-        var field = "flightNumber"
-        f1[field]=req.body.flightNumber
+    if(req.body.flightNumber){ 
+        f1.flightNumber=req.body.flightNumber
     }
-    if(req.body.departureTime){
-        field = "departureTime"
-        f1[field]=req.body.departureTime
+    if(req.body.departureTime){ 
+        f1.departureTime=req.body.departureTime
     }
     if(req.body.arrivalTime){
-        field = "arrivalTime"
-        f1[field]=req.body.arrivalTime
+        f1.arrivalTime = req.body.arrivalTime
     }
     if(req.body.departureDate){
-        field = "departureDate"
-        f1[field]=req.body.departureDate
+        f1.departureDate = req.body.departureDate
     }
     if(req.body.arrivalDate){
-        field = "arrivalDate"
-        f1[field]=req.body.arrivalDate
+        f1.arrivalDate=req.body.arrivalDate
     }
-    if(req.body.airport){
-        field = "airport"
-        f1[field]=req.body.airport
+    if(req.body.economySeats){
+        f1.economySeats=req.body.economySeats
+    }
+    if(req.body.businessSeats){
+        f1.businessSeats=req.body.businessSeats
+    }
+    if(req.body.departureAirport){
+        f1.departureAirport=req.body.departureAirport
+    }
+    if(req.body.destinationAirport){
+        f1.destinationAirport=req.body.destinationAirport
     }
 
     Flight.find(f1)
@@ -99,28 +102,16 @@ FlightRouter.delete('/deleteFlight/:id',(req,res) =>{
 // ________Edit a Flight________
 FlightRouter.put('/updateFlight/:id',(req,res) =>{
     Flight.findById(req.params.id)
-    .then(flight => {
-    if(req.body.flightNumber){
-      flight.flightNumber = req.body.flightNumber
-    }
-    if(req.body.departureTime){
-        flight.departureTime = req.body.departureTime
-    }
-    if(req.body.arrivalTime){
-        flight.arrivalTime= req.body.arrivalTime
-    }
-    if(req.body.departureDate){ 
-        flight.departureDate= req.body.departureDate
-    }
-    if(req.body.arrivalDate){ 
-        flight.arrivalDate= req.body.arrivalDate
-    }
-    if(req.body.destinationAirport){
-        flight.destinationAirport= req.body.destinationAirport
-    }
-    if(req.body.departureAirport){
-        flight.departureAirport= req.body.departureAirport
-    }
+    .then(flight => { 
+            flight.flightNumber =  req.body.flightNumber
+            flight.departureTime =  req.body.departureTime
+            flight.arrivalTime=  req.body.arrivalTime
+            flight.departureDate = req.body.departureDate
+            flight.arrivalDate = req.body.arrivalDate
+            flight.destinationAirport = req.body.destinationAirport
+            flight.departureAirport = req.body.departureAirport
+            flight.economySeats = req.body.economySeats
+            flight.businessSeats = req.body.businessSeats
         flight.save().then(() => res.json({success: true}))})
     .catch(er => res.status(404).json({success: false}))
 })

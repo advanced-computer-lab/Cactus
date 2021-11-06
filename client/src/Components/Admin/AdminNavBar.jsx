@@ -5,7 +5,6 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Avatar from '@mui/material/Avatar';
 
 
 
@@ -23,7 +22,7 @@ function AdminNavBar() {
               </Typography>
             </Link>
             <Link color="inherit" href="/Login" style={{ textDecoration: 'none' }}>
-              <Button color="inherit" variant="outlined" align="right">Login</Button>
+              <Button color="inherit" variant="outlined" align="right">Logout</Button>
             </Link>
           </Toolbar>
         </AppBar>
