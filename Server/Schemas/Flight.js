@@ -2,9 +2,13 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 const flightSchema = new Schema({
+    id:{
+        type:String
+    },
     flightNumber: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     departureTime: {
         type: String,
@@ -22,7 +26,11 @@ const flightSchema = new Schema({
         type: Date,
         required: true
     },
-    airport: {
+    destinationAirport: {
+        type: String,
+        required: true
+    },
+    departureAirport: {
         type: String,
         required: true
     },

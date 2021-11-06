@@ -2,7 +2,7 @@
 import './App.css';
 
 //___________Middleware___________
-import {BrowserRouter as Router, Switch, Route, Link}from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 
 
 //___________Views___________
@@ -12,10 +12,35 @@ import HomePage from './Views/HomePage'
 import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
+import Login from './Components/Main/Login/Login'
+
+//___________Theme__________
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#804000'
+    },
+    secondary: {
+      main: '#004080'
+    },
+    error: {
+      main: '#800000'
+    },
+    info: {
+      main: '#b8d52d'
+    },
+    success: {
+      main: '#008040'
+    }
+  },
+});
 
 function App() {
   return (
     <div className="App">
+      <ThemeProvider theme={theme}>
         <Router>
           <Switch>
             <Route exact path="/">
@@ -36,8 +61,12 @@ function App() {
             <Route path="/findFlight">
               <FindFlight />
             </Route>
+            <Route path="/login">
+              <Login />
+            </Route>
           </Switch>
         </Router>
+      </ThemeProvider>
     </div>
   );
 }
