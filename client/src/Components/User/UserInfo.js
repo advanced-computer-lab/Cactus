@@ -17,6 +17,15 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import { IconButton } from '@mui/material'
 import SaveIcon from '@mui/icons-material/Save';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import { Link } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info';
+import EventNoteIcon from '@mui/icons-material/EventNote'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -84,15 +93,21 @@ export default function UserInfo() {
                             <Grid item sx={6}>
                                 <Typography variant="h4" component="h4" style={{ marginLeft: '-220px' }}>Mr. Test User</Typography>
                                 <ButtonGroup color="secondary" aria-label="navigation" style={{ marginTop: '50px', marginLeft: '20px' }}>
-                                    <Button variant="outlined" startIcon={<HomeIcon />}>
-                                        Home
-                                    </Button>
-                                    <Button variant="outlined" startIcon={<FlightTakeoffIcon />}>
-                                        Book Flight
-                                    </Button>
-                                    <Button variant="outlined" startIcon={<PasswordIcon />}>
-                                        Change Password
-                                    </Button>
+                                    <Link color="inherit" href="/HomePage" style={{ textDecoration: 'none' }}>
+                                        <Button variant="outlined" startIcon={<HomeIcon />} color="secondary">
+                                            Home
+                                        </Button>
+                                    </Link>
+                                    <Link color="inherit" href="/HomePage" style={{ textDecoration: 'none' }}>
+                                        <Button variant="outlined" startIcon={<FlightTakeoffIcon />} color="secondary">
+                                            Book Flight
+                                        </Button>
+                                    </Link>
+                                    <Link color="inherit" href="#" style={{ textDecoration: 'none' }}>
+                                        <Button variant="outlined" startIcon={<PasswordIcon />} color="secondary">
+                                            Change Password
+                                        </Button>
+                                    </Link>
                                 </ButtonGroup>
                             </Grid>
                             <Grid item sm={2}></Grid>
@@ -105,8 +120,8 @@ export default function UserInfo() {
                                 <Box sx={{ width: '100%' }}>
                                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                                            <Tab label="About" {...a11yProps(0)} />
-                                            <Tab label="My Flights" {...a11yProps(1)} />
+                                            <Tab icon={<InfoIcon />} iconPosition='start' label="About" {...a11yProps(0)} />
+                                            <Tab icon={<EventNoteIcon />} iconPosition='start' label="My Flights" {...a11yProps(1)} />
                                         </Tabs>
                                     </Box>
                                     <TabPanel value={value} index={0}>
@@ -119,12 +134,18 @@ export default function UserInfo() {
                                                     <TextField fullWidth variant="outlined" disabled value="01/01/2021" label="Date of Birth" />
                                                 </Grid>
                                                 <Grid item sm={4}>
-                                                    <IconButton aria-label="male" style={{marginRight: '20px'}} color="secondary">
+                                                    <IconButton aria-label="male" style={{ marginRight: '20px' }} color="secondary">
                                                         <MaleIcon />
                                                     </IconButton>
                                                     <IconButton aria-label="female" disabled>
                                                         <FemaleIcon />
                                                     </IconButton>
+                                                </Grid>
+                                                <Grid item sm={6}>
+                                                    <TextField fullWidth variant="outlined" label="First Name" defaultValue="Test" type="text" required />
+                                                </Grid>
+                                                <Grid item sm={6}>
+                                                    <TextField fullWidth variant="outlined" label="Last Name" defaultValue="User" type="text" required />
                                                 </Grid>
                                                 <Grid item sm={12}>
                                                     <TextField fullWidth variant="outlined" label="Email" defaultValue="usermail@mail.com" type="email" required />
@@ -143,13 +164,59 @@ export default function UserInfo() {
                                                 </Grid>
                                                 <Grid item sm={6}></Grid>
                                                 <Grid item sm={6}>
-                                                    <Button variant="contained" endIcon={<SaveIcon/>} fullWidth>Save Changes</Button>
+                                                    <Button variant="contained" endIcon={<SaveIcon />} fullWidth>Save Changes</Button>
                                                 </Grid>
                                             </Grid>
                                         </Box>
                                     </TabPanel>
                                     <TabPanel value={value} index={1}>
-                                        Item Two
+                                        {/* <Box>
+                                            <Grid container spacing={2}>
+                                                <Grid item sm={6}>
+                                                    <Timeline position="alternate">
+                                                        <TimelineItem>
+                                                            <TimelineSeparator>
+                                                                <TimelineDot color="secondary" />
+                                                                <TimelineConnector />
+                                                            </TimelineSeparator>
+                                                            <TimelineContent>CAI</TimelineContent>
+                                                        </TimelineItem>
+                                                        <TimelineItem>
+                                                            <TimelineSeparator>
+                                                                <TimelineDot color="success" />
+                                                            </TimelineSeparator>
+                                                            <TimelineContent>LAX</TimelineContent>
+                                                        </TimelineItem>
+                                                    </Timeline>
+                                                </Grid>
+                                                <Grid item sm={6}>
+                                                    <Button variant="outlined" fullWidth color="error">Cancel</Button>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid container spacing={2}>
+                                                <Grid item sm={6}>
+                                                    <Timeline position="alternate">
+                                                        <TimelineItem>
+                                                            <TimelineSeparator>
+                                                                <TimelineDot color="secondary" />
+                                                                <TimelineConnector />
+                                                            </TimelineSeparator>
+                                                            <TimelineContent>CAI</TimelineContent>
+                                                        </TimelineItem>
+                                                        <TimelineItem>
+                                                            <TimelineSeparator>
+                                                                <TimelineDot color="success" />
+                                                            </TimelineSeparator>
+                                                            <TimelineContent>LAX</TimelineContent>
+                                                        </TimelineItem>
+                                                    </Timeline>
+                                                </Grid>
+                                                <Grid item sm={6}>
+                                                    <Button variant="outlined" fullWidth color="error">Cancel</Button>
+                                                </Grid>
+                                            </Grid>
+                                        </Box> */}
+                                        Flight Reservations will go here
                                     </TabPanel>
                                 </Box>
                             </Grid>
