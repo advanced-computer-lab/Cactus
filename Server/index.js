@@ -33,5 +33,5 @@ app.get('/', (req, res) => {
     res.send('<h1>Cactus Airlines - Server Homepage</h1>')
 })
 
-app.use('/Flight',FlightRouter);
-app.use('/Authentication',AuthenticationRouter);
+app.use('/Flight',cors(),FlightRouter);
+app.use('/Authentication',cors(),AuthenticationRouter);
