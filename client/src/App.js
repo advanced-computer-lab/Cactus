@@ -13,6 +13,9 @@ import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
 import Login from './Components/Main/Login/Login'
+import Register from './Views/User/Register'
+import UserProfile from './Views/User/UserProfile'
+
 
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -47,6 +50,9 @@ function App() {
               <Login />
               {/* <HomePage /> */}
             </Route>
+            <Route path="/Register">
+              <Register />
+            </Route>
             <Route path="/homepage">
               <UserHome />
             </Route>
@@ -64,6 +70,12 @@ function App() {
             </Route>
             <Route path="/login">
               <Login />
+            </Route>
+            <Route path="/login">
+              <Login />
+            </Route>
+            <Route path="/UserProfile">
+              <UserProfile />
             </Route>
           </Switch>
         </Router>
