@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
-const Flight = require('../Schemas/Flight').schema
+const Reservation = require('../Schemas/Reservation').schema
 
 const UserSchema = new Schema({
     username: {
@@ -25,8 +25,8 @@ const UserSchema = new Schema({
     isAdmin: {
         type: Boolean
     },
-    flights: {
-        type: [Flight]
+    reservations: {
+        type: [Reservation]
     }
 })
 const User = mongoose.model('User', UserSchema)
