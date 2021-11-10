@@ -6,6 +6,8 @@ require('dotenv').config();
 
 //___________Routers___________
 const FlightRouter = require('./Routes/Flight/Flight')
+const UserRouter = require('./Routes/User/User')
+
 const AuthenticationRouter = require('./Authentication/Authentications')
 
 //___________App___________
@@ -34,4 +36,5 @@ app.get('/', (req, res) => {
 })
 
 app.use('/Flight',FlightRouter);
+app.use('/Users',UserRouter);
 app.use('/Authentication',AuthenticationRouter);

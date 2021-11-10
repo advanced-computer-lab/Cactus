@@ -38,6 +38,20 @@ const flightSchema = new Schema({
         type: Number,
         required: true
     },
+    economyPrice:{
+        type: Number,
+        required: true
+    },
+    businessPrice:{
+        type: Number,
+        required: true
+    },
+    availableEconomy: {
+        type: Number
+    },
+    availableBusiness: {
+        type: Number
+    },
     businessSeats: {
         type: Number,
         required: true

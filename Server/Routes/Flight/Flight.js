@@ -20,11 +20,15 @@ FlightRouter.post('/addFlight', (req, res) => {
         'destinationAirport': req.body.destinationAirport,
         'departureAirport': req.body.departureAirport,
         'economySeats': req.body.economySeats,
-        'businessSeats': req.body.businessSeats
+        'businessSeats': req.body.businessSeats,
+        'availableEconomy': req.body.economySeats,
+        'availableBusiness': req.body.businessSeats,
+        'economyPrice': req.body.economyPrice,
+        'businessPrice': req.body.businessPrice
     });
     flight.save()
         .then((result) => {
-            result.id = result._id 
+            result.id = result._id
             result.save().then((res2) =>{
                 res.send(res2)    
             })
@@ -112,6 +116,10 @@ FlightRouter.put('/updateFlight/:id',(req,res) =>{
             flight.departureAirport = req.body.departureAirport
             flight.economySeats = req.body.economySeats
             flight.businessSeats = req.body.businessSeats
+            flight.availableBusiness = req.body.availableBusiness
+            flight.availableEconomy = req.body.availableEconomy
+            flight.economyPrice = req.body.economyPrice
+            flight.businessPrice = req.body.businessPrice
         flight.save().then(() => res.json({success: true}))})
     .catch(er => res.status(404).json({success: false}))
 })
