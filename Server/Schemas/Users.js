@@ -1,11 +1,12 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
+const Reservation = require('../Schemas/Reservation').schema
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
     username: {
         type:String,
         required: true,
-        min: 3,
+        min: 2,
         max: 20,
         unique:true
     },
@@ -23,6 +24,9 @@ const UserSchema = new mongoose.Schema({
     },
     isAdmin: {
         type: Boolean
+    },
+    reservations: {
+        type: [Reservation]
     }
 })
 const User = mongoose.model('User', UserSchema)

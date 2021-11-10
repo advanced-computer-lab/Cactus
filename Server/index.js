@@ -6,6 +6,8 @@ require('dotenv').config();
 
 //___________Routers___________
 const FlightRouter = require('./Routes/Flight/Flight')
+const UserRouter = require('./Routes/User/User')
+
 const AuthenticationRouter = require('./Authentication/Authentications')
 
 //___________App___________
@@ -33,5 +35,9 @@ app.get('/', (req, res) => {
     res.send('<h1>Cactus Airlines - Server Homepage</h1>')
 })
 
+
 app.use('/Flight',cors(),FlightRouter);
 app.use('/Authentication',cors(),AuthenticationRouter);
+app.use('/Users',UserRouter);
+
+
