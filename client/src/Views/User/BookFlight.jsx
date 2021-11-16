@@ -499,7 +499,7 @@ function BookFlight() {
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                         <Typography variant="h6" component="h6" color="primary">9,000 EGP</Typography>
-                                                        <Button variant="outlined" onClick={()=>setSearch(true)}>Change this flight</Button>
+                                                        <Button variant="outlined" onClick={() => setSearch(true)}>Change this flight</Button>
                                                     </Box>
                                                 </Grid>
                                                 <Grid item sx={8}>
@@ -534,7 +534,7 @@ function BookFlight() {
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                         <Typography variant="h6" component="h6" color="primary">9,000 EGP</Typography>
-                                                        <Button variant="outlined" onClick={()=>setDepSelected(true)}>Change this flight</Button>
+                                                        <Button variant="outlined" onClick={() => setDepSelected(true)}>Change this flight</Button>
                                                     </Box>
                                                 </Grid>
                                             </Grid>
