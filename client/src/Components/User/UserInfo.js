@@ -1,31 +1,31 @@
+// ___________MIDDLEWARE____________
 import React from 'react'
-import { ButtonGroup, Divider, Paper } from '@mui/material'
-import { Grid } from '@mui/material'
-import { Box } from '@mui/system'
-import { Button } from '@mui/material'
 import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography'
-import UserNavBar from '../../Components/User/UserNavBar'
+
+// ___________MATERIAL UI____________
+import { Box } from '@mui/system'
+import { Link, IconButton, Typography, Tab, Tabs, Button, Grid, ButtonGroup, Divider, Paper, TextField, MenuItem, Menu } from '@mui/material'
+
+// ___________MATERIAL UI ICONS____________
 import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import PasswordIcon from '@mui/icons-material/Password';
-import TextField from '@mui/material/TextField'
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
-import { IconButton } from '@mui/material'
 import SaveIcon from '@mui/icons-material/Save';
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
-import { Link } from '@mui/material'
+import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import InfoIcon from '@mui/icons-material/Info';
 import EventNoteIcon from '@mui/icons-material/EventNote'
+
+// ___________COMPONENTS____________
+import UserNavBar from '../../Components/User/UserNavBar'
+
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -62,7 +62,14 @@ function a11yProps(index) {
 
 export default function UserInfo() {
     const [value, setValue] = React.useState(0);
-
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -170,53 +177,123 @@ export default function UserInfo() {
                                         </Box>
                                     </TabPanel>
                                     <TabPanel value={value} index={1}>
-                                        {/* <Box>
-                                            <Grid container spacing={2}>
-                                                <Grid item sm={6}>
-                                                    <Timeline position="alternate">
-                                                        <TimelineItem>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot color="secondary" />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>CAI</TimelineContent>
-                                                        </TimelineItem>
-                                                        <TimelineItem>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot color="success" />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>LAX</TimelineContent>
-                                                        </TimelineItem>
-                                                    </Timeline>
+                                        <Paper elevation={2} variant="outlined" style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '650px', marginLeft: '-200px' }}>
+                                            <Box>
+                                                <Grid container spacing={2}>
+                                                    <Grid item sm={10}>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">Cairo</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={2}>
+                                                                <CompareArrowsIcon />
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">Los Angeles</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">11/11/2021 5:00AM</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={2}>
+                                                                <AccessTimeIcon />
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">20/11/2021 7:30PM</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AirlineSeatReclineNormalIcon />
+                                                                <Typography variant="h6" component="h6">4 Seats</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AttachMoneyIcon />
+                                                                <Typography variant="h6" component="h6">12,000 EGP</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AirlineSeatReclineExtraIcon />
+                                                                <Typography variant="h6" component="h6">Business</Typography>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Grid item sm={2}>
+                                                        <IconButton
+                                                            id="basic-button"
+                                                            aria-controls="basic-menu"
+                                                            aria-haspopup="true"
+                                                            aria-expanded={open ? 'true' : undefined}
+                                                            onClick={handleClick}
+                                                        >
+                                                            <MoreVertIcon color="secondary" />
+                                                        </IconButton>
+                                                        <Menu
+                                                            id="basic-menu"
+                                                            anchorEl={anchorEl}
+                                                            open={open}
+                                                            onClose={handleClose}
+                                                            MenuListProps={{
+                                                                'aria-labelledby': 'basic-button',
+                                                            }}
+                                                        >
+                                                            <MenuItem onClick={handleClose}><Button variant="contained" color="info" fullWidth>View Details</Button></MenuItem>
+                                                            <Divider variant="middle" />
+                                                            <MenuItem onClick={handleClose}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
+                                                        </Menu>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item sm={6}>
-                                                    <Button variant="outlined" fullWidth color="error">Cancel</Button>
+                                            </Box>
+                                        </Paper>
+                                        <Paper elevation={2} variant="outlined" style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '650px', marginLeft: '-200px' }}>
+                                            <Box>
+                                                <Grid container spacing={2}>
+                                                    <Grid item sm={10}>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">Cairo</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={2}>
+                                                                <CompareArrowsIcon />
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">Los Angeles</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">11/11/2021 5:00AM</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={2}>
+                                                                <AccessTimeIcon />
+                                                            </Grid>
+                                                            <Grid item sm={5}>
+                                                                <Typography variant="h6" component="h6">20/11/2021 7:30PM</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AirlineSeatReclineNormalIcon />
+                                                                <Typography variant="h6" component="h6">4 Seats</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AttachMoneyIcon />
+                                                                <Typography variant="h6" component="h6">12,000 EGP</Typography>
+                                                            </Grid>
+                                                            <Grid item sm={4}>
+                                                                <AirlineSeatReclineExtraIcon />
+                                                                <Typography variant="h6" component="h6">Business</Typography>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Grid item sm={2}>
+                                                        <IconButton
+                                                            aria-label="more"
+                                                            id="long-button"
+                                                            aria-controls="long-menu"
+                                                            // aria-expanded={open ? 'true' : undefined}
+                                                            aria-haspopup="true"
+                                                        // onClick={handleClick}
+                                                        >
+                                                            <MoreVertIcon />
+                                                        </IconButton>
+
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
-                                            <Grid container spacing={2}>
-                                                <Grid item sm={6}>
-                                                    <Timeline position="alternate">
-                                                        <TimelineItem>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot color="secondary" />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>CAI</TimelineContent>
-                                                        </TimelineItem>
-                                                        <TimelineItem>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot color="success" />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>LAX</TimelineContent>
-                                                        </TimelineItem>
-                                                    </Timeline>
-                                                </Grid>
-                                                <Grid item sm={6}>
-                                                    <Button variant="outlined" fullWidth color="error">Cancel</Button>
-                                                </Grid>
-                                            </Grid>
-                                        </Box> */}
-                                        Flight Reservations will go here
+                                            </Box>
+                                        </Paper>
                                     </TabPanel>
                                 </Box>
                             </Grid>

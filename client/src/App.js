@@ -17,8 +17,13 @@ import Register from './Views/User/Register'
 import UserProfile from './Views/User/UserProfile'
 
 
+
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
+import { amber } from '@mui/material/colors';
+
+
+const color = amber.A200;
 
 const theme = createTheme({
   palette: {
@@ -32,7 +37,7 @@ const theme = createTheme({
       main: '#800000'
     },
     info: {
-      main: '#b8d52d'
+      main: '#FFD700'
     },
     success: {
       main: '#008040'
@@ -67,9 +72,6 @@ function App() {
             </Route>
             <Route path="/findFlight">
               <FindFlight />
-            </Route>
-            <Route path="/login">
-              <Login />
             </Route>
             <Route path="/login">
               <Login />

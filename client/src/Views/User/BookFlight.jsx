@@ -1,26 +1,24 @@
+// ____________MIDDLEWARE_________________
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+
+
+// ____________MATERIAL UI COMPONENTS_________________
+import {
+    Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
+    DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
+    Paper, TextField, FormControl, FormControlLabel, Autocomplete
+} from '@mui/material';
+
+// ____________ICONS_________________
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import EventNoteIcon from '@mui/icons-material/EventNote';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import { Button, ButtonGroup, CircularProgress, Divider, Grid, Typography } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import Autocomplete from '@mui/material/Autocomplete';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import axios from 'axios'
+
+// ____________MATERIAL UI LAB COMPONENTS_________________
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -28,8 +26,14 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+
+// ____________STRIPE_________________
 import StripeContainer from '../../Components/User/StripeContainer'
+
+// ____________STYLESHEETS AND LOGIC_________________
 import './BookFlight.css';
+import Search from './Logic/Search'
+import SeatSelector from '../../Components/User/seatSelection/SeatSelector';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -65,135 +69,14 @@ function a11yProps(index) {
 }
 
 function BookFlight() {
-    const [value, setValue] = React.useState(0);
-    const [date, setDate] = React.useState([Date.now(), Date.now()]);
-    const [open, setOpen] = React.useState(false);
-    const [counter, setCounter] = React.useState(1);
-    const [search, setSearch] = React.useState(false)
-    const [from, setFrom] = React.useState()
-    const [to, setTo] = React.useState()
-    const [seats, setSeats] = React.useState()
-    const [cabin, setCabin] = React.useState('economy')
-    const [counterChild, setCounterChild] = React.useState(0);
-    const [depSelected, setDepSelected] = React.useState(false)
-    const [returnSelected, setReturnSelected] = React.useState(false)
-    const [departureFlights, setDepartureFlights] = React.useState([])
-    const [returnFlights, setReturnFlights] = React.useState([])
-    const [departureId, setDepartureId] = React.useState()
-    const [isFetching, setFetching] = React.useState(false)
-    const [showCheckout, setShowCheckout] = React.useState(false)
 
-
-
-    const depDate = new Date(date[0]);
-    var depDateFormat = (depDate.getDate()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
-    if ((depDate.getMonth()) < 10) {
-        depDateFormat = (depDate.getDate()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
-        if ((depDate.getDate()) < 10) {
-            depDateFormat = "0" + (depDate.getDate()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
-        }
-    }
-
-    const returnDate = new Date(date[1]);
-    var returnDateFormat = (returnDate.getDate()) + "-" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
-    if ((depDate.getMonth()) < 10) {
-        returnDateFormat = (returnDate.getDate()) + "-0" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
-        if ((returnDate.getDate()) < 10) {
-            returnDateFormat = "0" + (returnDate.getDate()) + "-0" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
-        }
-    }
-
-
-    const handleIncrementChild = () => {
-        setCounterChild(counterChild + 1)
-    };
-
-    const handleDecrementChild = () => {
-        if (counterChild !== 0) {
-            setCounterChild(counterChild - 1)
-        }
-        else {
-            setCounterChild(1)
-        }
-    }
-
-    const handleIncrement = () => {
-        setCounter(counter + 1)
-    };
-
-    const handleDecrement = () => {
-        if (counter !== 1) {
-            setCounter(counter - 1)
-        }
-        else {
-            setCounter(1)
-        }
-    };
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-        setSeats(counter + counterChild)
-    };
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
-    const handleFromChange = (e) => {
-        setFrom(e.target.value)
-    }
-    const handleToChange = (e) => {
-        setTo(e.target.value)
-    }
-    const data = {
-        departureDate: depDateFormat,
-        destinationAirport: to,
-        departureAirport: from,
-        cabin: cabin,
-        seats: seats
-    }
-    const returnData = {
-        departureDate: returnDateFormat,
-        destinationAirport: from,
-        departureAirport: to,
-        cabin: cabin,
-        seats: seats
-    }
-    const handleFindFlight = (e) => {
-        e.preventDefault()
-        console.log(data);
-        setFetching(true)
-        axios.post('/Users/getFlights', data)
-            .then((response) => {
-                setSearch(true)
-                setFetching(false)
-                setDepartureFlights(response.data)
-                console.log(departureFlights)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-    const handleReturnFlight = (e) => {
-        e.preventDefault()
-        console.log(returnData);
-        axios.post('/Users/getFlights', returnData)
-            .then((response) => {
-                setSearch(false)
-                setDepSelected(true)
-                setReturnFlights(response.data)
-                console.log(returnFlights)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-
-
+    const { handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
+        handleFromChange, handleToChange, handleDecrement, handleIncrement, handleDecrementChild,
+        handleIncrementChild, value, date, setDate, open, counter, search, setSearch, from, to, cabin, setCabin,
+        counterChild, depSelected, setDepSelected, returnSelected, setReturnSelected, departureFlights, isFetching,
+        showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats
+    } = Search()
+    
     return (
         <>
             <Paper elevation={1} square style={{ borderRadius: '1rem', marginTop: '50px' }}>
@@ -354,6 +237,7 @@ function BookFlight() {
                                 </Dialog>
                             </Grid>
                             <Grid item lg={10}></Grid>
+                            {/* Search Button */}
                             <Grid item lg={2}>
                                 <Button variant="contained" endIcon={<FlightTakeoffIcon />} className="searchButton"
                                     onClick={handleFindFlight}
@@ -369,7 +253,7 @@ function BookFlight() {
                                     <>
                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                             <Typography variant="h4" component="h4" color="primary">Select your departure flight from</Typography>
-                                            <Typography variant="h5" component="h5" color="primary">{flight.departureAirport} to {flight.destinationAirport}</Typography>
+                                            <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
                                             <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
                                         </Box>
                                         <Paper elevation={3} square style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
@@ -379,6 +263,7 @@ function BookFlight() {
                                                         <Box style={{ display: "flex", flexDirection: "column" }}>
                                                             <Typography color="secondary" variant="h4" component="h4">{flight.departureTime} {flight.departureAirport}</Typography>
                                                             <Typography component="legend" >{flight.flightNumber}</Typography>
+                                                            <Typography component="legend" >Cairo</Typography>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item sx={1} style={{ marginTop: '20px' }}>
@@ -388,6 +273,7 @@ function BookFlight() {
                                                     <Grid item sx={4}>
                                                         <Typography color="secondary" variant="h4" component="h4">{flight.arrivalTime} {flight.destinationAirport}</Typography>
                                                         <Typography component="legend" >{flight.flightNumber}</Typography>
+                                                        <Typography component="legend" >Los Angeles</Typography>
                                                     </Grid>
                                                     <Grid item sx={3}>
                                                         <Paper elevation={2} square style={{
@@ -396,7 +282,7 @@ function BookFlight() {
                                                         }}>
                                                             <Typography color="secondary" variant="h3" component="h3">{cabin === "economy" ? flight.economyPrice : flight.businessPrice} EGP <span>/person</span></Typography>
                                                             <br />
-                                                            <Button variant="outlined" fullWidth onClick={handleReturnFlight}>Select Flight</Button>
+                                                            <Button variant="outlined" fullWidth onClick={(e) => handleReturnFlight(flight, e)}>Select Flight</Button>
                                                         </Paper>
                                                     </Grid>
                                                 </Grid>
@@ -411,46 +297,48 @@ function BookFlight() {
                         {/* Return Flights */}
                         {depSelected ?
                             <>
-                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Typography variant="h4" component="h4" color="primary">Select your return flight from</Typography>
-                                    <Typography variant="h5" component="h5" color="primary">LOS ANGELES to CAIRO</Typography>
-                                    <Typography variant="legend" component="legend" color="primary">Wed, 17 Nov 2021</Typography>
-                                </Box>
-                                <Paper elevation={3} square style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
-                                    <Box sx={{ width: '100%' }}>
-                                        <Grid container spacing={5}>
-                                            <Grid item sx={4}>
-                                                <Box style={{ display: "flex", flexDirection: "column" }}>
-                                                    <Typography color="secondary" variant="h4" component="h4">02:00 CAI</Typography>
-                                                    <Typography component="legend" >Cairo</Typography>
-                                                    <Typography component="legend" >C001</Typography>
-                                                </Box>
-                                            </Grid>
-                                            <Grid item sx={1} style={{ marginTop: '20px' }}>
-                                                <ScheduleIcon />
-                                                <Typography component="legend">14H</Typography>
-                                            </Grid>
-                                            <Grid item sx={4}>
-                                                <Typography color="secondary" variant="h4" component="h4">16:00 LAX</Typography>
-                                                <Typography component="legend" >Los Angeles</Typography>
-                                                <Typography component="legend" >C001</Typography>
-                                            </Grid>
-                                            <Grid item sx={3}>
-                                                <Paper elevation={2} square style={{
-                                                    borderRadius: '1rem', padding: '30px', marginLeft: '200px',
-                                                    display: 'flex', flexDirection: 'column', width: '500px'
-                                                }}>
-                                                    <Typography color="secondary" variant="h3" component="h3">9,000 EGP  <span>/person</span></Typography>
-                                                    <br />
-                                                    <Button variant="outlined" fullWidth onClick={() => {
-                                                        setDepSelected(false)
-                                                        setReturnSelected(true)
-                                                    }}>Select Flight</Button>
-                                                </Paper>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-                                </Paper>
+                                {returnFlights.length === 0 ? <div><h2>No available flights</h2></div> : returnFlights.map((flight) =>
+                                    <>
+                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
+                                            <Typography variant="h4" component="h4" color="primary">Select your return flight from</Typography>
+                                            <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
+                                            <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
+                                        </Box>
+                                        <Paper elevation={3} square style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
+                                            <Box sx={{ width: '100%' }}>
+                                                <Grid container spacing={5}>
+                                                    <Grid item sx={4}>
+                                                        <Box style={{ display: "flex", flexDirection: "column" }}>
+                                                            <Typography color="secondary" variant="h4" component="h4">{flight.departureTime} {flight.departureAirport}</Typography>
+                                                            <Typography component="legend" >{flight.flightNumber}</Typography>
+                                                            <Typography component="legend" >Los Angeles</Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sx={1} style={{ marginTop: '20px' }}>
+                                                        <ScheduleIcon />
+                                                        <Typography component="legend">14H</Typography>
+                                                    </Grid>
+                                                    <Grid item sx={4}>
+                                                        <Typography color="secondary" variant="h4" component="h4">{flight.arrivalTime} {flight.destinationAirport}</Typography>
+                                                        <Typography component="legend" >{flight.flightNumber}</Typography>
+                                                        <Typography component="legend" >Cairo</Typography>
+                                                    </Grid>
+                                                    <Grid item sx={3}>
+                                                        <Paper elevation={2} square style={{
+                                                            borderRadius: '1rem', padding: '30px', marginLeft: '200px',
+                                                            display: 'flex', flexDirection: 'column', width: '500px'
+                                                        }}>
+                                                            <Typography color="secondary" variant="h3" component="h3">{cabin === "economy" ? flight.economyPrice : flight.businessPrice} EGP <span>/person</span></Typography>
+                                                            <br />
+                                                            <Button variant="outlined" fullWidth onClick={(e) => { handleReturnSelected(flight, e) }}>Select Flight</Button>
+                                                        </Paper>
+                                                    </Grid>
+                                                </Grid>
+                                            </Box>
+                                        </Paper>
+                                    </>
+                                )}
+
                             </>
                             :
                             <></>
@@ -468,11 +356,11 @@ function BookFlight() {
                                             </Box>
                                             <Grid container spacing={2}>
                                                 <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">Cairo to Los Angeles</Typography>
+                                                    <Typography variant="h6" component="h6" color="primary">{from} to {to}</Typography>
                                                     <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                Wed, 10 Nov 2021 - 02:00 CAI<br />
+                                                                {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime} {from}<br />
                                                                 Cairo, Cairo International Airport<br />
                                                                 Egypt
                                                             </TimelineOppositeContent>
@@ -484,7 +372,7 @@ function BookFlight() {
                                                         </TimelineItem>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                Wed, 10 Nov 2021 - 16:00 LAX<br />
+                                                                {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime} {to}<br />
                                                                 Los Angeles, Los Angeles Airport<br />
                                                                 United States
                                                             </TimelineOppositeContent>
@@ -498,16 +386,16 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">9,000 EGP</Typography>
+                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice)*(seats)} EGP</Typography>
                                                         <Button variant="outlined" onClick={() => setSearch(true)}>Change this flight</Button>
                                                     </Box>
                                                 </Grid>
                                                 <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">Los Angeles to Cairo</Typography>
+                                                    <Typography variant="h6" component="h6" color="primary">{to} to {from}</Typography>
                                                     <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                Wed, 17 Nov 2021 - 02:00 LAX<br />
+                                                                {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime} {to}<br />
                                                                 Los Angeles, Los Angeles Airport<br />
                                                                 United Stated
                                                             </TimelineOppositeContent>
@@ -519,8 +407,8 @@ function BookFlight() {
                                                         </TimelineItem>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                Wed, 17 Nov 2021 - 16:00 CAI <br />
-                                                                Cairo, Cairo International Airport <br />
+                                                                {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime} {from} <br />
+                                                                Cairo, Cairo International Airport<br />
                                                                 Egypt
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
@@ -533,7 +421,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">9,000 EGP</Typography>
+                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice)*(seats)} EGP</Typography>
                                                         <Button variant="outlined" onClick={() => setDepSelected(true)}>Change this flight</Button>
                                                     </Box>
                                                 </Grid>
@@ -543,7 +431,12 @@ function BookFlight() {
                                     <Grid item xs={4}>
                                         <Paper elevation={2} square style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
                                             <Box style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <Typography variant="h6" component="h6">Total Price: 18,000 EGP</Typography>
+                                                <Typography variant="h4" component="h4" color="secondary">
+                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice)*(seats))+((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice)*(seats))} EGP
+                                                </Typography>
+                                                <br />
+                                                <Divider variant="middle"/>
+                                                <br />
                                                 <Button variant="contained" color="secondary"
                                                     onClick={() => setShowCheckout(true)}
                                                 >Checkout</Button>
@@ -559,15 +452,15 @@ function BookFlight() {
 
 
                     </TabPanel>
-                    <TabPanel value={value} index={1}>
-                        Item Two
+                    <TabPanel value={value} index={1} >
+                        Logged user's upcoming flights
                     </TabPanel>
                 </Box>
             </Paper>
+            <SeatSelector />
         </>
     );
 }
-export default BookFlight;
 
 const countries = [
     { code: 'AD', label: 'Andorra', phone: '376' },
@@ -993,3 +886,6 @@ const countries = [
     { code: 'ZM', label: 'Zambia', phone: '260' },
     { code: 'ZW', label: 'Zimbabwe', phone: '263' },
 ];
+
+export default BookFlight;
+
