@@ -51,13 +51,15 @@ UserRouter.post('/getFlights', (req, res) => {
 UserRouter.post('/reserveFlight', (req, res) => {
     const reserve = new Reservation()
     var departureId = ""
-    var returnId = ""
+    var returningId = ""
     var departurePrice =0
     var returnPrice = 0
     var destination = ""
     var returnloc = ""
     var departureDate = ""
     var returnDate = ""
+    var departureTime = ""
+    var returnTime = ""
     Flight.findById(req.body.departureId)
     .then((flight) => {
         if(req.body.cabin === 'business'){
@@ -71,6 +73,7 @@ UserRouter.post('/reserveFlight', (req, res) => {
         flight.save().then(() => {
             departureId = flight._id
             departureDate = flight.departureDate
+            departureTime = flight.departureTime
         })
         .catch(er => console.log(er))
         })
@@ -85,24 +88,28 @@ UserRouter.post('/reserveFlight', (req, res) => {
             returnPrice = flight2.economyPrice
         }
         flight2.save().then(() =>  {
-            returnId = flight2._id
             destination = flight2.destinationAirport
             returnloc = flight2.departureAirport
             returnDate = flight2.departureDate
+            returnTime = flight2.departureTime            
+            returningId = flight2._id
 
         User.find({"username":req.body.username})
     .then((users) => {
         reserve.departureId = departureId
-        reserve.returnId = returnId
+        reserve.returnId = returningId
         reserve.destination = destination
         reserve.return = returnloc
         reserve.departureDate = departureDate
+        reserve.departureTime = departureTime
         reserve.returnDate = returnDate
+        reserve.returnTime = returnTime
         reserve.departurePrice = departurePrice
         reserve.returnPrice = returnPrice
         reserve.seats = req.body.seats
         reserve.cabin =  req.body.cabin 
         users[0].reservations.push(reserve)
+        reserve.save()
         users[0].save().then(()=> res.send(reserve))
         .catch(er => console.log(er))
     })
@@ -110,17 +117,19 @@ UserRouter.post('/reserveFlight', (req, res) => {
         .catch(er => console.log(er))})
     
     })
-   
+
+
     UserRouter.post('/cancelReservation', (req, res) => {
-        User.find({"username":req.body.username})
-        .then((users) => {
-            const reserve = new Reservation()
-            for( i =0;i<users[0].reservations.length;i++){
-                if(users[0].reservations[i]._id === req.body.reservationId){
-                     reserve = users[0].reservations.splice(i,1)[0]
-                    break
-                }
-            }
+        Reservation.findById(req.body.reservationId)
+        .then((reserve) =>{
+            User.find({"username":req.body.username})
+            .then((users) => {
+                    for(i=0;i<users[0].reservations.length;i++){
+                        if(reserve._id.equals(users[0].reservations[i]._id)){ 
+                            users[0].reservations.splice(i,1)
+                        }
+                    }
+                   reserve.remove()
             users[0].save().then(()=> {
                 Flight.findById(reserve.departureId)
                 .then((flight) => {
@@ -130,11 +139,9 @@ UserRouter.post('/reserveFlight', (req, res) => {
                     else{
                         flight.availableEconomy += reserve.seats
                     }
-                    flight.save().then(() => {})
-                .catch(er => console.log(er))
-                })
-                Flight.findById(reserve.returnId)
-                .then((flight2) => {
+                    flight.save().then(() => {
+                    Flight.findById(reserve.returnId)
+                    .then((flight2) => {
                     if(reserve.cabin === 'business'){
                         flight2.availableBusiness += reserve.seats
                     }
@@ -142,10 +149,18 @@ UserRouter.post('/reserveFlight', (req, res) => {
                         flight2.availableEconomy += reserve.seats
                         }
                     flight2.save().then(() =>  {res.send({success:true})})
-                .catch(er => console.log(er))})
+                    }) })
+               })
             })
         })
-        .catch(er => console.log(er))
         })
+        })
+
+    UserRouter.post('/getAllReservations', (req, res) => {
+        User.find({"username":req.body.username})
+        .then((user) =>{
+            res.send(user[0].reservations)
+        })
+    })      
 
 module.exports = UserRouter;
