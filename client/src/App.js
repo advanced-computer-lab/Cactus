@@ -17,7 +17,6 @@ import Register from './Views/User/Register'
 import UserProfile from './Views/User/UserProfile'
 
 
-
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
 import { amber } from '@mui/material/colors';
