@@ -8,7 +8,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 //___________Views___________
 import AdminHome from './Views/Admin/AdminHome'
 import UserHome from './Views/User/UserHome'
-// import HomePage from './Views/HomePage'
+import HomePage from './Views/HomePage'
 import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
@@ -19,6 +19,10 @@ import UserProfile from './Views/User/UserProfile'
 
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
+import { amber } from '@mui/material/colors';
+
+
+const color = amber.A200;
 
 const theme = createTheme({
   palette: {
@@ -32,7 +36,7 @@ const theme = createTheme({
       main: '#800000'
     },
     info: {
-      main: '#b8d52d'
+      main: '#FFD700'
     },
     success: {
       main: '#008040'
@@ -47,8 +51,8 @@ function App() {
         <Router>
           <Switch>
             <Route exact path="/">
-              <Login />
-              {/* <HomePage /> */}
+              {/* <Login /> */}
+              <HomePage />
             </Route>
             <Route path="/Register">
               <Register />
@@ -67,9 +71,6 @@ function App() {
             </Route>
             <Route path="/findFlight">
               <FindFlight />
-            </Route>
-            <Route path="/login">
-              <Login />
             </Route>
             <Route path="/login">
               <Login />

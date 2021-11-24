@@ -69,6 +69,7 @@ function AddFlight() {
         economySeats: economy,
         businessSeats: business
     }
+    
     const handleClick = (e) => {
 
         e.preventDefault()
