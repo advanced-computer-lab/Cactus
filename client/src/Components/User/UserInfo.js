@@ -87,6 +87,7 @@ export default function UserInfo() {
                 >
                     <Box >
                         <Grid container spacing={1}>
+                            {/* User profile pic */}
                             <Grid item sx={4}>
                                 <Paper elvation={3} square
                                     style={{
@@ -97,6 +98,7 @@ export default function UserInfo() {
                                     <PersonIcon sx={{ fontSize: 100 }} />
                                 </Paper>
                             </Grid>
+                            {/* Navigation */}
                             <Grid item sx={6}>
                                 <Typography variant="h4" component="h4" style={{ marginLeft: '-220px' }}>Mr. Test User</Typography>
                                 <ButtonGroup color="secondary" aria-label="navigation" style={{ marginTop: '50px', marginLeft: '20px' }}>
@@ -131,6 +133,7 @@ export default function UserInfo() {
                                             <Tab icon={<EventNoteIcon />} iconPosition='start' label="My Flights" {...a11yProps(1)} />
                                         </Tabs>
                                     </Box>
+                                    {/* User personal info */}
                                     <TabPanel value={value} index={0}>
                                         <Box>
                                             <Grid container spacing={2}>
@@ -176,6 +179,7 @@ export default function UserInfo() {
                                             </Grid>
                                         </Box>
                                     </TabPanel>
+                                    {/* User's booked trips */}
                                     <TabPanel value={value} index={1}>
                                         <Paper elevation={2} variant="outlined" style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '650px', marginLeft: '-200px' }}>
                                             <Box>
@@ -280,16 +284,27 @@ export default function UserInfo() {
                                                     </Grid>
                                                     <Grid item sm={2}>
                                                         <IconButton
-                                                            aria-label="more"
-                                                            id="long-button"
-                                                            aria-controls="long-menu"
-                                                            // aria-expanded={open ? 'true' : undefined}
+                                                            id="basic-button"
+                                                            aria-controls="basic-menu"
                                                             aria-haspopup="true"
-                                                        // onClick={handleClick}
+                                                            aria-expanded={open ? 'true' : undefined}
+                                                            onClick={handleClick}
                                                         >
-                                                            <MoreVertIcon />
+                                                            <MoreVertIcon color="secondary" />
                                                         </IconButton>
-
+                                                        <Menu
+                                                            id="basic-menu"
+                                                            anchorEl={anchorEl}
+                                                            open={open}
+                                                            onClose={handleClose}
+                                                            MenuListProps={{
+                                                                'aria-labelledby': 'basic-button',
+                                                            }}
+                                                        >
+                                                            <MenuItem onClick={handleClose}><Button variant="contained" color="info" fullWidth>View Details</Button></MenuItem>
+                                                            <Divider variant="middle" />
+                                                            <MenuItem onClick={handleClose}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
+                                                        </Menu>
                                                     </Grid>
                                                 </Grid>
                                             </Box>

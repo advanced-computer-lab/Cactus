@@ -2,6 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+// ____________CUSTOM COMPONENTS_________________
+import Schedule from '../../Components/User/flightSchedule/Schedule';
 
 // ____________MATERIAL UI COMPONENTS_________________
 import {
@@ -453,7 +455,7 @@ function BookFlight() {
 
                     </TabPanel>
                     <TabPanel value={value} index={1} >
-                        Logged user's upcoming flights
+                        <Schedule />
                     </TabPanel>
                 </Box>
             </Paper>
