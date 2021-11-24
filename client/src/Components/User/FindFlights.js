@@ -7,7 +7,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Button } from "@mui/material";
 import UserFlightTimeLine from "./UserFlightTimeLine";
 
-function FindFlights() {
+function FindFlights(flight) {
     const [depSelected, setDepSelected] = useState(false)
     const [returnSelected, setReturnSelected] = useState(false)
     return (
