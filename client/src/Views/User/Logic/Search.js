@@ -139,8 +139,24 @@ const Search = () => {
         setReturnSelected(true)
         setSelectedRet(params)
     }
-
-
+    // Seats, Cabin, 2 Flight ids, username
+    const reserveData = {
+        seats: seats,
+        cabin: cabin,
+        departureId: selectedDepFlight._id,
+        returnId: selectedRetFlight._id,
+        username:"Mazen"
+    }
+    const handleReserve = (e) => {
+        e.preventDefault()
+        axios.post('/Users/reserveFlight', reserveData)
+        .then((response) => {
+            console.log(response.data)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
     return {
         handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
         handleFromChange, handleToChange, data, returnData, handleDecrement, handleIncrement,
@@ -149,7 +165,7 @@ const Search = () => {
         seats, setSeats, cabin, setCabin, counterChild, setCounterChild, depSelected, setDepSelected,
         returnSelected, setReturnSelected, departureFlights, setDepartureFlights, departureId,
         setDepartureId, isFetching, setFetching, showCheckout, setShowCheckout, returnFlights, setReturnFlights,
-        selectedDepFlight, selectedRetFlight, handleReturnSelected
+        selectedDepFlight, selectedRetFlight, handleReturnSelected, handleReserve
     }
 }
 export default Search;

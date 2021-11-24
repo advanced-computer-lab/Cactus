@@ -13,7 +13,7 @@ export default function Schedule() {
     ];
     return (
         <div>
-            <Paper>
+            <Paper style={{ borderRadius: '20px'}}>
                 <Scheduler
                     data={schedulerData}
                 >
