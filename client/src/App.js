@@ -3,12 +3,12 @@ import './App.css';
 
 //___________Middleware___________
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { UserContext } from './Context/UserContext';
 
 
 //___________Views___________
 import AdminHome from './Views/Admin/AdminHome'
 import UserHome from './Views/User/UserHome'
-import HomePage from './Views/HomePage'
 import AddFlight from './Views/Admin/Flight/AddFlight'
 import EditFlight from './Views/Admin/Flight/EditFlight'
 import FindFlight from './Views/Admin/Flight/FindFlight'
@@ -17,13 +17,11 @@ import Register from './Views/User/Register'
 import UserProfile from './Views/User/UserProfile'
 
 
-
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
-import { amber } from '@mui/material/colors';
+import { useState } from 'react';
 
 
-const color = amber.A200;
 
 const theme = createTheme({
   palette: {
@@ -46,21 +44,12 @@ const theme = createTheme({
 });
 
 function App() {
+  const [loggedUser, setLoggedUser] = useState()
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
         <Router>
           <Switch>
-            <Route exact path="/">
-              {/* <Login /> */}
-              <HomePage />
-            </Route>
-            <Route path="/Register">
-              <Register />
-            </Route>
-            <Route path="/homepage">
-              <UserHome />
-            </Route>
             <Route path="/adminHome">
               <AdminHome />
             </Route>
@@ -73,12 +62,16 @@ function App() {
             <Route path="/findFlight">
               <FindFlight />
             </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/UserProfile">
-              <UserProfile />
-            </Route>
+            <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
+              <Route exact path="/" component={UserHome} />
+              <Route path="/Register">
+                <Register />
+              </Route>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <Route path="/UserProfile" component={UserProfile} />
+            </UserContext.Provider>
           </Switch>
         </Router>
       </ThemeProvider>

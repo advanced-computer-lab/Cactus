@@ -19,6 +19,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import logo from '../../../logo4.png'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom'
+import { UserContext } from '../../../Context/UserContext';
 
 
 function Copyright(props) {
@@ -36,11 +37,12 @@ function Copyright(props) {
 
 
 export default function SignInSide() {
-  const [username, setUsername] = React.useState();
-  const [userPass, setPassword] = React.useState();
+  const [username, setUsername] = React.useState('');
+  const [userPass, setPassword] = React.useState('');
   const [isFetching, setFetching] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const history = useHistory()
+  const { setLoggedUser } = React.useContext(UserContext)
 
   const usernameChange = (e) => {
     setUsername(e.target.value)
@@ -69,7 +71,9 @@ export default function SignInSide() {
             history.push("/adminHome")
           }
           else{
-            history.push("/homepage")
+            setFetching(false)
+            setLoggedUser(res.data)
+            history.push("/")
           }
         }
       })

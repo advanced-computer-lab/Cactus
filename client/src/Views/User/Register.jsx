@@ -22,7 +22,7 @@ import CountryBox from '../../Components/User/CountryBox'
 import AreaCodeBox from '../../Components/User/AreaCodeBox'
 import UserNavBar from '../../Components/User/UserNavBar'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-
+import axios from 'axios'
 
 
 let index = 0;
@@ -30,8 +30,15 @@ let index = 0;
 function Register() {
     const [activeStep, setActiveStep] = React.useState(0);
     const [title, setTitle] = React.useState('');
-    // const [date, setDate] = React.useState(new Date());
-    const [values, setValues] = React.useState({
+    const [firstName, setFName] = React.useState();
+    const [lastName, setLName] = React.useState();
+    const [dateOfBirth, setDoB] = React.useState();
+    const [username, setUsername] = React.useState();
+    const [email, setEmail] = React.useState();
+    const [gender, setGender] = React.useState();
+    const [passportNumber, setPassportNumber] = React.useState();
+    const [phoneNumber, setPhoneNumber] = React.useState();
+    const [password, setPassword] = React.useState({
         password: '',
         showPassword: false,
         retypePassword: '',
@@ -39,22 +46,22 @@ function Register() {
     });
 
     const handlePasswordChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
+        setPassword({ ...password, [prop]: event.target.value });
     };
     const handleRetypePasswordChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
+        setPassword({ ...password, [prop]: event.target.value });
     };
 
     const handleClickShowPassword = () => {
-        setValues({
-            ...values,
-            showPassword: !values.showPassword,
+        setPassword({
+            ...password,
+            showPassword: !password.showPassword,
         });
     };
     const handleClickShowRetypePassword = () => {
-        setValues({
-            ...values,
-            showRetypePassword: !values.showRetypePassword,
+        setPassword({
+            ...password,
+            showRetypePassword: !password.showRetypePassword,
         });
     };
 
@@ -68,9 +75,31 @@ function Register() {
     const handleChange = (event) => {
         setTitle(event.target.value);
     };
+    const newUser = {
+        title: title,
+        firstName: firstName,
+        lastName: lastName,
+        dateOfBirth: dateOfBirth,
+        username: username,
+        email: email,
+        password: password.password,
+        passportNumber: passportNumber,
+        gender: gender,
+        phoneNumber: phoneNumber
+    };
     const handleNext = () => {
         index++;
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        if(index === 2){
+            axios.post('/Authentication/Register',newUser)
+            .then((res)=>{
+                console.log(res.data)
+            })
+            .catch((error)=>{
+                console.log(error.message)
+            })
+        }
+
     };
 
     const handleBack = () => {
@@ -82,6 +111,7 @@ function Register() {
         index = 0;
         setActiveStep(0);
     };
+
     return (
         <div >
             <UserNavBar />
@@ -117,6 +147,9 @@ function Register() {
                                                 placeholder="Username"
                                                 type="text"
                                                 fullWidth
+                                                onChange={(e)=>{
+                                                    setUsername(e.target.value)
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item lg={6}></Grid>
@@ -128,6 +161,9 @@ function Register() {
                                                 placeholder="user@email.com"
                                                 type="email"
                                                 fullWidth
+                                                onChange={(e)=>{
+                                                    setEmail(e.target.value)
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item lg={6}>
@@ -135,9 +171,9 @@ function Register() {
                                                 <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                                                 <OutlinedInput
                                                     id="outlined-adornment-password"
-                                                    type={values.showPassword ? 'text' : 'password'}
+                                                    type={password.showPassword ? 'text' : 'password'}
                                                     fullWidth
-                                                    value={values.password}
+                                                    value={password.password}
                                                     onChange={handlePasswordChange('password')}
                                                     endAdornment={
                                                         <InputAdornment position="end">
@@ -147,7 +183,7 @@ function Register() {
                                                                 onMouseDown={handleMouseDownPassword}
                                                                 edge="end"
                                                             >
-                                                                {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                                                {password.showPassword ? <VisibilityOff /> : <Visibility />}
                                                             </IconButton>
                                                         </InputAdornment>
                                                     }
@@ -160,9 +196,9 @@ function Register() {
                                                 <InputLabel htmlFor="outlined-adornment-password">Retype Password</InputLabel>
                                                 <OutlinedInput
                                                     id="outlined-adornment-password"
-                                                    type={values.showRetypePassword ? 'text' : 'password'}
+                                                    type={password.showRetypePassword ? 'text' : 'password'}
                                                     fullWidth
-                                                    value={values.retypePassword}
+                                                    value={password.retypePassword}
                                                     onChange={handleRetypePasswordChange('retypePassword')}
                                                     endAdornment={
                                                         <InputAdornment position="end">
@@ -172,7 +208,7 @@ function Register() {
                                                                 onMouseDown={handleMouseDownRetypePassword}
                                                                 edge="end"
                                                             >
-                                                                {values.showRetypePassword ? <VisibilityOff /> : <Visibility />}
+                                                                {password.showRetypePassword ? <VisibilityOff /> : <Visibility />}
                                                             </IconButton>
                                                         </InputAdornment>
                                                     }
@@ -191,6 +227,9 @@ function Register() {
                                                 placeholder="XXXXXXXX"
                                                 type="tel"
                                                 fullWidth
+                                                onChange={(e)=>{
+                                                    setPhoneNumber(e.target.value)
+                                                }}
                                             />
                                         </Grid>
 
@@ -250,6 +289,9 @@ function Register() {
                                                     placeholder="First Name (as per passport)"
                                                     type="text"
                                                     fullWidth
+                                                    onChange={(e)=>{
+                                                        setFName(e.target.value)
+                                                    }}
                                                 />
                                             </Grid>
                                             <Grid item lg={5}>
@@ -260,6 +302,9 @@ function Register() {
                                                     placeholder="Last Name (as per passport)"
                                                     type="text"
                                                     fullWidth
+                                                    onChange={(e)=>{
+                                                        setLName(e.target.value)
+                                                    }}
                                                 />
                                             </Grid>
                                             <Grid item lg={12}>
@@ -269,6 +314,9 @@ function Register() {
                                                     fullWidth
                                                     type="text"
                                                     required
+                                                    onChange={(e)=>{
+                                                        setPassportNumber(e.target.value)
+                                                    }}
                                                 />
                                             </Grid>
                                             <Grid item lg={12}>
@@ -284,12 +332,22 @@ function Register() {
                                                         shrink: true,
                                                     }}
                                                     required
+                                                    onChange={(e)=>{
+                                                        setDoB(e.target.value)
+                                                    }}
                                                 />
                                             </Grid>
                                             <Grid item lg={4}>
                                                 <FormControl component="fieldset">
                                                     <FormLabel component="legend" style={{ textAlign: 'start' }}>Gender</FormLabel>
-                                                    <RadioGroup row-aria-label="gender" name="row-radio-button-group" row>
+                                                    <RadioGroup 
+                                                    row-aria-label="gender" 
+                                                    name="row-radio-button-group" 
+                                                    row
+                                                    onChange={(e)=>{
+                                                        setGender(e.target.value)
+                                                    }}
+                                                    >
                                                         <FormControlLabel value="Male" control={<Radio />} label="Male" />
                                                         <FormControlLabel value="Female" control={<Radio />} label="Female" />
                                                     </RadioGroup>

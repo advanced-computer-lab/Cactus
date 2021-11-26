@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 // ____________CUSTOM COMPONENTS_________________
 import Schedule from '../../Components/User/flightSchedule/Schedule';
 
+
 // ____________MATERIAL UI COMPONENTS_________________
 import {
     Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
-    Paper, TextField, FormControl, FormControlLabel, Autocomplete
+    Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress
 } from '@mui/material';
 
 // ____________ICONS_________________
@@ -71,23 +72,38 @@ function a11yProps(index) {
 }
 
 function BookFlight() {
+    const [progress, setProgress] = React.useState(0);
 
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setProgress((oldProgress) => {
+                if (oldProgress === 100) {
+                    return 0;
+                }
+                const diff = Math.random() * 10;
+                return Math.min(oldProgress + diff, 100);
+            });
+        }, 500);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
     const { handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
         handleFromChange, handleToChange, handleDecrement, handleIncrement, handleDecrementChild,
         handleIncrementChild, value, date, setDate, open, counter, search, setSearch, from, to, cabin, setCabin,
         counterChild, depSelected, setDepSelected, returnSelected, setReturnSelected, departureFlights, isFetching,
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats
     } = Search()
-    
+    // TODO: add handleReserve ^
     return (
         <>
-            <Paper elevation={1} square style={{ borderRadius: '1rem', marginTop: '50px' }}>
+            <Paper elevation={1} style={{ borderRadius: '1rem', marginTop: '50px' }}>
                 <Box sx={{ width: '100%' }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="Booking tabs" indicatorColor="secondary">
                             <Tab icon={<FlightTakeoffIcon />} iconPosition='start' label="BOOK FLIGHT" {...a11yProps(0)} />
                             <Tab icon={<EventNoteIcon />} iconPosition='start' label="MY TRIPS" {...a11yProps(1)} />
-
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
@@ -248,7 +264,7 @@ function BookFlight() {
                                 </Button>
                             </Grid>
                         </Grid>
-                        {search ?
+                        {isFetching? <LinearProgress variant="determinate" value={progress} color="secondary" style={{marginTop: '50px'}}/> : search ?
                             <>
                                 {/* Departure Flights */}
                                 {departureFlights.length === 0 ? <div><h2>No available flights</h2></div> : departureFlights.map((flight) =>
@@ -258,7 +274,7 @@ function BookFlight() {
                                             <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
                                             <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
                                         </Box>
-                                        <Paper elevation={3} square style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
+                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
                                             <Box sx={{ width: '100%' }}>
                                                 <Grid container spacing={5}>
                                                     <Grid item sx={4}>
@@ -306,7 +322,7 @@ function BookFlight() {
                                             <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
                                             <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
                                         </Box>
-                                        <Paper elevation={3} square style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
+                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
                                             <Box sx={{ width: '100%' }}>
                                                 <Grid container spacing={5}>
                                                     <Grid item sx={4}>
@@ -349,7 +365,7 @@ function BookFlight() {
                             <>
                                 <Grid container spacing={3}>
                                     <Grid item xs={8}>
-                                        <Paper elevation={2} square style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
+                                        <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
                                             <Box style={{
                                                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                                                 justifyContent: 'center', marginBottom: '30px'
@@ -388,8 +404,13 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice)*(seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={() => setSearch(true)}>Change this flight</Button>
+                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
+                                                        <Button variant="outlined" onClick={() => {
+                                                            setSearch(true)
+                                                            setReturnSelected(false)
+                                                        }}>
+                                                            Change this flight
+                                                        </Button>
                                                     </Box>
                                                 </Grid>
                                                 <Grid item sx={8}>
@@ -423,21 +444,26 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice)*(seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={() => setDepSelected(true)}>Change this flight</Button>
+                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)} EGP</Typography>
+                                                        <Button variant="outlined" onClick={() => {
+                                                            setDepSelected(true)
+                                                            setReturnSelected(false)
+                                                        }}>
+                                                            Change this flight
+                                                        </Button>
                                                     </Box>
                                                 </Grid>
                                             </Grid>
                                         </Paper>
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <Paper elevation={2} square style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
+                                        <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
                                             <Box style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Typography variant="h4" component="h4" color="secondary">
-                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice)*(seats))+((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice)*(seats))} EGP
+                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats))} EGP
                                                 </Typography>
                                                 <br />
-                                                <Divider variant="middle"/>
+                                                <Divider variant="middle" />
                                                 <br />
                                                 <Button variant="contained" color="secondary"
                                                     onClick={() => setShowCheckout(true)}
@@ -451,15 +477,17 @@ function BookFlight() {
                             </>
                             :
                             <></>}
+                        {/* TODO: onClick={handleReserve} */}
 
 
                     </TabPanel>
                     <TabPanel value={value} index={1} >
                         <Schedule />
+                        <SeatSelector />
                     </TabPanel>
                 </Box>
             </Paper>
-            <SeatSelector />
+
         </>
     );
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import './Checkout.css'
+import Search from '../../Views/User/Logic/Search'
 
 const CARD_OPTIONS = {
     iconStyle: "solid",
@@ -27,6 +28,7 @@ function Checkout() {
     const [success, setSuccess] = useState(false)
     const stripe = useStripe()
     const elements = useElements()
+    const { handleReserve } = Search()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -44,6 +46,7 @@ function Checkout() {
                 })
                 if (response.data.success) {
                     console.log("successful payment")
+                    handleReserve()
                     setSuccess(true)
                 }
             } catch (error) {

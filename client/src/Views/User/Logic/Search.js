@@ -1,5 +1,6 @@
-import { React, useState } from "react";
+import { useState, useContext } from "react";
 import axios from 'axios'
+import { UserContext } from "../../../Context/UserContext";
 
 const Search = () => {
     const [value, setValue] = useState(0);
@@ -21,6 +22,7 @@ const Search = () => {
     const [showCheckout, setShowCheckout] = useState(false)
     const [selectedDepFlight, setSelectedDep] = useState({})
     const [selectedRetFlight, setSelectedRet] = useState({})
+    const { loggedUser } = useContext(UserContext)
 
 
 
@@ -106,6 +108,15 @@ const Search = () => {
         e.preventDefault()
         console.log(data);
         setFetching(true)
+        if(search){
+            setSearch(false)
+        }
+        if(depSelected){
+            setDepSelected(false)
+        }
+        if(returnSelected){
+            setReturnSelected(false)
+        }
         axios.post('/Users/getFlights', data)
             .then((response) => {
                 setSearch(true)
@@ -139,16 +150,16 @@ const Search = () => {
         setReturnSelected(true)
         setSelectedRet(params)
     }
-    // Seats, Cabin, 2 Flight ids, username
-    const reserveData = {
-        seats: seats,
-        cabin: cabin,
-        departureId: selectedDepFlight._id,
-        returnId: selectedRetFlight._id,
-        username:"Mazen"
-    }
-    const handleReserve = (e) => {
-        e.preventDefault()
+    
+    const handleReserve = () => {
+        const reserveData = {
+            seats: seats,
+            cabin: cabin,
+            departureId: selectedDepFlight._id,
+            returnId: selectedRetFlight._id,
+            username: loggedUser.username
+        }
+        console.log(reserveData)
         axios.post('/Users/reserveFlight', reserveData)
         .then((response) => {
             console.log(response.data)
