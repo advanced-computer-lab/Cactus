@@ -2,6 +2,10 @@
 const express = require('express')
 const UserRouter = express.Router()
 const mongoose = require('mongoose')
+const nodemailer = require('nodemailer')
+require('dotenv').config();
+
+const EMAIL_PASS = process.env.EMAIL_PASS
 
 //___________Schema___________
 const User = require('../../Schemas/Users')
@@ -130,6 +134,28 @@ UserRouter.post('/reserveFlight', (req, res) => {
                         }
                     }
                    reserve.remove()
+                //    Sending Mail
+                    console.log("Sending Mail Here");
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'Cactusairlinesguc@gmail.com',
+                            pass: EMAIL_PASS
+                        }
+                    })
+                    var mailOptions = {
+                        from: 'Cactusairlinesguc@gmail.com',
+                        to: req.body.email,
+                        subject: 'Cancellation Email',
+                        text: 'Dear ' +req.body.title +' '+ req.body.firstName+ ' Your booking has been cancelled successfully, you will be refunded EGP ' + req.body.refundedAmount +' We hope that we can have you on board with us soon. Cactus Airlines Team'
+                    } 
+                    transporter.sendMail(mailOptions, function(error,info){
+                        if(error){
+                            console.log(error);
+                        }else{
+                            console.log('Email send: '+info.response)
+                        }
+                    })
             users[0].save().then(()=> {
                 Flight.findById(reserve.departureId)
                 .then((flight) => {

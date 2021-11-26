@@ -9,6 +9,7 @@ import { Link } from '@mui/material';
 import { useContext } from 'react';
 import { UserContext } from '../../Context/UserContext';
 import { useHistory } from 'react-router';
+// import logo from '../../logo5.png'
 
 
 export default function MenuAppBar() {
@@ -21,9 +22,20 @@ export default function MenuAppBar() {
   }
   return (
     <Box >
-      <AppBar position="static" color="secondary">
+      <AppBar 
+      position="static" 
+      style={{ boxShadow: "0px 0px 0px 0px" }} color="secondary">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          {/* <Box 
+            component="img"
+            sx={{
+              height: 64,
+            }}
+            alt="logo"
+            src={logo}
+            /> */}
+          
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} color="inherit">
             Cactus Airlines
           </Typography>
           <div>
@@ -37,10 +49,11 @@ export default function MenuAppBar() {
                   color="inherit"
                   startIcon={<AccountCircle />}
                   onClick={handleClick}
+                  style={{marginRight: '10px'}}
                 >
                   Hello {loggedUser.firstName}
                 </Button>
-                <Button variant="contained" color="error" onClick={()=>{setLoggedUser(null)}}>Logout</Button>
+                <Button variant="outlined" color="error" onClick={()=>{setLoggedUser(null)}}>Logout</Button>
               </>
               :
               <>
@@ -51,6 +64,7 @@ export default function MenuAppBar() {
                     aria-controls="menu-appbar"
                     aria-haspopup="true"
                     color="inherit"
+                    variant="outlined"
                     startIcon={<AccountCircle />}
                   >
                     Login|Sign up

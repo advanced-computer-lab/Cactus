@@ -1,11 +1,14 @@
 // ___________MIDDLEWARE____________
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import axios from 'axios'
 
 // ___________MATERIAL UI____________
 import { Box } from '@mui/system'
-import { IconButton, Typography, Tab, Tabs, Button, Grid, ButtonGroup, Divider, Paper, TextField, MenuItem, Menu, Alert } from '@mui/material'
+import { IconButton, Typography, Tab, Tabs, Button, Grid, ButtonGroup, Divider, 
+         Paper, TextField, MenuItem, Menu, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
+         DialogContentText, Collapse, Backdrop
+} from '@mui/material'
 
 // ___________MATERIAL UI ICONS____________
 import PersonIcon from '@mui/icons-material/Person';
@@ -24,6 +27,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import InfoIcon from '@mui/icons-material/Info';
 import EventNoteIcon from '@mui/icons-material/EventNote'
 import CircularProgress from '@mui/material/CircularProgress';
+import CloseIcon from '@mui/icons-material/Close';
 
 // ___________COMPONENTS____________
 import UserNavBar from '../../Components/User/UserNavBar'
@@ -95,26 +99,64 @@ export default function UserInfo() {
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        if (newValue === 1) {
-            setFetching(true)
-            axios.post('/Users/getAllReservations', { username: loggedUser.username })
-                .then((res) => {
-                    setReservations(res.data)
-                    setFetching(false)
-                })
-                .catch((error) => { console.log(error.message) })
-            console.log(reservations)
-        }
+        setFetching(true)
+            
+    };
+    useEffect(()=>{
+    const fetchReservations = async () =>{
+        axios.post('/Users/getAllReservations', { username: loggedUser.username })
+            .then((res) => {
+                setReservations(res.data)
+                setFetching(false)
+            })
+            .catch((error) => { console.log(error.message) })
+        console.log(reservations)
+    };
+    fetchReservations();
+    },[reservations])
+    const [openDialog, setOpenDialog] = React.useState(false);
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
     };
 
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+    const [success, setSuccess] = React.useState(false)
+    const [backdropOpen, setBackdropOpen] = React.useState(false);
+    const handleCancleBooking = (e, params) => {
+        e.preventDefault()
+        const data = {
+            username: loggedUser.username,
+            reservationId: params._id,
+            title: loggedUser.title,
+            refundedAmount: (params.departurePrice + params.returnPrice) * params.seats,
+            email: loggedUser.email,
+            firstName: loggedUser.firstName
+        }
+        console.log(data)
+        setOpenDialog(false);
+        setBackdropOpen(true)
+        axios.post("/Users/cancelReservation", data)
+            .then((res)=> {
+                console.log(res.data)
+                setSuccess(true)
+                setBackdropOpen(false)
+                })
+            .catch((error)=>{
+                console.log(error)
+            })
+    }
     return (
         <>
             <div>
                 <UserNavBar />
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {loggedUser ?
                 <>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div>
                         <Paper
                             elevation={2}
                             square
@@ -122,6 +164,27 @@ export default function UserInfo() {
                             style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '700px' }}
                         >
                             <Box >
+                            <Box sx={{ width: '100%' }}>
+                                <Collapse in={success}>
+                                    <Alert
+                                    action={
+                                        <IconButton
+                                        aria-label="close"
+                                        color="inherit"
+                                        size="small"
+                                        onClick={() => {
+                                            setSuccess(false);
+                                        }}
+                                        >
+                                        <CloseIcon fontSize="inherit" />
+                                        </IconButton>
+                                    }
+                                    sx={{ mb: 2 }}
+                                    >
+                                    You have received an email confirming your cancellation
+                                    </Alert>
+                                </Collapse>
+                                </Box>
                                 <Grid container spacing={1}>
                                     {/* User profile pic */}
                                     <Grid item sx={4}>
@@ -136,7 +199,7 @@ export default function UserInfo() {
                                     </Grid>
                                     {/* Navigation */}
                                     <Grid item sx={5}>
-                                        <Typography variant="h4" component="h4" style={{ marginLeft: '-100px' }}>{loggedUser.title} {loggedUser.firstName} {loggedUser.lastName}</Typography>
+                                        <Typography variant="h4" component="h4" >{loggedUser.title} {loggedUser.firstName} {loggedUser.lastName}</Typography>
                                         <ButtonGroup color="secondary" aria-label="navigation" style={{ marginTop: '50px', marginLeft: '20px' }}>
                                                 <Button variant="outlined" startIcon={<HomeIcon />} color="secondary" onClick={()=>{history.push("/")}}>
                                                     Home
@@ -270,14 +333,42 @@ export default function UserInfo() {
                                                                                     'aria-labelledby': 'basic-button',
                                                                                 }}
                                                                             >
-                                                                                <MenuItem onClick={handleClose}><Button variant="contained" color="info" fullWidth>View Details</Button></MenuItem>
+                                                                                <MenuItem onClick={handleClose}><Button variant="contained" color="warning" fullWidth>View Details</Button></MenuItem>
                                                                                 <Divider variant="middle" />
-                                                                                <MenuItem onClick={handleClose}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
+                                                                                <MenuItem onClick={handleOpenDialog}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
                                                                             </Menu>
+                                                                            
                                                                         </Grid>
                                                                     </Grid>
                                                                 </Box>
                                                             </Paper>
+                                                            <Dialog
+                                                                open={openDialog}
+                                                                onClose={handleCloseDialog}
+                                                                aria-labelledby="alert-dialog-title"
+                                                                aria-describedby="alert-dialog-description"
+                                                            >
+                                                                <DialogTitle id="alert-dialog-title">
+                                                                Cancel Booking {reservation._id}
+                                                                </DialogTitle>
+                                                                <DialogContent>
+                                                                <DialogContentText id="alert-dialog-description">
+                                                                    Are you sure you want to cancel this booking?
+                                                                </DialogContentText>
+                                                                </DialogContent>
+                                                                <DialogActions>
+                                                                <Button onClick={handleCloseDialog} color="warning" variant="outlined">Close</Button>
+                                                                <Button onClick={(e)=> {handleCancleBooking(e,reservation)}} autoFocus color="error" variant="contained">
+                                                                    Cancel Booking
+                                                                </Button>
+                                                                </DialogActions>
+                                                            </Dialog>
+                                                            <Backdrop
+                                                                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                                                                open={backdropOpen}
+                                                            >
+                                                                <CircularProgress color="inherit" />
+                                                            </Backdrop>
                                                         </>
                                                     )
                                                 }
@@ -293,6 +384,7 @@ export default function UserInfo() {
                 :
                 <><h1>User isn't logged in</h1></>
             }
+            </div>
         </>
     )
 }

@@ -6,11 +6,10 @@
     margin-left: 1090px;
     height: 55px;
 }
-.background{
-    width: 300px;
-    height: 500px;
-    background: url(../plane.png) no-repeat;
+.flightBtn{
+    width: 250px;
 }
-.foreground{
 
+.foreground{
+    margin-top: -150px;
 }

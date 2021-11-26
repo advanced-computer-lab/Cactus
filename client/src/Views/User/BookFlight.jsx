@@ -10,7 +10,8 @@ import Schedule from '../../Components/User/flightSchedule/Schedule';
 import {
     Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
-    Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress
+    Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
+    List, ListItem, ListItemText, ListItemIcon
 } from '@mui/material';
 
 // ____________ICONS_________________
@@ -20,6 +21,13 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import WifiIcon from '@mui/icons-material/Wifi';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import MovieIcon from '@mui/icons-material/Movie';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
+import servicesImage from '../serviceStock.png'
 
 // ____________MATERIAL UI LAB COMPONENTS_________________
 import Timeline from '@mui/lab/Timeline';
@@ -73,7 +81,7 @@ function a11yProps(index) {
 
 function BookFlight() {
     const [progress, setProgress] = React.useState(0);
-
+    const [details, setDetails] = React.useState(false);
     React.useEffect(() => {
         const timer = setInterval(() => {
             setProgress((oldProgress) => {
@@ -98,7 +106,9 @@ function BookFlight() {
     // TODO: add handleReserve ^
     return (
         <>
-            <Paper elevation={1} style={{ borderRadius: '1rem', marginTop: '50px' }}>
+          
+            <div>
+            <Paper elevation={1} style={{ borderRadius: '8px', marginTop: '50px' }}>
                 <Box sx={{ width: '100%' }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="Booking tabs" indicatorColor="secondary">
@@ -264,7 +274,8 @@ function BookFlight() {
                                 </Button>
                             </Grid>
                         </Grid>
-                        {isFetching? <LinearProgress variant="determinate" value={progress} color="secondary" style={{marginTop: '50px'}}/> : search ?
+                        {isFetching? <LinearProgress variant="determinate" value={progress} color="secondary" style={{marginTop: '50px'}}/> 
+                        : search ?
                             <>
                                 {/* Departure Flights */}
                                 {departureFlights.length === 0 ? <div><h2>No available flights</h2></div> : departureFlights.map((flight) =>
@@ -274,35 +285,129 @@ function BookFlight() {
                                             <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
                                             <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
                                         </Box>
-                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
+                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
                                             <Box sx={{ width: '100%' }}>
                                                 <Grid container spacing={5}>
                                                     <Grid item sx={4}>
-                                                        <Box style={{ display: "flex", flexDirection: "column" }}>
-                                                            <Typography color="secondary" variant="h4" component="h4">{flight.departureTime} {flight.departureAirport}</Typography>
-                                                            <Typography component="legend" >{flight.flightNumber}</Typography>
-                                                            <Typography component="legend" >Cairo</Typography>
+                                                        <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
+                                                            <Typography variant="h6" component="h6" style={{color: 'black'}}>{flight.departureTime} - {flight.arrivalTime}</Typography>
+                                                            <Timeline style={{ marginLeft: '-200px' }}>
+                                                                <TimelineItem>
+                                                                    <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary"/>
+                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }}/>
+                                                                    </TimelineSeparator>
+                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Cairo ({flight.departureAirport})</TimelineContent>
+                                                                </TimelineItem>
+                                                                <TimelineItem>
+                                                                    <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary"/>
+                                                                    </TimelineSeparator>
+                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Los Angeles ({flight.destinationAirport})</TimelineContent>
+                                                                </TimelineItem>
+                                                            </Timeline>
                                                         </Box>
                                                     </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '20px' }}>
-                                                        <ScheduleIcon />
-                                                        <Typography component="legend">14H</Typography>
+                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Cactus Airlines</Typography>
+                                                            <Typography component="legend">{flight.flightNumber}</Typography>
+                                                        </Box>
                                                     </Grid>
-                                                    <Grid item sx={4}>
-                                                        <Typography color="secondary" variant="h4" component="h4">{flight.arrivalTime} {flight.destinationAirport}</Typography>
-                                                        <Typography component="legend" >{flight.flightNumber}</Typography>
-                                                        <Typography component="legend" >Los Angeles</Typography>
+                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Duration</Typography>
+                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                                <ScheduleIcon />
+                                                                <Typography component="legend">14H</Typography>
+                                                            </Box>
+                                                        </Box>
                                                     </Grid>
-                                                    <Grid item sx={3}>
-                                                        <Paper elevation={2} square style={{
-                                                            borderRadius: '1rem', padding: '30px', marginLeft: '200px',
-                                                            display: 'flex', flexDirection: 'column', width: '500px'
-                                                        }}>
-                                                            <Typography color="secondary" variant="h3" component="h3">{cabin === "economy" ? flight.economyPrice : flight.businessPrice} EGP <span>/person</span></Typography>
-                                                            <br />
-                                                            <Button variant="outlined" fullWidth onClick={(e) => handleReturnFlight(flight, e)}>Select Flight</Button>
-                                                        </Paper>
+                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Services</Typography>
+                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                                <WifiIcon />
+                                                                <RestaurantIcon />
+                                                                <MovieIcon />
+                                                            </Box>
+                                                        </Box>
                                                     </Grid>
+                                                    <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                        <Button 
+                                                        variant="contained" 
+                                                        endIcon={<ExpandMoreIcon />} style={{marginBottom: '20px'}} className="flightBtn"
+                                                        onClick={()=>setDetails(true)}
+                                                        >
+                                                            From {<br/>}
+                                                            EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                        </Button>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sx={2}></Grid>
+                                                    {details ?
+                                                    <Grid item sx={12}>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sx={5}>
+                                                                <Box style={{marginLeft: '250px'}}>
+                                                                    <Card sx={{ minWidth: 400 }}>
+                                                                        <CardContent>
+                                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                                {cabin.toUpperCase()}
+                                                                            </Typography>
+                                                                            <Typography variant="legend" component="div">
+                                                                                Included per Passenger
+                                                                            </Typography>
+                                                                            <Typography variant="body2">
+                                                                                <List>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="2 checked baggage (23 kg)" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="Seat Selection" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="Refundable" />
+                                                                                    </ListItem>
+                                                                                    </List>
+                                                                            </Typography>
+                                                                        </CardContent>
+                                                                        <CardActions style={{alignItems: 'end'}}>
+                                                                            <Button size="medium" variant="outlined" onClick={(e) => { handleReturnFlight(flight, e) }}>Select Flight</Button>
+                                                                        </CardActions>
+                                                                     </Card>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={3}>
+                                                                <Box style={{marginLeft: '100px'}}>
+                                                                    <img src={servicesImage} alt="stock" 
+                                                                    style={{width: '300px', height: '300px', borderRadius: '8px'}}/>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={1}>
+                                                                <Button startIcon={<CloseIcon />} onClick={()=> setDetails(false)}/>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Grid>
+                                                    :
+                                                    <></>
+                                                    }
                                                 </Grid>
                                             </Box>
                                         </Paper>
@@ -320,37 +425,128 @@ function BookFlight() {
                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
                                             <Typography variant="h4" component="h4" color="primary">Select your return flight from</Typography>
                                             <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
-                                            <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
+                                            <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>            
                                         </Box>
-                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', maxHeight: '300px' }}>
+                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
                                             <Box sx={{ width: '100%' }}>
                                                 <Grid container spacing={5}>
                                                     <Grid item sx={4}>
-                                                        <Box style={{ display: "flex", flexDirection: "column" }}>
-                                                            <Typography color="secondary" variant="h4" component="h4">{flight.departureTime} {flight.departureAirport}</Typography>
-                                                            <Typography component="legend" >{flight.flightNumber}</Typography>
-                                                            <Typography component="legend" >Los Angeles</Typography>
+                                                        <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
+                                                            <Typography variant="h6" component="h6" style={{color: 'black'}}>{flight.departureTime} - {flight.arrivalTime}</Typography>
+                                                            <Timeline style={{ marginLeft: '-200px' }}>
+                                                                <TimelineItem>
+                                                                    <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary"/>
+                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }}/>
+                                                                    </TimelineSeparator>
+                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Los Angeles ({flight.departureAirport})</TimelineContent>
+                                                                </TimelineItem>
+                                                                <TimelineItem>
+                                                                    <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary"/>
+                                                                    </TimelineSeparator>
+                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Cairo ({flight.destinationAirport})</TimelineContent>
+                                                                </TimelineItem>
+                                                            </Timeline>
                                                         </Box>
                                                     </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '20px' }}>
-                                                        <ScheduleIcon />
-                                                        <Typography component="legend">14H</Typography>
+                                                     <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Cactus Airlines</Typography>
+                                                            <Typography component="legend">{flight.flightNumber}</Typography>
+                                                        </Box>
                                                     </Grid>
-                                                    <Grid item sx={4}>
-                                                        <Typography color="secondary" variant="h4" component="h4">{flight.arrivalTime} {flight.destinationAirport}</Typography>
-                                                        <Typography component="legend" >{flight.flightNumber}</Typography>
-                                                        <Typography component="legend" >Cairo</Typography>
+                                                     <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Duration</Typography>
+                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                                <ScheduleIcon />
+                                                                <Typography component="legend">14H</Typography>
+                                                            </Box>
+                                                        </Box>
                                                     </Grid>
-                                                    <Grid item sx={3}>
-                                                        <Paper elevation={2} square style={{
-                                                            borderRadius: '1rem', padding: '30px', marginLeft: '200px',
-                                                            display: 'flex', flexDirection: 'column', width: '500px'
-                                                        }}>
-                                                            <Typography color="secondary" variant="h3" component="h3">{cabin === "economy" ? flight.economyPrice : flight.businessPrice} EGP <span>/person</span></Typography>
-                                                            <br />
-                                                            <Button variant="outlined" fullWidth onClick={(e) => { handleReturnSelected(flight, e) }}>Select Flight</Button>
-                                                        </Paper>
+                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                            <Typography component="legend">Services</Typography>
+                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                                <WifiIcon />
+                                                                <RestaurantIcon />
+                                                                <MovieIcon />
+                                                            </Box>
+                                                        </Box>
                                                     </Grid>
+                                                    <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
+                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                                                        <Button 
+                                                        variant="contained" 
+                                                        endIcon={<ExpandMoreIcon />} style={{marginBottom: '20px'}} className="flightBtn"
+                                                        onClick={()=>setDetails(true)}
+                                                        >
+                                                            From {<br/>}
+                                                            EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                        </Button>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sx={2}></Grid>
+                                                    {details ?
+                                                    <Grid item sx={12}>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sx={6}>
+                                                                <Box style={{marginLeft: '250px'}}>
+                                                                    <Card sx={{ minWidth: 400 }}>
+                                                                        <CardContent>
+                                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                                {cabin.toUpperCase()}
+                                                                            </Typography>
+                                                                            <Typography variant="legend" component="div">
+                                                                                Included per Passenger
+                                                                            </Typography>
+                                                                            <Typography variant="body2">
+                                                                                <List>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="2 checked baggage (23 kg)" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="Seat Selection" />
+                                                                                    </ListItem>
+                                                                                    <ListItem disablePadding>
+                                                                                        <ListItemIcon>
+                                                                                            <DoneIcon color="primary"/>
+                                                                                        </ListItemIcon>
+                                                                                        <ListItemText primary="Refundable" />
+                                                                                    </ListItem>
+                                                                                    </List>
+                                                                            </Typography>
+                                                                        </CardContent>
+                                                                        <CardActions style={{alignItems: 'end'}}>
+                                                                            <Button size="medium" variant="outlined" onClick={(e) => { handleReturnSelected(flight, e) }}>Select Flight</Button>
+                                                                        </CardActions>
+                                                                     </Card>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={3}>
+                                                                <Box style={{marginLeft: '100px'}}>
+                                                                    <img src={servicesImage} alt="stock" 
+                                                                    style={{width: '300px', height: '300px', borderRadius: '8px'}}/>
+                                                                </Box>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Grid>
+                                                    :
+                                                    <></>
+                                                    }
                                                 </Grid>
                                             </Box>
                                         </Paper>
@@ -487,6 +683,7 @@ function BookFlight() {
                     </TabPanel>
                 </Box>
             </Paper>
+            </div>
 
         </>
     );
