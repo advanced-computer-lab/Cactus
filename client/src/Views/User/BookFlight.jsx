@@ -1,6 +1,8 @@
 // ____________MIDDLEWARE_________________
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { UserContext } from '../../Context/UserContext';
+import axios from 'axios'
 
 // ____________CUSTOM COMPONENTS_________________
 import Schedule from '../../Components/User/flightSchedule/Schedule';
@@ -11,16 +13,13 @@ import {
     Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
-    List, ListItem, ListItemText, ListItemIcon
+    List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton
 } from '@mui/material';
 
 // ____________ICONS_________________
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import DateRangePicker from '@mui/lab/DateRangePicker';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import WifiIcon from '@mui/icons-material/Wifi';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import MovieIcon from '@mui/icons-material/Movie';
@@ -28,6 +27,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import servicesImage from '../serviceStock.png'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 // ____________MATERIAL UI LAB COMPONENTS_________________
 import Timeline from '@mui/lab/Timeline';
@@ -37,6 +37,9 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import DateRangePicker from '@mui/lab/DateRangePicker';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 // ____________STRIPE_________________
 import StripeContainer from '../../Components/User/StripeContainer'
@@ -79,9 +82,26 @@ function a11yProps(index) {
     };
 }
 
+
+
 function BookFlight() {
+    const { handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
+        handleFromChange, handleToChange, handleDecrement, handleIncrement, handleDecrementChild,
+        handleIncrementChild, value, date, setDate, open, counter, search, setSearch, from, to, cabin, setCabin,
+        counterChild, depSelected, setDepSelected, returnSelected, setReturnSelected, departureFlights, isFetching,
+        showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
+        loginOpen, setLoginOpen, success, handleReserve
+    } = Search()
+
     const [progress, setProgress] = React.useState(0);
     const [details, setDetails] = React.useState(false);
+    const [username, setUsername] = React.useState('');
+    const [userPass, setPassword] = React.useState('');
+
+    const [isFetchingUser, setFetchingUser] = React.useState(false)
+    const [alertOpen, setAlertOpen] = React.useState(false)
+    const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+
     React.useEffect(() => {
         const timer = setInterval(() => {
             setProgress((oldProgress) => {
@@ -97,592 +117,717 @@ function BookFlight() {
             clearInterval(timer);
         };
     }, []);
-    const { handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
-        handleFromChange, handleToChange, handleDecrement, handleIncrement, handleDecrementChild,
-        handleIncrementChild, value, date, setDate, open, counter, search, setSearch, from, to, cabin, setCabin,
-        counterChild, depSelected, setDepSelected, returnSelected, setReturnSelected, departureFlights, isFetching,
-        showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats
-    } = Search()
-    // TODO: add handleReserve ^
+
+
+
+    const handleLoginClose = () => {
+        setLoginOpen(false);
+    };
+    const usernameChange = (e) => {
+        setUsername(e.target.value)
+    }
+    const passwordChange = (e) => {
+        setPassword(e.target.value)
+    }
+
+    const user = {
+        "username": username,
+        "password": userPass
+    }
+    const handleLogin = (e) => {
+        e.preventDefault()
+        setFetchingUser(true)
+        axios.post('/Authentication/Login', user)
+            .then((res) => {
+                if (res.data.username === undefined || res.data.password === undefined) {
+                    setFetchingUser(false)
+                    setAlertOpen(true)
+                } else {
+                    setLoggedUser(res.data)
+                    console.log(res.data)
+                    setLoginOpen(false)
+                    setFetchingUser(false)
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                setFetchingUser(false)
+                setAlertOpen(true)
+            })
+
+    }
+    const handleShowCheckout = (e) => {
+        e.preventDefault()
+        if (loggedUser === undefined) {
+            setShowCheckout(false)
+            setLoginOpen(true)
+        }
+        else {
+            setShowCheckout(true)
+        }
+    }
     return (
         <>
-          
+
             <div>
-            <Paper elevation={1} style={{ borderRadius: '8px', marginTop: '50px' }}>
-                <Box sx={{ width: '100%' }}>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                        <Tabs value={value} onChange={handleChange} aria-label="Booking tabs" indicatorColor="secondary">
-                            <Tab icon={<FlightTakeoffIcon />} iconPosition='start' label="BOOK FLIGHT" {...a11yProps(0)} />
-                            <Tab icon={<EventNoteIcon />} iconPosition='start' label="MY TRIPS" {...a11yProps(1)} />
-                        </Tabs>
-                    </Box>
-                    <TabPanel value={value} index={0}>
-                        <Grid container spacing={1}>
-                            {/* From */}
-                            <Grid item lg={3}>
-                                <Autocomplete
-                                    id="country-select-demo"
-                                    options={countries}
-                                    autoHighlight
-                                    getOptionLabel={(option) => option.code}
-                                    renderOption={(props, option) => (
-                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                            <img
-                                                loading="lazy"
-                                                width="20"
-                                                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                alt=""
+                <Paper elevation={1} style={{ borderRadius: '8px', marginTop: '50px' }}>
+                    <Box sx={{ width: '100%' }}>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <Tabs value={value} onChange={handleChange} aria-label="Booking tabs" indicatorColor="secondary">
+                                <Tab icon={<FlightTakeoffIcon />} iconPosition='start' label="BOOK FLIGHT" {...a11yProps(0)} />
+                                <Tab icon={<EventNoteIcon />} iconPosition='start' label="MY TRIPS" {...a11yProps(1)} />
+                            </Tabs>
+                        </Box>
+                        <TabPanel value={value} index={0}>
+                            <Grid container spacing={1}>
+                                {/* From */}
+                                <Grid item lg={3}>
+                                    <Autocomplete
+                                        id="country-select-demo"
+                                        options={countries}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.code}
+                                        renderOption={(props, option) => (
+                                            <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                <img
+                                                    loading="lazy"
+                                                    width="20"
+                                                    src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                    srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                    alt=""
+                                                />
+                                                {option.label} ({option.code})
+                                            </Box>
+                                        )}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="From"
+                                                fullWidth
+                                                required
+                                                onChange={handleFromChange}
+                                                inputProps={{
+                                                    ...params.inputProps,
+                                                    autoComplete: 'new-password', // disable autocomplete and autofill
+                                                }}
                                             />
-                                            {option.label} ({option.code})
-                                        </Box>
-                                    )}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="From"
-                                            fullWidth
-                                            required
-                                            onChange={handleFromChange}
-                                            inputProps={{
-                                                ...params.inputProps,
-                                                autoComplete: 'new-password', // disable autocomplete and autofill
-                                            }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            {/* To */}
-                            <Grid item lg={3}>
-                                <Autocomplete
-                                    id="country-select-demo"
-                                    options={countries}
-                                    autoHighlight
-                                    getOptionLabel={(option) => option.code}
-                                    renderOption={(props, option) => (
-                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                            <img
-                                                loading="lazy"
-                                                width="20"
-                                                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                alt=""
-                                            />
-                                            {option.label} ({option.code})
-                                        </Box>
-                                    )}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="To"
-                                            fullWidth
-                                            required
-                                            onChange={handleToChange}
-                                            inputProps={{
-                                                ...params.inputProps,
-                                                autoComplete: 'new-password', // disable autocomplete and autofill
-                                            }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            {/* Dates */}
-                            <Grid item lg={4}>
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DateRangePicker
-                                        startText="Departure"
-                                        endText="Return"
-                                        value={date}
-                                        onChange={(newDate) => {
-                                            setDate(newDate);
-                                        }}
-                                        renderInput={(startProps, endProps) => (
-                                            <React.Fragment>
-                                                <TextField {...startProps} required />
-                                                <Box sx={{ mx: 2 }}> to </Box>
-                                                <TextField {...endProps} required />
-                                            </React.Fragment>
                                         )}
                                     />
-                                </LocalizationProvider>
-                            </Grid>
-                            {/* Cabin and Seats */}
-                            <Grid item lg={2}>
-                                <Button variant="outlined" onClick={handleClickOpen} className="button">
-                                    Passenger/Cabin
-                                </Button>
-                                <Dialog open={open} onClose={handleClose}>
-                                    <DialogContent>
-                                        <Typography component="legend">Passengers</Typography>
-                                        <br />
-                                        <Grid container spacing={2}>
-                                            <Grid item sx={2}>
-                                                <Typography variant="h6" component="h6">Adults (12+ years)</Typography>
-                                            </Grid>
-                                            <Grid item sx={6}>
-                                                <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '13px' }}>
-                                                    <Button onClick={handleDecrement}>-</Button>
-                                                    <Button >{counter}</Button>
-                                                    <Button onClick={handleIncrement}>+</Button>
-
-                                                </ButtonGroup>
-                                            </Grid>
-                                        </Grid>
-                                        <Grid container spacing={2}>
-                                            <Grid item sx={2}>
-                                                <Typography variant="h6" component="h6">Child (2-11 years)</Typography>
-                                            </Grid>
-                                            <Grid item sx={6}>
-                                                <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '20px' }}>
-                                                    <Button onClick={handleDecrementChild}>-</Button>
-                                                    <Button >{counterChild}</Button>
-                                                    <Button onClick={handleIncrementChild}>+</Button>
-
-                                                </ButtonGroup>
-                                            </Grid>
-                                        </Grid>
-                                        <br />
-                                        <Divider variant="middle" />
-                                        <br />
-                                        <FormControl component="fieldset">
-                                            <Typography component="legend">Cabin</Typography>
-                                            <br />
-                                            <RadioGroup
-                                                aria-label="economy"
-                                                defaultValue='economy'
-                                                value={cabin}
-                                                name="radio-buttons-group"
-                                                onChange={(e) => setCabin(e.target.value)}
-                                            >
-                                                <FormControlLabel value="economy" control={<Radio />} label="Economy" />
-                                                <FormControlLabel value="business" control={<Radio />} label="Business" />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleClose} color="success">Confirm</Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </Grid>
-                            <Grid item lg={10}></Grid>
-                            {/* Search Button */}
-                            <Grid item lg={2}>
-                                <Button variant="contained" endIcon={<FlightTakeoffIcon />} className="searchButton"
-                                    onClick={handleFindFlight}
-                                >
-                                    {isFetching ? <CircularProgress color="primary" /> : "Show Flights"}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        {isFetching? <LinearProgress variant="determinate" value={progress} color="secondary" style={{marginTop: '50px'}}/> 
-                        : search ?
-                            <>
-                                {/* Departure Flights */}
-                                {departureFlights.length === 0 ? <div><h2>No available flights</h2></div> : departureFlights.map((flight) =>
-                                    <>
-                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                            <Typography variant="h4" component="h4" color="primary">Select your departure flight from</Typography>
-                                            <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
-                                            <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
-                                        </Box>
-                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
-                                            <Box sx={{ width: '100%' }}>
-                                                <Grid container spacing={5}>
-                                                    <Grid item sx={4}>
-                                                        <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
-                                                            <Typography variant="h6" component="h6" style={{color: 'black'}}>{flight.departureTime} - {flight.arrivalTime}</Typography>
-                                                            <Timeline style={{ marginLeft: '-200px' }}>
-                                                                <TimelineItem>
-                                                                    <TimelineSeparator>
-                                                                    <TimelineDot variant="outlined" color="secondary"/>
-                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }}/>
-                                                                    </TimelineSeparator>
-                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Cairo ({flight.departureAirport})</TimelineContent>
-                                                                </TimelineItem>
-                                                                <TimelineItem>
-                                                                    <TimelineSeparator>
-                                                                    <TimelineDot variant="outlined" color="secondary"/>
-                                                                    </TimelineSeparator>
-                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Los Angeles ({flight.destinationAirport})</TimelineContent>
-                                                                </TimelineItem>
-                                                            </Timeline>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Cactus Airlines</Typography>
-                                                            <Typography component="legend">{flight.flightNumber}</Typography>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Duration</Typography>
-                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                                                <ScheduleIcon />
-                                                                <Typography component="legend">14H</Typography>
-                                                            </Box>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Services</Typography>
-                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                                                <WifiIcon />
-                                                                <RestaurantIcon />
-                                                                <MovieIcon />
-                                                            </Box>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                        <Button 
-                                                        variant="contained" 
-                                                        endIcon={<ExpandMoreIcon />} style={{marginBottom: '20px'}} className="flightBtn"
-                                                        onClick={()=>setDetails(true)}
-                                                        >
-                                                            From {<br/>}
-                                                            EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
-                                                        </Button>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={2}></Grid>
-                                                    {details ?
-                                                    <Grid item sx={12}>
-                                                        <Grid container spacing={2}>
-                                                            <Grid item sx={5}>
-                                                                <Box style={{marginLeft: '250px'}}>
-                                                                    <Card sx={{ minWidth: 400 }}>
-                                                                        <CardContent>
-                                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                                                {cabin.toUpperCase()}
-                                                                            </Typography>
-                                                                            <Typography variant="legend" component="div">
-                                                                                Included per Passenger
-                                                                            </Typography>
-                                                                            <Typography variant="body2">
-                                                                                <List>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="2 checked baggage (23 kg)" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="Seat Selection" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="Refundable" />
-                                                                                    </ListItem>
-                                                                                    </List>
-                                                                            </Typography>
-                                                                        </CardContent>
-                                                                        <CardActions style={{alignItems: 'end'}}>
-                                                                            <Button size="medium" variant="outlined" onClick={(e) => { handleReturnFlight(flight, e) }}>Select Flight</Button>
-                                                                        </CardActions>
-                                                                     </Card>
-                                                                </Box>
-                                                            </Grid>
-                                                            <Grid item sx={3}>
-                                                                <Box style={{marginLeft: '100px'}}>
-                                                                    <img src={servicesImage} alt="stock" 
-                                                                    style={{width: '300px', height: '300px', borderRadius: '8px'}}/>
-                                                                </Box>
-                                                            </Grid>
-                                                            <Grid item sx={1}>
-                                                                <Button startIcon={<CloseIcon />} onClick={()=> setDetails(false)}/>
-                                                            </Grid>
-                                                        </Grid>
-                                                    </Grid>
-                                                    :
-                                                    <></>
-                                                    }
-                                                </Grid>
-                                            </Box>
-                                        </Paper>
-                                    </>
-                                )}
-                            </>
-                            :
-                            <></>
-                        }
-                        {/* Return Flights */}
-                        {depSelected ?
-                            <>
-                                {returnFlights.length === 0 ? <div><h2>No available flights</h2></div> : returnFlights.map((flight) =>
-                                    <>
-                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-                                            <Typography variant="h4" component="h4" color="primary">Select your return flight from</Typography>
-                                            <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
-                                            <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>            
-                                        </Box>
-                                        <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
-                                            <Box sx={{ width: '100%' }}>
-                                                <Grid container spacing={5}>
-                                                    <Grid item sx={4}>
-                                                        <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
-                                                            <Typography variant="h6" component="h6" style={{color: 'black'}}>{flight.departureTime} - {flight.arrivalTime}</Typography>
-                                                            <Timeline style={{ marginLeft: '-200px' }}>
-                                                                <TimelineItem>
-                                                                    <TimelineSeparator>
-                                                                    <TimelineDot variant="outlined" color="secondary"/>
-                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }}/>
-                                                                    </TimelineSeparator>
-                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Los Angeles ({flight.departureAirport})</TimelineContent>
-                                                                </TimelineItem>
-                                                                <TimelineItem>
-                                                                    <TimelineSeparator>
-                                                                    <TimelineDot variant="outlined" color="secondary"/>
-                                                                    </TimelineSeparator>
-                                                                    <TimelineContent style={{fontWeight: 'bold'}} width="400px">Cairo ({flight.destinationAirport})</TimelineContent>
-                                                                </TimelineItem>
-                                                            </Timeline>
-                                                        </Box>
-                                                    </Grid>
-                                                     <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Cactus Airlines</Typography>
-                                                            <Typography component="legend">{flight.flightNumber}</Typography>
-                                                        </Box>
-                                                    </Grid>
-                                                     <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Duration</Typography>
-                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                                                <ScheduleIcon />
-                                                                <Typography component="legend">14H</Typography>
-                                                            </Box>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={1} style={{ marginTop: '70px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                            <Typography component="legend">Services</Typography>
-                                                            <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                                                <WifiIcon />
-                                                                <RestaurantIcon />
-                                                                <MovieIcon />
-                                                            </Box>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
-                                                        <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                                        <Button 
-                                                        variant="contained" 
-                                                        endIcon={<ExpandMoreIcon />} style={{marginBottom: '20px'}} className="flightBtn"
-                                                        onClick={()=>setDetails(true)}
-                                                        >
-                                                            From {<br/>}
-                                                            EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
-                                                        </Button>
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item sx={2}></Grid>
-                                                    {details ?
-                                                    <Grid item sx={12}>
-                                                        <Grid container spacing={2}>
-                                                            <Grid item sx={6}>
-                                                                <Box style={{marginLeft: '250px'}}>
-                                                                    <Card sx={{ minWidth: 400 }}>
-                                                                        <CardContent>
-                                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                                                {cabin.toUpperCase()}
-                                                                            </Typography>
-                                                                            <Typography variant="legend" component="div">
-                                                                                Included per Passenger
-                                                                            </Typography>
-                                                                            <Typography variant="body2">
-                                                                                <List>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="2 checked baggage (23 kg)" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="Seat Selection" />
-                                                                                    </ListItem>
-                                                                                    <ListItem disablePadding>
-                                                                                        <ListItemIcon>
-                                                                                            <DoneIcon color="primary"/>
-                                                                                        </ListItemIcon>
-                                                                                        <ListItemText primary="Refundable" />
-                                                                                    </ListItem>
-                                                                                    </List>
-                                                                            </Typography>
-                                                                        </CardContent>
-                                                                        <CardActions style={{alignItems: 'end'}}>
-                                                                            <Button size="medium" variant="outlined" onClick={(e) => { handleReturnSelected(flight, e) }}>Select Flight</Button>
-                                                                        </CardActions>
-                                                                     </Card>
-                                                                </Box>
-                                                            </Grid>
-                                                            <Grid item sx={3}>
-                                                                <Box style={{marginLeft: '100px'}}>
-                                                                    <img src={servicesImage} alt="stock" 
-                                                                    style={{width: '300px', height: '300px', borderRadius: '8px'}}/>
-                                                                </Box>
-                                                            </Grid>
-                                                        </Grid>
-                                                    </Grid>
-                                                    :
-                                                    <></>
-                                                    }
-                                                </Grid>
-                                            </Box>
-                                        </Paper>
-                                    </>
-                                )}
-
-                            </>
-                            :
-                            <></>
-                        }
-                        {returnSelected ?
-                            <>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={8}>
-                                        <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
-                                            <Box style={{
-                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                justifyContent: 'center', marginBottom: '30px'
-                                            }}>
-                                                <Typography variant="h4" component="h4" color="primary">Your trip summary</Typography>
-                                            </Box>
-                                            <Grid container spacing={2}>
-                                                <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">{from} to {to}</Typography>
-                                                    <Timeline position="left" style={{ marginLeft: '-200px' }}>
-                                                        <TimelineItem>
-                                                            <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime} {from}<br />
-                                                                Cairo, Cairo International Airport<br />
-                                                                Egypt
-                                                            </TimelineOppositeContent>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>Departure</TimelineContent>
-                                                        </TimelineItem>
-                                                        <TimelineItem>
-                                                            <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime} {to}<br />
-                                                                Los Angeles, Los Angeles Airport<br />
-                                                                United States
-                                                            </TimelineOppositeContent>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>Arrival</TimelineContent>
-                                                        </TimelineItem>
-                                                    </Timeline>
-                                                </Grid>
-                                                <Grid item sx={4}>
-                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={() => {
-                                                            setSearch(true)
-                                                            setReturnSelected(false)
-                                                        }}>
-                                                            Change this flight
-                                                        </Button>
-                                                    </Box>
-                                                </Grid>
-                                                <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">{to} to {from}</Typography>
-                                                    <Timeline position="left" style={{ marginLeft: '-200px' }}>
-                                                        <TimelineItem>
-                                                            <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime} {to}<br />
-                                                                Los Angeles, Los Angeles Airport<br />
-                                                                United Stated
-                                                            </TimelineOppositeContent>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>Departure</TimelineContent>
-                                                        </TimelineItem>
-                                                        <TimelineItem>
-                                                            <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime} {from} <br />
-                                                                Cairo, Cairo International Airport<br />
-                                                                Egypt
-                                                            </TimelineOppositeContent>
-                                                            <TimelineSeparator>
-                                                                <TimelineDot />
-                                                                <TimelineConnector />
-                                                            </TimelineSeparator>
-                                                            <TimelineContent>Arrival</TimelineContent>
-                                                        </TimelineItem>
-                                                    </Timeline>
-                                                </Grid>
-                                                <Grid item sx={4}>
-                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={() => {
-                                                            setDepSelected(true)
-                                                            setReturnSelected(false)
-                                                        }}>
-                                                            Change this flight
-                                                        </Button>
-                                                    </Box>
-                                                </Grid>
-                                            </Grid>
-                                        </Paper>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
-                                            <Box style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <Typography variant="h4" component="h4" color="secondary">
-                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats))} EGP
-                                                </Typography>
-                                                <br />
-                                                <Divider variant="middle" />
-                                                <br />
-                                                <Button variant="contained" color="secondary"
-                                                    onClick={() => setShowCheckout(true)}
-                                                >Checkout</Button>
-                                                <br />
-                                                {showCheckout ? <StripeContainer /> : <></>}
-                                            </Box>
-                                        </Paper>
-                                    </Grid>
                                 </Grid>
-                            </>
-                            :
-                            <></>}
-                        {/* TODO: onClick={handleReserve} */}
+                                {/* To */}
+                                <Grid item lg={3}>
+                                    <Autocomplete
+                                        id="country-select-demo"
+                                        options={countries}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.code}
+                                        renderOption={(props, option) => (
+                                            <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                <img
+                                                    loading="lazy"
+                                                    width="20"
+                                                    src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                    srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                    alt=""
+                                                />
+                                                {option.label} ({option.code})
+                                            </Box>
+                                        )}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="To"
+                                                fullWidth
+                                                required
+                                                onChange={handleToChange}
+                                                inputProps={{
+                                                    ...params.inputProps,
+                                                    autoComplete: 'new-password', // disable autocomplete and autofill
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                                {/* Dates */}
+                                <Grid item lg={4}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DateRangePicker
+                                            startText="Departure"
+                                            endText="Return"
+                                            value={date}
+                                            onChange={(newDate) => {
+                                                setDate(newDate);
+                                            }}
+                                            renderInput={(startProps, endProps) => (
+                                                <React.Fragment>
+                                                    <TextField {...startProps} required />
+                                                    <Box sx={{ mx: 2 }}> to </Box>
+                                                    <TextField {...endProps} required />
+                                                </React.Fragment>
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                </Grid>
+                                {/* Cabin and Seats */}
+                                <Grid item lg={2}>
+                                    <Button variant="outlined" onClick={handleClickOpen} className="button">
+                                        Passenger/Cabin
+                                    </Button>
+                                    <Dialog open={open} onClose={handleClose}>
+                                        <DialogContent>
+                                            <Typography component="legend">Passengers</Typography>
+                                            <br />
+                                            <Grid container spacing={2}>
+                                                <Grid item sx={2}>
+                                                    <Typography variant="h6" component="h6">Adults (12+ years)</Typography>
+                                                </Grid>
+                                                <Grid item sx={6}>
+                                                    <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '13px' }}>
+                                                        <Button onClick={handleDecrement}>-</Button>
+                                                        <Button >{counter}</Button>
+                                                        <Button onClick={handleIncrement}>+</Button>
 
+                                                    </ButtonGroup>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid container spacing={2}>
+                                                <Grid item sx={2}>
+                                                    <Typography variant="h6" component="h6">Child (2-11 years)</Typography>
+                                                </Grid>
+                                                <Grid item sx={6}>
+                                                    <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '20px' }}>
+                                                        <Button onClick={handleDecrementChild}>-</Button>
+                                                        <Button >{counterChild}</Button>
+                                                        <Button onClick={handleIncrementChild}>+</Button>
 
-                    </TabPanel>
-                    <TabPanel value={value} index={1} >
-                        <Schedule />
-                        <SeatSelector />
-                    </TabPanel>
-                </Box>
-            </Paper>
+                                                    </ButtonGroup>
+                                                </Grid>
+                                            </Grid>
+                                            <br />
+                                            <Divider variant="middle" />
+                                            <br />
+                                            <FormControl component="fieldset">
+                                                <Typography component="legend">Cabin</Typography>
+                                                <br />
+                                                <RadioGroup
+                                                    aria-label="economy"
+                                                    defaultValue='economy'
+                                                    value={cabin}
+                                                    name="radio-buttons-group"
+                                                    onChange={(e) => setCabin(e.target.value)}
+                                                >
+                                                    <FormControlLabel value="economy" control={<Radio />} label="Economy" />
+                                                    <FormControlLabel value="business" control={<Radio />} label="Business" />
+                                                </RadioGroup>
+                                            </FormControl>
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button onClick={handleClose} color="success">Confirm</Button>
+                                        </DialogActions>
+                                    </Dialog>
+                                </Grid>
+                                <Grid item lg={10}></Grid>
+                                {/* Search Button */}
+                                <Grid item lg={2}>
+                                    <Button variant="contained" endIcon={<FlightTakeoffIcon />} className="searchButton"
+                                        onClick={handleFindFlight}
+                                    >
+                                        {isFetching ? <CircularProgress color="primary" /> : "Show Flights"}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            {isFetching ? <LinearProgress variant="determinate" value={progress} color="secondary" style={{ marginTop: '50px' }} />
+                                : search ?
+                                    <>
+                                        {/* Departure Flights */}
+                                        {departureFlights.length === 0 ? <div><h2>No available flights</h2></div> : departureFlights.map((flight) =>
+                                            <>
+                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Typography variant="h4" component="h4" color="primary">Select your departure flight from</Typography>
+                                                    <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
+                                                    <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
+                                                </Box>
+                                                <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
+                                                    <Box sx={{ width: '100%' }}>
+                                                        <Grid container spacing={5}>
+                                                            <Grid item sx={4}>
+                                                                <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
+                                                                    <Typography variant="h6" component="h6" style={{ color: 'black' }}>{flight.departureTime} - {flight.arrivalTime}</Typography>
+                                                                    <Timeline style={{ marginLeft: '-200px' }}>
+                                                                        <TimelineItem>
+                                                                            <TimelineSeparator>
+                                                                                <TimelineDot variant="outlined" color="secondary" />
+                                                                                <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                            </TimelineSeparator>
+                                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="400px">Cairo ({flight.departureAirport})</TimelineContent>
+                                                                        </TimelineItem>
+                                                                        <TimelineItem>
+                                                                            <TimelineSeparator>
+                                                                                <TimelineDot variant="outlined" color="secondary" />
+                                                                            </TimelineSeparator>
+                                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="400px">Los Angeles ({flight.destinationAirport})</TimelineContent>
+                                                                        </TimelineItem>
+                                                                    </Timeline>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <Typography component="legend">Cactus Airlines</Typography>
+                                                                    <Typography component="legend">{flight.flightNumber}</Typography>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <Typography component="legend">Duration</Typography>
+                                                                    <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                        <ScheduleIcon />
+                                                                        <Typography component="legend">14H</Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <Typography component="legend">Services</Typography>
+                                                                    <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                        <WifiIcon />
+                                                                        <RestaurantIcon />
+                                                                        <MovieIcon />
+                                                                    </Box>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
+                                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        endIcon={<ExpandMoreIcon />} style={{ marginBottom: '20px' }} className="flightBtn"
+                                                                        onClick={() => setDetails(true)}
+                                                                    >
+                                                                        From {<br />}
+                                                                        EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                                    </Button>
+                                                                </Box>
+                                                            </Grid>
+                                                            <Grid item sx={2}></Grid>
+                                                            {details ?
+                                                                <Grid item sx={12}>
+                                                                    <Grid container spacing={2}>
+                                                                        <Grid item sx={5}>
+                                                                            <Box style={{ marginLeft: '250px' }}>
+                                                                                <Card sx={{ minWidth: 400 }}>
+                                                                                    <CardContent>
+                                                                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                                            {cabin.toUpperCase()}
+                                                                                        </Typography>
+                                                                                        <Typography variant="legend" component="div">
+                                                                                            Included per Passenger
+                                                                                        </Typography>
+                                                                                        <Typography variant="body2">
+                                                                                            <List>
+                                                                                                <ListItem disablePadding>
+                                                                                                    <ListItemIcon>
+                                                                                                        <DoneIcon color="primary" />
+                                                                                                    </ListItemIcon>
+                                                                                                    <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
+                                                                                                </ListItem>
+                                                                                                <ListItem disablePadding>
+                                                                                                    <ListItemIcon>
+                                                                                                        <DoneIcon color="primary" />
+                                                                                                    </ListItemIcon>
+                                                                                                    <ListItemText primary="2 checked baggage (23 kg)" />
+                                                                                                </ListItem>
+                                                                                                <ListItem disablePadding>
+                                                                                                    <ListItemIcon>
+                                                                                                        <DoneIcon color="primary" />
+                                                                                                    </ListItemIcon>
+                                                                                                    <ListItemText primary="Seat Selection" />
+                                                                                                </ListItem>
+                                                                                                <ListItem disablePadding>
+                                                                                                    <ListItemIcon>
+                                                                                                        <DoneIcon color="primary" />
+                                                                                                    </ListItemIcon>
+                                                                                                    <ListItemText primary="Refundable" />
+                                                                                                </ListItem>
+                                                                                            </List>
+                                                                                        </Typography>
+                                                                                    </CardContent>
+                                                                                    <CardActions style={{ alignItems: 'end' }}>
+                                                                                        <Button size="medium" variant="outlined" onClick={(e) => { handleReturnFlight(flight, e) }}>Select Flight</Button>
+                                                                                    </CardActions>
+                                                                                </Card>
+                                                                            </Box>
+                                                                        </Grid>
+                                                                        <Grid item sx={3}>
+                                                                            <Box style={{ marginLeft: '100px' }}>
+                                                                                <img src={servicesImage} alt="stock"
+                                                                                    style={{ width: '300px', height: '300px', borderRadius: '8px' }} />
+                                                                            </Box>
+                                                                        </Grid>
+                                                                        <Grid item sx={1}>
+                                                                            <Button startIcon={<CloseIcon />} onClick={() => setDetails(false)} />
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                </Grid>
+                                                                :
+                                                                <></>
+                                                            }
+                                                        </Grid>
+                                                    </Box>
+                                                </Paper>
+                                            </>
+                                        )}
+                                    </>
+                                    :
+                                    <></>
+                            }
+                            {/* Return Flights */}
+                            {depSelected ?
+                                <>
+                                    {returnFlights.length === 0 ? <div><h2>No available flights</h2></div> : returnFlights.map((flight) =>
+                                        <>
+                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
+                                                <Typography variant="h4" component="h4" color="primary">Select your return flight from</Typography>
+                                                <Typography variant="h5" component="h5" color="primary">{(flight.departureAirport).toUpperCase()} to {(flight.destinationAirport).toUpperCase()}</Typography>
+                                                <Typography variant="legend" component="legend" color="primary">{flight.departureDate}</Typography>
+                                            </Box>
+                                            <Paper elevation={3} style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px' }}>
+                                                <Box sx={{ width: '100%' }}>
+                                                    <Grid container spacing={5}>
+                                                        <Grid item sx={4}>
+                                                            <Box style={{ display: "flex", flexDirection: "column", width: '100%' }}>
+                                                                <Typography variant="h6" component="h6" style={{ color: 'black' }}>{flight.departureTime} - {flight.arrivalTime}</Typography>
+                                                                <Timeline style={{ marginLeft: '-200px' }}>
+                                                                    <TimelineItem>
+                                                                        <TimelineSeparator>
+                                                                            <TimelineDot variant="outlined" color="secondary" />
+                                                                            <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                        </TimelineSeparator>
+                                                                        <TimelineContent style={{ fontWeight: 'bold' }} width="400px">Los Angeles ({flight.departureAirport})</TimelineContent>
+                                                                    </TimelineItem>
+                                                                    <TimelineItem>
+                                                                        <TimelineSeparator>
+                                                                            <TimelineDot variant="outlined" color="secondary" />
+                                                                        </TimelineSeparator>
+                                                                        <TimelineContent style={{ fontWeight: 'bold' }} width="400px">Cairo ({flight.destinationAirport})</TimelineContent>
+                                                                    </TimelineItem>
+                                                                </Timeline>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography component="legend">Cactus Airlines</Typography>
+                                                                <Typography component="legend">{flight.flightNumber}</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography component="legend">Duration</Typography>
+                                                                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <ScheduleIcon />
+                                                                    <Typography component="legend">14H</Typography>
+                                                                </Box>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sx={1} style={{ marginTop: '70px' }}>
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography component="legend">Services</Typography>
+                                                                <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <WifiIcon />
+                                                                    <RestaurantIcon />
+                                                                    <MovieIcon />
+                                                                </Box>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Button
+                                                                    variant="contained"
+                                                                    endIcon={<ExpandMoreIcon />} style={{ marginBottom: '20px' }} className="flightBtn"
+                                                                    onClick={() => setDetails(true)}
+                                                                >
+                                                                    From {<br />}
+                                                                    EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                                </Button>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sx={2}></Grid>
+                                                        {details ?
+                                                            <Grid item sx={12}>
+                                                                <Grid container spacing={2}>
+                                                                    <Grid item sx={6}>
+                                                                        <Box style={{ marginLeft: '250px' }}>
+                                                                            <Card sx={{ minWidth: 400 }}>
+                                                                                <CardContent>
+                                                                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                                        {cabin.toUpperCase()}
+                                                                                    </Typography>
+                                                                                    <Typography variant="legend" component="div">
+                                                                                        Included per Passenger
+                                                                                    </Typography>
+                                                                                    <Typography variant="body2">
+                                                                                        <List>
+                                                                                            <ListItem disablePadding>
+                                                                                                <ListItemIcon>
+                                                                                                    <DoneIcon color="primary" />
+                                                                                                </ListItemIcon>
+                                                                                                <ListItemText primary="1 hand baggage and 1 personal item (12 kg total)" />
+                                                                                            </ListItem>
+                                                                                            <ListItem disablePadding>
+                                                                                                <ListItemIcon>
+                                                                                                    <DoneIcon color="primary" />
+                                                                                                </ListItemIcon>
+                                                                                                <ListItemText primary="2 checked baggage (23 kg)" />
+                                                                                            </ListItem>
+                                                                                            <ListItem disablePadding>
+                                                                                                <ListItemIcon>
+                                                                                                    <DoneIcon color="primary" />
+                                                                                                </ListItemIcon>
+                                                                                                <ListItemText primary="Seat Selection" />
+                                                                                            </ListItem>
+                                                                                            <ListItem disablePadding>
+                                                                                                <ListItemIcon>
+                                                                                                    <DoneIcon color="primary" />
+                                                                                                </ListItemIcon>
+                                                                                                <ListItemText primary="Refundable" />
+                                                                                            </ListItem>
+                                                                                        </List>
+                                                                                    </Typography>
+                                                                                </CardContent>
+                                                                                <CardActions style={{ alignItems: 'end' }}>
+                                                                                    <Button size="medium" variant="outlined" onClick={(e) => { handleReturnSelected(flight, e) }}>Select Flight</Button>
+                                                                                </CardActions>
+                                                                            </Card>
+                                                                        </Box>
+                                                                    </Grid>
+                                                                    <Grid item sx={3}>
+                                                                        <Box style={{ marginLeft: '100px' }}>
+                                                                            <img src={servicesImage} alt="stock"
+                                                                                style={{ width: '300px', height: '300px', borderRadius: '8px' }} />
+                                                                        </Box>
+                                                                    </Grid>
+                                                                </Grid>
+                                                            </Grid>
+                                                            :
+                                                            <></>
+                                                        }
+                                                    </Grid>
+                                                </Box>
+                                            </Paper>
+                                        </>
+                                    )}
+
+                                </>
+                                :
+                                <></>
+                            }
+                            {returnSelected ?
+                                <>
+                                    <Grid container spacing={3}>
+                                        <Grid item xs={8}>
+                                            <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
+                                                <Box style={{
+                                                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                                    justifyContent: 'center', marginBottom: '30px'
+                                                }}>
+                                                    <Typography variant="h4" component="h4" color="primary">Your trip summary</Typography>
+                                                </Box>
+                                                <Grid container spacing={2}>
+                                                    <Grid item sx={8}>
+                                                        <Typography variant="h6" component="h6" color="primary">{from} to {to}</Typography>
+                                                        <Timeline position="left" style={{ marginLeft: '-200px' }}>
+                                                            <TimelineItem>
+                                                                <TimelineOppositeContent color="text.secondary" width="500px">
+                                                                    {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime} {from}<br />
+                                                                    Cairo, Cairo International Airport<br />
+                                                                    Egypt
+                                                                </TimelineOppositeContent>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot />
+                                                                    <TimelineConnector />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent>Departure</TimelineContent>
+                                                            </TimelineItem>
+                                                            <TimelineItem>
+                                                                <TimelineOppositeContent color="text.secondary" width="500px">
+                                                                    {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime} {to}<br />
+                                                                    Los Angeles, Los Angeles Airport<br />
+                                                                    United States
+                                                                </TimelineOppositeContent>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot />
+                                                                    <TimelineConnector />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent>Arrival</TimelineContent>
+                                                            </TimelineItem>
+                                                        </Timeline>
+                                                    </Grid>
+                                                    <Grid item sx={4}>
+                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
+                                                            <Button variant="outlined" onClick={() => {
+                                                                setSearch(true)
+                                                                setReturnSelected(false)
+                                                            }}>
+                                                                Change this flight
+                                                            </Button>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sx={8}>
+                                                        <Typography variant="h6" component="h6" color="primary">{to} to {from}</Typography>
+                                                        <Timeline position="left" style={{ marginLeft: '-200px' }}>
+                                                            <TimelineItem>
+                                                                <TimelineOppositeContent color="text.secondary" width="500px">
+                                                                    {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime} {to}<br />
+                                                                    Los Angeles, Los Angeles Airport<br />
+                                                                    United Stated
+                                                                </TimelineOppositeContent>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot />
+                                                                    <TimelineConnector />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent>Departure</TimelineContent>
+                                                            </TimelineItem>
+                                                            <TimelineItem>
+                                                                <TimelineOppositeContent color="text.secondary" width="500px">
+                                                                    {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime} {from} <br />
+                                                                    Cairo, Cairo International Airport<br />
+                                                                    Egypt
+                                                                </TimelineOppositeContent>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot />
+                                                                    <TimelineConnector />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent>Arrival</TimelineContent>
+                                                            </TimelineItem>
+                                                        </Timeline>
+                                                    </Grid>
+                                                    <Grid item sx={4}>
+                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)} EGP</Typography>
+                                                            <Button variant="outlined" onClick={() => {
+                                                                setDepSelected(true)
+                                                                setReturnSelected(false)
+                                                            }}>
+                                                                Change this flight
+                                                            </Button>
+                                                        </Box>
+                                                    </Grid>
+                                                </Grid>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
+                                                <Box style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <Typography variant="h4" component="h4" color="secondary">
+                                                        Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats))} EGP
+                                                    </Typography>
+                                                    <br />
+                                                    <Divider variant="middle" />
+                                                    <br />
+                                                    <Button variant="contained" color="secondary"
+                                                        onClick={handleShowCheckout}
+                                                    >Checkout</Button>
+                                                    <br />
+                                                    {showCheckout ? <>
+                                                        <StripeContainer />
+                                                    </> : <></>}
+                                                    {success ? <Button onClick={handleReserve}>Confirm Booking</Button> : <></>}
+                                                </Box>
+                                            </Paper>
+                                        </Grid>
+                                    </Grid>
+                                </>
+                                :
+                                <></>}
+                            <Dialog open={loginOpen} onClose={handleLoginClose}>
+                                <DialogContent>
+                                    <Grid item xs={12} sm={12} md={12} component={Paper} elevation={0} square>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                padding: '30px',
+                                                boxShadow: '0px 0px 0px 0px'
+                                            }}
+                                        >
+                                            <Box sx={{ width: '100%' }}>
+                                                <Collapse in={alertOpen}>
+                                                    <Alert
+                                                        action={
+                                                            <IconButton
+                                                                aria-label="close"
+                                                                color="inherit"
+                                                                size="small"
+                                                                onClick={() => {
+                                                                    setAlertOpen(false);
+                                                                }}
+                                                            >
+                                                                <CloseIcon fontSize="inherit" />
+                                                            </IconButton>
+                                                        }
+                                                        sx={{ mb: 2 }}
+                                                        variant="filled"
+                                                        severity="error"
+                                                    >
+                                                        Incorrect Username or Password
+                                                    </Alert>
+                                                </Collapse>
+                                            </Box>
+                                            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                                                <LockOutlinedIcon />
+                                            </Avatar>
+                                            <Typography component="h1" variant="h5">
+                                                Sign in
+                                            </Typography>
+                                            <Box component="form" noValidate sx={{ mt: 1 }}>
+                                                <TextField
+                                                    margin="normal"
+                                                    required
+                                                    fullWidth
+                                                    id="username"
+                                                    label="Username"
+                                                    name="username"
+                                                    onChange={usernameChange}
+                                                    autoFocus
+                                                />
+                                                <TextField
+                                                    margin="normal"
+                                                    required
+                                                    fullWidth
+                                                    name="password"
+                                                    label="Password"
+                                                    type="password"
+                                                    id="password"
+                                                    onChange={passwordChange}
+                                                    autoComplete="current-password"
+                                                />
+
+                                                <Button
+                                                    type="submit"
+                                                    fullWidth
+                                                    variant="contained"
+                                                    sx={{ mt: 3, mb: 2 }}
+                                                    color="secondary"
+                                                    onClick={handleLogin}
+                                                >
+                                                    {isFetchingUser ? <CircularProgress color="primary" /> : "Login"}
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleLoginClose} color="error" variant="contained">Cancel</Button>
+                                </DialogActions>
+                            </Dialog>
+
+                        </TabPanel>
+                        <TabPanel value={value} index={1} >
+                            <Schedule />
+                            <SeatSelector />
+                        </TabPanel>
+                    </Box>
+                </Paper>
             </div>
 
         </>

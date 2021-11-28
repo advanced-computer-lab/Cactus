@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import axios from 'axios'
 import { UserContext } from "../../../Context/UserContext";
 
@@ -20,9 +20,10 @@ const Search = () => {
     const [departureId, setDepartureId] = useState()
     const [isFetching, setFetching] = useState(false)
     const [showCheckout, setShowCheckout] = useState(false)
-    const [selectedDepFlight, setSelectedDep] = useState({})
-    const [selectedRetFlight, setSelectedRet] = useState({})
-    const { loggedUser } = useContext(UserContext)
+    const [selectedDepFlight, setSelectedDep] = useState()
+    const [selectedRetFlight, setSelectedRet] = useState()
+    const [loginOpen, setLoginOpen] = useState(false);
+  
 
 
 
@@ -108,13 +109,13 @@ const Search = () => {
         e.preventDefault()
         console.log(data);
         setFetching(true)
-        if(search){
+        if (search) {
             setSearch(false)
         }
-        if(depSelected){
+        if (depSelected) {
             setDepSelected(false)
         }
-        if(returnSelected){
+        if (returnSelected) {
             setReturnSelected(false)
         }
         axios.post('/Users/getFlights', data)
@@ -137,7 +138,6 @@ const Search = () => {
                 setDepSelected(true)
                 setReturnFlights(response.data)
                 setSelectedDep(params)
-                console.log(returnFlights)
             })
             .catch((err) => {
                 console.log(err)
@@ -145,13 +145,15 @@ const Search = () => {
     }
     const handleReturnSelected = (params, e) => {
         e.preventDefault()
-        console.log(params)
         setDepSelected(false)
         setReturnSelected(true)
         setSelectedRet(params)
+        console.log(selectedDepFlight, selectedRetFlight, seats, cabin)
     }
-    
-    const handleReserve = () => {
+    const { loggedUser } = useContext(UserContext)
+    const [success, setSuccess] = useState(false)
+
+    function handleReserve(){
         const reserveData = {
             seats: seats,
             cabin: cabin,
@@ -159,15 +161,16 @@ const Search = () => {
             returnId: selectedRetFlight._id,
             username: loggedUser.username
         }
-        console.log(reserveData)
         axios.post('/Users/reserveFlight', reserveData)
-        .then((response) => {
-            console.log(response.data)
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+            .then((response) => {
+                console.log(response.data)
+                setSuccess(true)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     }
+    
     return {
         handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
         handleFromChange, handleToChange, data, returnData, handleDecrement, handleIncrement,
@@ -176,7 +179,7 @@ const Search = () => {
         seats, setSeats, cabin, setCabin, counterChild, setCounterChild, depSelected, setDepSelected,
         returnSelected, setReturnSelected, departureFlights, setDepartureFlights, departureId,
         setDepartureId, isFetching, setFetching, showCheckout, setShowCheckout, returnFlights, setReturnFlights,
-        selectedDepFlight, selectedRetFlight, handleReturnSelected, handleReserve
+        selectedDepFlight, selectedRetFlight, handleReturnSelected, loginOpen, setLoginOpen, handleReserve, success, setSuccess
     }
 }
 export default Search;

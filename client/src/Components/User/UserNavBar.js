@@ -53,7 +53,7 @@ export default function MenuAppBar() {
                 >
                   Hello {loggedUser.firstName}
                 </Button>
-                <Button variant="outlined" color="error" onClick={()=>{setLoggedUser(null)}}>Logout</Button>
+                <Button variant="contained" color="error" onClick={()=>{setLoggedUser(null)}}>Logout</Button>
               </>
               :
               <>

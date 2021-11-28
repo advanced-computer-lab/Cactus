@@ -79,7 +79,7 @@ UserRouter.post('/reserveFlight', (req, res) => {
             departureDate = flight.departureDate
             departureTime = flight.departureTime
         })
-        .catch(er => console.log(er))
+        .catch((er) => {console.log(er)})
         })
     Flight.findById(req.body.returnId)
     .then((flight2) => {
@@ -114,11 +114,15 @@ UserRouter.post('/reserveFlight', (req, res) => {
         reserve.cabin =  req.body.cabin 
         users[0].reservations.push(reserve)
         reserve.save()
-        users[0].save().then(()=> res.send(reserve))
-        .catch(er => console.log(er))
-    })
+        users[0].save()
+        .then(()=> {
+            res.send(reserve)
+            console.log(reserve)    
         })
-        .catch(er => console.log(er))})
+        .catch((er) => (console.log(er)))
+        })
+        })
+        .catch((er) => {console.log(er)})})
     
     })
 

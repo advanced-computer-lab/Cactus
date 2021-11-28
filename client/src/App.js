@@ -35,7 +35,7 @@ const theme = createTheme({
       main: '#800000'
     },
     info: {
-      main: '#FFD700'
+      main: '#72C6ED'
     },
     success: {
       main: '#008040'
@@ -45,6 +45,7 @@ const theme = createTheme({
 
 function App() {
   const [loggedUser, setLoggedUser] = useState()
+  const [reservation, setReservation] = useState()
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
@@ -62,7 +63,7 @@ function App() {
             <Route path="/findFlight">
               <FindFlight />
             </Route>
-            <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
+            <UserContext.Provider value={{ loggedUser, setLoggedUser, reservation, setReservation }}>
               <Route exact path="/" component={UserHome} />
               <Route path="/Register">
                 <Register />
