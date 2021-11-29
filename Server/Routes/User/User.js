@@ -2,10 +2,7 @@
 const express = require('express')
 const UserRouter = express.Router()
 const mongoose = require('mongoose')
-const nodemailer = require('nodemailer')
-require('dotenv').config();
-
-const EMAIL_PASS = process.env.EMAIL_PASS
+const nodemailer=require('nodemailer')
 
 //___________Schema___________
 const User = require('../../Schemas/Users')
@@ -15,18 +12,76 @@ const Reservation = require('../../Schemas/Reservation')
 //___________Flight Router___________
 UserRouter.use(express.json())
 
+//////USER DATA (HIMSELF)/////
+
+UserRouter.get('/getallusers',(req,res)=>{
+    User.find()
+        .then((result)=>{
+            res.send(result)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+});
+
+UserRouter.put('/updateUser',(req,res)=>{
+    User.findByIdAndUpdate(req.body._id,{
+        'firstname':req.body.firstname ,
+        'lastname':req.body.lastname,
+        'email':req.body.email,
+        'password':req.body.password ,
+        'passportNumber':req.body.passportNumber,
+        'telephones':req.body.telephones,
+        'homeAddress':{
+            'country':req.body.country,
+            'city':req.body.city
+        },
+        'countryCode':req.body.countryCode,
+        'reservations':req.body.reservations
+    })
+        .then((result)=>{
+            res.send({success:true})
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+});
+
+UserRouter.delete('/deleteuser',(req,res)=>{
+    User.findByIdAndRemove(req.body._id)
+        .then((result)=>{
+            res.send({sucess:true})
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+});
 
 UserRouter.post('/addUser', (req,res) => {
-    const user = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-        isAdmin: false,
-        reservations: []
+    const newuser = new User({
+        'firstname':req.body.firstname ,
+        'lastname':req.body.lastname,
+        'email':req.body.email,
+        'username':req.body.username,
+        'password':req.body.password ,
+        'isAdmin':false,
+        'passportNumber':req.body.passportNumber,
+        'telephones':req.body.telephones,
+        'homeAddress':req.body.homeAddress,
+        'countryCode':req.body.countryCode,
+        'reservations':[]
     })
-    user.save().then(() => res.send({success:true}))
-    .catch(err => console.log(err))
-})
+    newuser.save()
+        .then((result)=>{
+            res.send({success:true})
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+});
+
+
+///USER FLIGHTS////
 
 UserRouter.post('/getFlights', (req, res) => {
     var flights =[]
@@ -79,7 +134,7 @@ UserRouter.post('/reserveFlight', (req, res) => {
             departureDate = flight.departureDate
             departureTime = flight.departureTime
         })
-        .catch((er) => {console.log(er)})
+        .catch(er => console.log(er))
         })
     Flight.findById(req.body.returnId)
     .then((flight2) => {
@@ -114,15 +169,11 @@ UserRouter.post('/reserveFlight', (req, res) => {
         reserve.cabin =  req.body.cabin 
         users[0].reservations.push(reserve)
         reserve.save()
-        users[0].save()
-        .then(()=> {
-            res.send(reserve)
-            console.log(reserve)    
+        users[0].save().then(()=> res.send(reserve))
+        .catch(er => console.log(er))
+    })
         })
-        .catch((er) => (console.log(er)))
-        })
-        })
-        .catch((er) => {console.log(er)})})
+        .catch(er => console.log(er))})
     
     })
 
@@ -138,28 +189,34 @@ UserRouter.post('/reserveFlight', (req, res) => {
                         }
                     }
                    reserve.remove()
-                //    Sending Mail
-                    console.log("Sending Mail Here");
-                    var transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: 'Cactusairlinesguc@gmail.com',
-                            pass: EMAIL_PASS
-                        }
-                    })
-                    var mailOptions = {
-                        from: 'Cactusairlinesguc@gmail.com',
-                        to: req.body.email,
-                        subject: 'Cancellation Email',
-                        text: 'Dear ' +req.body.title +' '+ req.body.firstName+ ' Your booking has been cancelled successfully, you will be refunded EGP ' + req.body.refundedAmount +' We hope that we can have you on board with us soon. Cactus Airlines Team'
-                    } 
-                    transporter.sendMail(mailOptions, function(error,info){
-                        if(error){
-                            console.log(error);
-                        }else{
-                            console.log('Email send: '+info.response)
-                        }
-                    })
+                   //Mail Cancelation
+                   //////////////////////////
+                   console.log("Sending Mail Here");
+                   var transporter = nodemailer.createTransport({
+                     service: 'gmail',
+                     auth: {
+                       user: 'Cactusairlinesguc@gmail.com',
+                       pass: 'w0BNWlUcVIqx'
+                     }
+                   });
+                   
+                   var mailOptions = {
+                     from: 'Cactusairlinesguc@gmail.com',
+                     to: req.body.email,//Insert User Email Here
+                     subject: 'Cancellation Email',
+                     text: 'Dear Sir/Madam : Your Booking had been Canceled Successfully and your balance had been Updated with '+req.body.amountrefunded+ '.Have a Nice Day !'
+                     
+                   };
+                   
+                   transporter.sendMail(mailOptions, function(error, info){
+                     if (error) {
+                       console.log(error);
+                     } else {
+                       console.log('Email sent: ' + info.response);
+                     }
+                   });
+
+                   ///
             users[0].save().then(()=> {
                 Flight.findById(reserve.departureId)
                 .then((flight) => {

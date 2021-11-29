@@ -90,6 +90,38 @@ export default function UserInfo() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [reservations, setReservations] = React.useState([])
     const [isFetching, setFetching] = React.useState(false)
+    const [email, setEmail] = React.useState(loggedUser.email)
+    const [fName, setFName] = React.useState(loggedUser.firstName)
+    const [lName, setLName] = React.useState(loggedUser.lastName)
+    const [cc1, setCc1] = React.useState(loggedUser.countryCode[0])
+    const [cc2, setCc2] = React.useState(() => {
+        if(loggedUser.countryCode.length > 1)
+            return loggedUser.countryCode[1]
+        else
+            return ""
+    })
+    const [cc3, setCc3] = React.useState(() => {
+        if(loggedUser.countryCode.length > 2)
+            return loggedUser.countryCode[2]
+        else
+            return ""
+    })
+    const [phone1, setPhone1] = React.useState(loggedUser.telephones[0])
+    const [phone2, setPhone2] = React.useState(() => {
+        if(loggedUser.telephones.length > 1)
+            return loggedUser.telephones[1]
+        else
+            return ""
+    })
+    const [phone3, setPhone3] = React.useState(() => {
+        if(loggedUser.telephones.length > 2)
+            return loggedUser.telephones[2]
+        else
+            return ""
+    })
+    const [passport, setPassport] = React.useState(loggedUser.passportNumber)
+    const [country, setCountry] = React.useState(loggedUser.homeAddress.country)
+    const [city, setCity] = React.useState(loggedUser.homeAddress.city)
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -118,6 +150,42 @@ export default function UserInfo() {
     }, [reservations, loggedUser])
     const [openDialog, setOpenDialog] = React.useState(false);
 
+    const emailChange = (e) => {
+        setEmail(e.target.value)
+    }
+    const fnameChange = (e) => {
+        setFName(e.target.value)
+    }
+    const lnameChange = (e) => {
+        setLName(e.target.value)
+    }
+    const passportChange = (e) => {
+        setPassport(e.target.value)
+    }
+    const countryChange = (e) => {
+        setCountry(e.target.value)
+    }
+    const cityChange = (e) => {
+        setCity(e.target.value)
+    }
+    const p1Change = (e) => {
+        setPhone1(e.target.value)
+    }
+    const cc1Change = (e) => {
+        setCc1(e.target.value)
+    }
+    const p2Change = (e) => {
+        setPhone2(e.target.value)
+    }
+    const cc2Change = (e) => {
+        setCc2(e.target.value)
+    }
+    const p3Change = (e) => {
+        setPhone3(e.target.value)
+    }
+    const cc3Change = (e) => {
+        setCc3(e.target.value)
+    }
     const handleOpenDialog = () => {
         setOpenDialog(true);
     };
@@ -125,6 +193,38 @@ export default function UserInfo() {
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
+
+    const UpdateUser = () => {
+        const phones = [phone1]
+        const codes = [cc1]
+        if(phone2 !== "" && cc2 != ""){
+            phones.push(phone2)
+            codes.push(cc2)
+        }
+        if(phone3 !== "" && cc3 != ""){
+            phones.push(phone3)
+            codes.push(cc3)
+        }
+        const data={
+        'email' : email,
+        'firstName' : fName,
+        'lastName' : lName,
+        'passportNumber' : passport,
+        'telephones' : phones,
+        'countryCode' : codes,
+        'country' : country,
+        'city' : city,
+        'password' : loggedUser.password,
+        '_id' : loggedUser._id,
+        'reservations' : loggedUser.reservations
+        }
+        console.log(data)
+        axios.put('/Users/updateUser', data)
+        .then((response) => {console.log(response)})
+        .catch((err) => {
+             console.log(err)
+         })
+    }
     const [success, setSuccess] = React.useState(false)
     const [backdropOpen, setBackdropOpen] = React.useState(false);
     const handleCancleBooking = (e, params) => {
@@ -247,29 +347,44 @@ export default function UserInfo() {
                                                                 </IconButton>
                                                             </Grid>
                                                             <Grid item sm={6}>
-                                                                <TextField fullWidth variant="outlined" label="First Name" defaultValue={loggedUser.firstName} type="text" required />
+                                                                <TextField fullWidth variant="outlined" label="First Name" defaultValue={fName} onChange={fnameChange} type="text" required />
                                                             </Grid>
                                                             <Grid item sm={6}>
-                                                                <TextField fullWidth variant="outlined" label="Last Name" defaultValue={loggedUser.lastName} type="text" required />
+                                                                <TextField fullWidth variant="outlined" label="Last Name" defaultValue={lName} onChange={lnameChange} type="text" required />
                                                             </Grid>
                                                             <Grid item sm={12}>
-                                                                <TextField fullWidth variant="outlined" label="Email" defaultValue={loggedUser.email} type="email" required />
+                                                                <TextField fullWidth variant="outlined" label="Email" defaultValue={email} onChange={emailChange} type="email" required />
                                                             </Grid>
-                                                            <Grid item sm={3}>
-                                                                <TextField fullWidth variant="outlined" label="Area Code" defaultValue="+20" type="text" required />
+                                                            <Grid item lg={4}>
+                                                                <TextField fullWidth variant="outlined" label="Area Code 1" defaultValue={cc1} onChange={cc1Change} type="text" />
                                                             </Grid>
-                                                            <Grid item sm={9}>
-                                                                <TextField fullWidth variant="outlined" label="Phone Number" defaultValue={loggedUser.phoneNumber} type="tel" required />
+                                                            <Grid item sm={8}>
+                                                                <TextField fullWidth variant="outlined" label="Phone Number 1" defaultValue={phone1} onChange={p1Change} type="tel" required />
+                                                            </Grid>
+                                                            <Grid item lg={4}>
+                                                                <TextField fullWidth variant="outlined" label="Area Code 2" defaultValue={cc2} onChange={cc2Change} type="text" />
+                                                            </Grid>
+                                                            <Grid item sm={8}>
+                                                                <TextField fullWidth variant="outlined" label="Phone Number 2" defaultValue={phone2} onChange={p2Change} type="tel" />
+                                                            </Grid>
+                                                            <Grid item lg={4}>
+                                                                <TextField fullWidth variant="outlined" label="Area Code 3" defaultValue={cc3} onChange={cc3Change} type="text" />
+                                                            </Grid>
+                                                            <Grid item sm={8}>
+                                                                <TextField fullWidth variant="outlined" label="Phone Number 3" defaultValue={phone3} onChange={p3Change} type="tel" />
+                                                            </Grid> 
+                                                            <Grid item sm={6}>
+                                                                <TextField fullWidth variant="outlined" label="Country/Region" defaultValue={country} onChange={countryChange} type="text" required />
+                                                            </Grid>
+                                                            <Grid item sm={6}>
+                                                                <TextField fullWidth variant="outlined" label="City" defaultValue={city} onChange={cityChange} type="text" required />
                                                             </Grid>
                                                             <Grid item sm={12}>
-                                                                <TextField fullWidth variant="outlined" label="Country/Region" defaultValue="Egypt" type="text" required />
-                                                            </Grid>
-                                                            <Grid item sm={12}>
-                                                                <TextField fullWidth variant="outlined" label="Passport Number" defaultValue={loggedUser.passportNumber} type="text" required />
+                                                                <TextField fullWidth variant="outlined" label="Passport Number" defaultValue={passport} onChange={passportChange} type="text" required />
                                                             </Grid>
                                                             <Grid item sm={6}></Grid>
                                                             <Grid item sm={6}>
-                                                                <Button variant="contained" endIcon={<SaveIcon />} fullWidth>Save Changes</Button>
+                                                                <Button variant="contained" onClick={UpdateUser} endIcon={<SaveIcon />} fullWidth>Save Changes</Button>
                                                             </Grid>
                                                         </Grid>
                                                     </Box>

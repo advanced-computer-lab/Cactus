@@ -3,37 +3,33 @@ const Schema = mongoose.Schema;
 const Reservation = require('../Schemas/Reservation').schema
 
 const UserSchema = new Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    firstName: {
+    firstname:{
         type:String,
         required: true,
         min: 2,
-        max: 20
+        max: 25,
     },
-    lastName: {
+    lastname:{
         type:String,
         required: true,
         min: 2,
-        max: 20
+        max: 25,
     },
     dateOfBirth: {
         type:String,
         required: true,
     },
-    username: {
-        type:String,
-        required: true,
-        min: 2,
-        max: 20,
-        unique:true
-    },
     email: {
         type:String,
         required: true,
         max:50,
+        unique:true
+    },
+    username: {
+        type:String,
+        required: true,
+        min: 3,
+        max: 20,
         unique:true
     },
     password: {
@@ -45,23 +41,31 @@ const UserSchema = new Schema({
     isAdmin: {
         type: Boolean
     },
-    reservations: {
-        type: [Reservation]
-    },
-    passportNumber: {
-        type:String,
-        required: true,
-        unique:true
+
+    passportNumber:{
+        type:Number   
     },
     gender: {
         type:String,
         required: true,
     },
-    phoneNumber: {
-        type:String,
-        unique: true,
-        required: true,
-    },
+
+	telephones:{
+	type:[Number]
+	},
+
+	homeAddress:{
+        country: {type:String},
+        city: {type:String}
+	},
+
+	countryCode:{
+	type:[String]
+	},
+    
+    reservations: {
+    type: [Reservation]
+    }
 })
 const User = mongoose.model('User', UserSchema)
 module.exports = User;
