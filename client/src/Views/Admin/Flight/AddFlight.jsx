@@ -76,9 +76,13 @@ function AddFlight() {
             setEconomy(30)
             setBusiness(15)
         }
-        else{
+        else if(e.target.value === "Large"){
             setEconomy(50)
             setBusiness(24)
+        }
+        else{
+            setEconomy('')
+            setBusiness('')
         }
     }
     const PriceEcoChange = (e) =>{
@@ -209,7 +213,7 @@ function AddFlight() {
                                 fullWidth
                                 placeholder="Departure Time"
                                 type="time"
-                                locale='sv-sv'
+                                ampm="false"
                                 onChange={DepartureTimeChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -239,6 +243,7 @@ function AddFlight() {
                                 fullWidth
                                 placeholder="Arrival Time"
                                 type="time"
+                                ampm={false}
                                 onChange={ArrivalTimeChange}
                                 InputLabelProps={{
                                     shrink: true,

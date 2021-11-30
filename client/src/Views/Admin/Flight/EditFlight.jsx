@@ -75,9 +75,13 @@ function EditFlight() {
             setEconomy(30)
             setBusiness(15)
         }
-        else{
+        else if(e.target.value === "Large"){
             setEconomy(50)
             setBusiness(24)
+        }
+        else{
+            setEconomy('')
+            setBusiness('')
         }
     }
     const EcoPriceChange = (e) => {
