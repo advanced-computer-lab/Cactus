@@ -197,11 +197,11 @@ export default function UserInfo() {
     const UpdateUser = () => {
         const phones = [phone1]
         const codes = [cc1]
-        if(phone2 !== "" && cc2 != ""){
+        if(phone2 !== "" && cc2 !== ""){
             phones.push(phone2)
             codes.push(cc2)
         }
-        if(phone3 !== "" && cc3 != ""){
+        if(phone3 !== "" && cc3 !== ""){
             phones.push(phone3)
             codes.push(cc3)
         }

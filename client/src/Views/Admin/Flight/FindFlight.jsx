@@ -46,6 +46,12 @@ function FindFlight() {
     fetchFlights();
   },[flights])
 
+  const getFlight = (id) => {
+    for(var i=0;i<flights.length;i++){
+      if(flights[i].id === id)
+        return flights[i]
+    }
+  }
   const columns = [
     { field: 'id', headerName: 'ID' },
     { field: 'flightNumber', headerName: 'Flight #', width: 80 },
@@ -76,7 +82,7 @@ function FindFlight() {
             history.push({
               pathname: "/EditFlight",
               search: '?query=abc',
-              state: {detail:  thisRow}
+              state: {detail:  getFlight(thisRow.id)}
             })
           console.log(thisRow.id);
         };

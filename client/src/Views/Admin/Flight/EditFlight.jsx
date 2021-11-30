@@ -7,10 +7,13 @@ import { Snackbar, Typography, Divider } from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import HomeIcon from '@mui/icons-material/Home';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
-import { Grid, Paper } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import { Grid, Paper, FormControl } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import {useLocation} from "react-router-dom";
@@ -26,10 +29,15 @@ function EditFlight() {
     const [arrivalDate, setArrivalDate] = useState(flightData.arrivalDate);
     const [departureTime, setDepartureTime] = useState(flightData.departureTime);
     const [departureDate, setDepartureDate] = useState(flightData.departureDate);
+    const [depCountry, setDepCountry] = useState(flightData.depCountry);
+    const [destCountry, setDestCountry] = useState(flightData.destCountry);
+    const [planeType, setPlaneType] = useState(flightData.planeType);
     const [desAirport, setdesAirport] = useState(flightData.destinationAirport);
     const [depAirport, setdepAirport] = useState(flightData.departureAirport);
     const [economy, setEconomy] = useState(flightData.economySeats);
+    const [priceEco, setPriceEco] = useState(flightData.economyPrice);
     const [business, setBusiness] = useState(flightData.businessSeats);
+    const [priceBus, setPriceBus] = useState(flightData.businessPrice);
     const [open, setOpen] = React.useState(false);
     const [loading, setLoading] =React.useState(false);
 
@@ -45,17 +53,38 @@ function EditFlight() {
     const DepartureDateChange = (e) => {
         setDepartureDate(e.target.value)
     }
+    const DepCountryChange = (e) => {
+        setDepCountry(e.target.value)
+    }
+    const DestCountryChange = (e) => {
+        setDestCountry(e.target.value)
+    }
     const DepAirportChange = (e) => {
         setdepAirport(e.target.value)
     }
     const DesAirportChange = (e) => {
         setdesAirport(e.target.value)
     }
-    const EconomyChange = (e) => {
-        setEconomy(e.target.value)
+    const PlaneChange = (e) => {
+        setPlaneType(e.target.value)
+        if(e.target.value === "Small"){
+            setEconomy(20)
+            setBusiness(9)
+        }
+        else if(e.target.value === "Medium"){
+            setEconomy(30)
+            setBusiness(15)
+        }
+        else{
+            setEconomy(50)
+            setBusiness(24)
+        }
     }
-    const BusinessChange = (e) => {
-        setBusiness(e.target.value)
+    const EcoPriceChange = (e) => {
+        setPriceEco(e.target.value)
+    }
+    const BusPriceChange = (e) => {
+        setPriceBus(e.target.value)
     }
     const data = {
         flightNumber: flightData.flightNumber,
@@ -66,7 +95,12 @@ function EditFlight() {
         destinationAirport: desAirport,
         departureAirport: depAirport,
         economySeats: economy,
-        businessSeats: business
+        businessSeats: business,
+        destCountry: destCountry,
+        depCountry: depCountry,
+        economyPrice: priceEco,
+        businessPrice: priceBus,
+        planeType: planeType
     }
     const handleClick = (e) => {
         e.preventDefault()
@@ -234,32 +268,99 @@ function EditFlight() {
                         <Grid item xs={2}></Grid>
                         <Grid item xs={2}></Grid>
                         <Grid item xs={4}>
+                        <FormControl sm={{ m: 1 }} fullWidth>
+                             <InputLabel id="demo-simple-select-helper-label">Plane</InputLabel>
+                             <Select
+                                labelId="demo-simple-select-helper-label"
+                                id="demo-simple-select-helper"
+                                value={planeType}
+                                label="Plane Type"
+                                onChange={PlaneChange}
+                                required 
+                             >
+                                    <MenuItem value="">
+                                     <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value="Small">Small</MenuItem>
+                                    <MenuItem value="Medium">Medium</MenuItem>
+                                    <MenuItem value="Large">Large</MenuItem>
+                                    </Select>
+                                    </FormControl>
+                                               
+                        </Grid> 
+                        <Grid item xs={2}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Number Of Economy Seats"
                                 fullWidth
                                 placeholder="Number Of Economy Seats"
-                                defaultValue={flightData.economySeats}
-                                onChange={EconomyChange}
+                                value={economy}
+                                disabled
                                 type="number"
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={2}>
                             <TextField
                                 id="outlined-textarea"
                                 label="Number Of Business Seats"
                                 fullWidth
                                 placeholder="Number Of Business Seats"
-                                defaultValue={flightData.businessSeats}
-                                onChange={BusinessChange}
+                                value={business} 
+                                disabled
                                 type="number"
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
                             />
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                id="outlined-textarea"
+                                label="Economy Ticket Price"
+                                fullWidth
+                                placeholder="Economy Price"
+                                value = {priceEco}
+                                onChange = {EcoPriceChange}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                id="outlined-textarea"
+                                label="Business Ticket Price"
+                                fullWidth
+                                placeholder="Business Price"
+                                value = {priceBus}
+                                onChange= {BusPriceChange}
+                            />
+
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                id="outlined-textarea"
+                                label="Departure Country"
+                                fullWidth
+                                placeholder="Departure Country"
+                                value = {depCountry}
+                                onChange = {DepCountryChange}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                id="outlined-textarea"
+                                label="Destination Country"
+                                fullWidth
+                                placeholder="Destination Country"
+                                value = { destCountry}
+                                onChange= {DestCountryChange}
+                            />
+
                         </Grid>
                         <Grid item xs={2}></Grid>
                         <Grid item xs={2}></Grid>
@@ -284,6 +385,7 @@ function EditFlight() {
                             />
 
                         </Grid>
+                        
                         <Grid item xs={2}></Grid>
                         <Grid item xs={6}></Grid>
                         <Grid item xs={4}>
