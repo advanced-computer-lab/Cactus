@@ -1,6 +1,8 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import axios from 'axios'
-import { UserContext } from "../../../Context/UserContext";
+import { set } from "date-fns";
+import { useHistory } from 'react-router'
+
 
 const Search = () => {
     const [value, setValue] = useState(0);
@@ -23,6 +25,7 @@ const Search = () => {
     const [selectedDepFlight, setSelectedDep] = useState()
     const [selectedRetFlight, setSelectedRet] = useState()
     const [loginOpen, setLoginOpen] = useState(false);
+    const [openConfirmDialog, setConfirmDialog] = useState(false)
   
 
 
@@ -123,7 +126,6 @@ const Search = () => {
                 setSearch(true)
                 setFetching(false)
                 setDepartureFlights(response.data)
-                console.log(departureFlights)
             })
             .catch((err) => {
                 console.log(err)
@@ -148,28 +150,14 @@ const Search = () => {
         setDepSelected(false)
         setReturnSelected(true)
         setSelectedRet(params)
-        console.log(selectedDepFlight, selectedRetFlight, seats, cabin)
     }
-    const { loggedUser } = useContext(UserContext)
-    const [success, setSuccess] = useState(false)
+    const history = useHistory()
 
-    function handleReserve(){
-        const reserveData = {
-            seats: seats,
-            cabin: cabin,
-            departureId: selectedDepFlight._id,
-            returnId: selectedRetFlight._id,
-            username: loggedUser.username
-        }
-        axios.post('/Users/reserveFlight', reserveData)
-            .then((response) => {
-                console.log(response.data)
-                setSuccess(true)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const handleCloseConfirm = () =>{
+        history.push("/")
     }
+    const [success, setSuccess] = useState(false)    
+    const [loading, setLoading] = useState(false)
     
     return {
         handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
@@ -179,7 +167,8 @@ const Search = () => {
         seats, setSeats, cabin, setCabin, counterChild, setCounterChild, depSelected, setDepSelected,
         returnSelected, setReturnSelected, departureFlights, setDepartureFlights, departureId,
         setDepartureId, isFetching, setFetching, showCheckout, setShowCheckout, returnFlights, setReturnFlights,
-        selectedDepFlight, selectedRetFlight, handleReturnSelected, loginOpen, setLoginOpen, handleReserve, success, setSuccess
+        selectedDepFlight, selectedRetFlight, handleReturnSelected, loginOpen, setLoginOpen, 
+        success, setSuccess, loading, setLoading, openConfirmDialog,handleCloseConfirm, setConfirmDialog
     }
 }
 export default Search;
