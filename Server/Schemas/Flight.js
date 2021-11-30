@@ -26,11 +26,23 @@ const flightSchema = new Schema({
         type: String,
         required: true
     },
+    destCountry: {
+        type: String,
+        required: true
+    },
     destinationAirport: {
         type: String,
         required: true
     },
+    depCountry: {
+        type: String,
+        required: true
+    },
     departureAirport: {
+        type: String,
+        required: true
+    },
+    planeType: {
         type: String,
         required: true
     },

@@ -19,12 +19,15 @@ FlightRouter.post('/addFlight', (req, res) => {
         'arrivalDate': req.body.arrivalDate,
         'destinationAirport': req.body.destinationAirport,
         'departureAirport': req.body.departureAirport,
+        'destCountry' : req.body.destCountry,
+        'depCountry' : req.body.depCountry,
         'economySeats': req.body.economySeats,
         'businessSeats': req.body.businessSeats,
         'availableEconomy': req.body.economySeats,
         'availableBusiness': req.body.businessSeats,
         'economyPrice': req.body.economyPrice,
-        'businessPrice': req.body.businessPrice
+        'businessPrice': req.body.businessPrice,
+        'planeType': req.body.planeType
     });
     flight.save()
         .then((result) => {
@@ -73,6 +76,15 @@ FlightRouter.post('/findFlight',(req,res) =>{
     if(req.body.destinationAirport){
         f1.destinationAirport=req.body.destinationAirport
     }
+    if(req.body.depCountry){
+        f1.depCountry=req.body.depCountry
+    }
+    if(req.body.destCountry){
+        f1.destCountry=req.body.destCountry
+    }
+    if(req.body.planeType){
+        f1.planeType=req.body.planeType
+    }
 
     Flight.find(f1)
         .then((result)=>{
@@ -120,6 +132,9 @@ FlightRouter.put('/updateFlight/:id',(req,res) =>{
             flight.availableEconomy = req.body.availableEconomy
             flight.economyPrice = req.body.economyPrice
             flight.businessPrice = req.body.businessPrice
+            flight.planeType = req.body.planeType
+            flight.destCountry = req.body.destCountry
+            flight.depCountry = req.body.depCountry
         flight.save().then(() => res.json({success: true}))})
     .catch(er => res.status(404).json({success: false}))
 })
