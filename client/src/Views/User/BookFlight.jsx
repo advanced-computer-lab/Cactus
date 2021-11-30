@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { UserContext } from '../../Context/UserContext';
 import axios from 'axios'
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 
 // ____________CUSTOM COMPONENTS_________________
 import Schedule from '../../Components/User/flightSchedule/Schedule';
@@ -13,7 +14,7 @@ import {
     Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
-    List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton
+    List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton, DialogTitle, Tooltip
 } from '@mui/material';
 
 // ____________ICONS_________________
@@ -41,8 +42,6 @@ import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
-// ____________STRIPE_________________
-import StripeContainer from '../../Components/User/StripeContainer'
 
 // ____________STYLESHEETS AND LOGIC_________________
 import './BookFlight.css';
@@ -82,6 +81,26 @@ function a11yProps(index) {
     };
 }
 
+// const CARD_OPTIONS = {
+//     iconStyle: "solid",
+//     style: {
+//         base: {
+//             iconColor: "#c4f0ff",
+//             color: "#fff",
+//             fontWeight: 500,
+//             fonFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+//             fontSize: "16px",
+//             fontSmoothing: "antialiased",
+//             ":-webkit-autofill": { color: "#fce883" },
+//             "::placeholder": { color: "#87bbfd" }
+//         },
+//         invalid: {
+//             iconColor: "#ffc7ee",
+//             color: "#ffc7ee"
+//         }
+//     }
+
+// }
 
 
 function BookFlight() {
@@ -90,17 +109,19 @@ function BookFlight() {
         handleIncrementChild, value, date, setDate, open, counter, search, setSearch, from, to, cabin, setCabin,
         counterChild, depSelected, setDepSelected, returnSelected, setReturnSelected, departureFlights, isFetching,
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
-        loginOpen, setLoginOpen, success, handleReserve
+        loginOpen, setLoginOpen, loading, setLoading, success, setSuccess, openConfirmDialog, handleCloseConfirm, setConfirmDialog
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
     const [details, setDetails] = React.useState(false);
     const [username, setUsername] = React.useState('');
     const [userPass, setPassword] = React.useState('');
-
     const [isFetchingUser, setFetchingUser] = React.useState(false)
     const [alertOpen, setAlertOpen] = React.useState(false)
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+    const elements = useElements()
+    const stripe = useStripe()
+
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -117,8 +138,6 @@ function BookFlight() {
             clearInterval(timer);
         };
     }, []);
-
-
 
     const handleLoginClose = () => {
         setLoginOpen(false);
@@ -166,16 +185,76 @@ function BookFlight() {
             setShowCheckout(true)
         }
     }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setLoading(true)
+        if (loggedUser === null || loggedUser === undefined) {
+            setLoading(false);
+            setLoginOpen(true);
+        }
+        else {
+            const reserveData = {
+                seats: seats,
+                cabin: cabin,
+                departureId: selectedDepFlight._id,
+                returnId: selectedRetFlight._id,
+                username: loggedUser.username
+            }
+            console.log('ReserveData(i): ', reserveData);
+            if (!stripe || !elements) {
+                return;
+            }
+            // create payment intent on server
+            const { error: backendError, clientSecret } = axios.post("/Authentication/create-payment-intent", {
+                paymentMethodType: 'card',
+                currency: 'egp',
+            }).then((res) => {
+                console.log(res)
+                console.log(reserveData)
+                axios.post('/Users/reserveFlight', reserveData)
+                    .then((response) => {
+                        console.log(response.data)
+                        setLoading(false)
+                        setSuccess(true)
+                        setConfirmDialog(true)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            });
+            if (backendError) {
+                console.log(`Error: ${backendError.message}`)
+                return;
+            }
+            // confirm payment on the client
+            const { stripeError, paymentIntent } = stripe.confirmCardPayment(
+                clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardElement),
+                }
+            }
+            ).then(() => {
+                console.log('PaymentIntent: ', paymentIntent.id + ': ' + paymentIntent.status)
+            })
+
+            if (stripeError) {
+                console.log(`Error: ${stripeError}`)
+            }
+        }
+
+    }
+
     return (
         <>
 
             <div>
-                <Paper elevation={1} style={{ borderRadius: '8px', marginTop: '50px' }}>
+                <Paper elevation={1} style={{ borderRadius: '8px', marginTop: '70px' }}>
                     <Box sx={{ width: '100%' }}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <Tabs value={value} onChange={handleChange} aria-label="Booking tabs" indicatorColor="secondary">
                                 <Tab icon={<FlightTakeoffIcon />} iconPosition='start' label="BOOK FLIGHT" {...a11yProps(0)} />
-                                <Tab icon={<EventNoteIcon />} iconPosition='start' label="MY TRIPS" {...a11yProps(1)} />
+                                <Tab icon={<EventNoteIcon />} iconPosition='start' label="MY TRIPS" {...a11yProps(1)} disabled />
                             </Tabs>
                         </Box>
                         <TabPanel value={value} index={0}>
@@ -702,7 +781,7 @@ function BookFlight() {
                                                     </Grid>
                                                     <Grid item sx={4}>
                                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                            <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)} EGP</Typography>
+                                                            <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
                                                             <Button variant="outlined" onClick={() => {
                                                                 setDepSelected(true)
                                                                 setReturnSelected(false)
@@ -727,14 +806,184 @@ function BookFlight() {
                                                         onClick={handleShowCheckout}
                                                     >Checkout</Button>
                                                     <br />
-                                                    {showCheckout ? <>
-                                                        <StripeContainer />
-                                                    </> : <></>}
-                                                    {success ? <Button onClick={handleReserve}>Confirm Booking</Button> : <></>}
+                                                    <Divider variant="middle" />
+                                                    <br />
+                                                    {showCheckout ?
+                                                        <>
+                                                            {!success ?
+                                                                <>
+                                                                    <Box component="form" noValidate onSubmit={handleSubmit}>
+
+                                                                        <CardElement />
+                                                                        <br />
+                                                                        <Button
+                                                                            color="secondary"
+                                                                            variant="outlined"
+                                                                            type="submit"
+                                                                            fullWidth
+                                                                            sx={{
+                                                                                width: 150,
+                                                                                marginTop: 20
+                                                                            }}
+                                                                        >
+                                                                            {loading ? <CircularProgress color="inherit" aria-busy="true" /> : "Pay"}
+                                                                        </Button>
+                                                                    </Box>
+                                                                </>
+                                                                :
+                                                                <div>
+                                                                    <br />
+                                                                    <Alert severity="info">Payment Successful and Your flights have been booked successfully</Alert>
+                                                                </div>}
+                                                        </>
+                                                        :
+                                                        <></>}
+                                                    <br />
                                                 </Box>
                                             </Paper>
                                         </Grid>
                                     </Grid>
+                                    {/* Confirmation Dialog */}
+                                    <Dialog
+                                        open={openConfirmDialog}
+                                        fullWidth
+                                        maxWidth="lg"
+                                        aria-labelledby="alert-dialog-title"
+                                        aria-describedby="alert-dialog-description"
+                                    >
+                                        <DialogTitle id="alert-dialog-title">
+                                            {"Booking Confirmation"}
+                                        </DialogTitle>
+                                        <DialogContent>
+                                            <Box>
+                                                <Grid container spacing={4}>
+                                                    <Grid item sm={12}>
+                                                        <Typography variant="h5" color="secondary">{selectedDepFlight.departureDate}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={1}>
+                                                        <Typography variant="h6">{selectedDepFlight.flightNumber}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={5}>
+                                                        <Timeline style={{ marginLeft: '-150px', marginTop: '-15px' }}>
+                                                            <TimelineItem>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} Cairo, {selectedDepFlight.from} <br /> Terminal 1</TimelineContent>
+                                                            </TimelineItem>
+                                                            <TimelineItem>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.arrivalTime} Los Angeles, {selectedDepFlight.to} <br /> Terminal 2</TimelineContent>
+                                                            </TimelineItem>
+                                                        </Timeline>
+                                                    </Grid>
+                                                    <Grid item sm={4}>
+                                                        <Box >
+                                                            <Typography variant="h6" color="green">Confirmed</Typography>
+                                                            <br />
+                                                            <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
+                                                            <br />
+                                                            <Typography variant="subtitle1" >Cabin: {selectedDepFlight.cabin}</Typography>
+                                                            <Typography variant="subtitle1" >Seats: E4,E5,E6</Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sm={2}>
+                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Typography component="legend">Services</Typography>
+                                                            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Tooltip title="Wifi">
+                                                                    <WifiIcon />
+                                                                </Tooltip>
+                                                                <Tooltip title="Meal">
+                                                                    <RestaurantIcon />
+                                                                </Tooltip>
+                                                                <Tooltip title="Entertainment">
+                                                                    <MovieIcon />
+                                                                </Tooltip>
+                                                            </Box>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sm={9}></Grid>
+                                                    <Grid item sm={3}>
+                                                        <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={12}>
+                                                        <Alert icon={<ScheduleIcon />} severity="info">
+                                                            Total Duration: 12h
+                                                        </Alert>
+                                                    </Grid>
+                                                    <Grid item sm={12}>
+                                                        <Typography variant="h5" color="secondary">{selectedRetFlight.departureDate}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={1}>
+                                                        <Typography variant="h6">{selectedRetFlight.flightNumber}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={5}>
+                                                        <Timeline style={{ marginLeft: '-150px', marginTop: '-15px' }}>
+                                                            <TimelineItem>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} Los Angeles, {selectedRetFlight.from} <br /> Terminal 6A</TimelineContent>
+                                                            </TimelineItem>
+                                                            <TimelineItem>
+                                                                <TimelineSeparator>
+                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                </TimelineSeparator>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.arrivalDate} Cairo, {selectedRetFlight.to} <br /> Terminal 2</TimelineContent>
+                                                            </TimelineItem>
+                                                        </Timeline>
+                                                    </Grid>
+                                                    <Grid item sm={4}>
+                                                        <Box>
+                                                            <Typography variant="h6" color="green">Confirmed</Typography>
+                                                            <br />
+                                                            <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
+                                                            <br />
+                                                            <Typography variant="subtitle1" >Cabin: Business</Typography>
+                                                            <Typography variant="subtitle1" >Seats: A4,A5,A6</Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sm={2}>
+                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Typography component="legend">Services</Typography>
+                                                            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Tooltip title="Wifi">
+                                                                    <WifiIcon />
+                                                                </Tooltip>
+                                                                <Tooltip title="Meal">
+                                                                    <RestaurantIcon />
+                                                                </Tooltip>
+                                                                <Tooltip title="Entertainment">
+                                                                    <MovieIcon />
+                                                                </Tooltip>
+                                                            </Box>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item sm={9}></Grid>
+                                                    <Grid item sm={3}>
+                                                        <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
+                                                    </Grid>
+                                                    <Grid item sm={12}>
+                                                        <Alert icon={<ScheduleIcon />} severity="info">
+                                                            Total Duration: 12h
+                                                        </Alert>
+                                                    </Grid>
+                                                </Grid>
+                                            </Box>
+                                        </DialogContent>
+                                        <DialogActions>
+
+                                            <Button onClick={handleCloseConfirm} autoFocus color="success" variant="outlined">
+                                                Confirm
+                                            </Button>
+                                        </DialogActions>
+                                    </Dialog>
+                                    <SeatSelector seats={seats} />
                                 </>
                                 :
                                 <></>}
@@ -824,12 +1073,12 @@ function BookFlight() {
                         </TabPanel>
                         <TabPanel value={value} index={1} >
                             <Schedule />
-                            <SeatSelector />
+
                         </TabPanel>
                     </Box>
                 </Paper>
             </div>
-
+            <SeatSelector seats={seats} />
         </>
     );
 }

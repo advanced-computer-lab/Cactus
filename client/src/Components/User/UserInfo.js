@@ -2,6 +2,8 @@
 import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import axios from 'axios'
+import { useHistory } from 'react-router'
+
 
 // ___________MATERIAL UI____________
 import { Box } from '@mui/system'
@@ -33,7 +35,6 @@ import CloseIcon from '@mui/icons-material/Close';
 // ___________COMPONENTS____________
 import UserNavBar from '../../Components/User/UserNavBar'
 import { UserContext } from '../../Context/UserContext';
-import { useHistory } from 'react-router'
 
 
 function TabPanel(props) {

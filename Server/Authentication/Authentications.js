@@ -61,29 +61,28 @@ AuthRouter.get('/users', (req, res) => {
             console.log(err)
         })
 })
-AuthRouter.post('/Checkout', async (req, res) => {
-    let { amount, id } = req.body
+AuthRouter.post('/create-payment-intent', async (req, res) => {
+    const {paymentMethodType, currency} = req.body;
     try {
-        const payment = await stripe.paymentIntents.create({
-            amount: amount,
-            currency: "EGP",
-            description: "Cactus Airlines",
-            payment_method: id,
-            confirm: true
-        })
-        console.log("Payment: ", payment)
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: 10000,
+            currency: currency,
+            description: 'Cactus Airlines',
+            payment_method_types:[paymentMethodType],
+        });
         res.json({
-            message: "Payment Successful",
-            success: true
-        })
+            clientSecret: paymentIntent.client_secret,
+            success: true,
+            message: "Payment successful"
+        });
     } catch (error) {
-        console.log("Error: ", error)
+        res.status(400).json({error: {message: error.message}});
         res.json({
             message: "Payment Failed",
             success: false
         })
     }
-})
+});
 
 
 module.exports = AuthRouter
