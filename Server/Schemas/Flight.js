@@ -61,8 +61,24 @@ const flightSchema = new Schema({
     availableEconomy: {
         type: Number
     },
+    economyMap: {
+        type: [
+            {
+            number: {type:Number}, 
+            reserved: {type:Boolean}
+            }
+            ]
+    },
     availableBusiness: {
         type: Number
+    },
+    businessMap: {
+        type: [
+            {
+            number: {type:Number}, 
+            reserved: {type:Boolean}
+            }
+            ]
     },
     businessSeats: {
         type: Number,
