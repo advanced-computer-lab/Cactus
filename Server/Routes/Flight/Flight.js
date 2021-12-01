@@ -11,6 +11,22 @@ FlightRouter.use(express.json())
 
 // ________Add a New Flight________
 FlightRouter.post('/addFlight', (req, res) => {
+    const economyMap = []
+    for( i=0;i<req.body.economySeats;i++){
+        const obj = {
+            number: (i+1),
+            reserved: false 
+        }
+        economyMap.push(obj)
+    }
+    const businessMap = []
+    for(i =0;i<req.body.businessSeats;i++){
+        const obj = {
+            number: (i+1),
+            reserved: false
+        }
+        businessMap.push(obj)
+    }
     const flight = new Flight({ 
         'flightNumber': req.body.flightNumber,
         'departureTime': req.body.departureTime,
@@ -27,7 +43,9 @@ FlightRouter.post('/addFlight', (req, res) => {
         'availableBusiness': req.body.businessSeats,
         'economyPrice': req.body.economyPrice,
         'businessPrice': req.body.businessPrice,
-        'planeType': req.body.planeType
+        'planeType': req.body.planeType,
+        'economyMap': economyMap,
+        'businessMap': businessMap
     });
     flight.save()
         .then((result) => {
@@ -135,6 +153,8 @@ FlightRouter.put('/updateFlight/:id',(req,res) =>{
             flight.planeType = req.body.planeType
             flight.destCountry = req.body.destCountry
             flight.depCountry = req.body.depCountry
+            flight.businessMap = req.body.businessMap
+            flight.economyMap = req.body.economyMap
         flight.save().then(() => res.json({success: true}))})
     .catch(er => res.status(404).json({success: false}))
 })

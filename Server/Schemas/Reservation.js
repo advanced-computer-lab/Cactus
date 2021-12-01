@@ -13,7 +13,9 @@ const reservationSchema = new Schema({
     seats : {type:Number},
     cabin : {type:String},
     departurePrice : {type:Number},
-    returnPrice : {type:Number}
+    returnPrice : {type:Number},
+    depSeatNumbers: {type:[Number]},
+    retSeatNumbers: {type:[Number]}
 }, { timestamps : true });
 
 
