@@ -42,6 +42,10 @@ const Search = () => {
     const [economyRetSeats, setEconomyRetSeats] = useState([])
     const [businessRetSeats, setBusinessRetSeats] = useState([])
     const [numberOfSeats, setNumberOfSeats] = useState(0);
+    const [depSeat, setDepSeat] = useState([])
+    const [retSeat, setRetSeat] = useState([])
+    const [depFlightMaps, setDepFlightMaps] = useState([])
+    const [retFlightMaps, setRetFlightMaps] = useState([])
 
     // Splicing economy seats
     useEffect(() => {
@@ -229,8 +233,8 @@ const Search = () => {
                 console.log(err)
             })
     }
-    let depSeats = []
-    let depFlightMap = []
+    var depSeats = []
+    var depFlightMap = []
     const handleDepSeatsSelected = () => {
         setNumberOfSeats(seats)
         setDepSelected(true)
@@ -239,12 +243,20 @@ const Search = () => {
             depFlightMap = economySplicedDep.flat(1)
             for(let i=0;i<recentlyReservedDepE.length;i++){
                 depSeats.push((recentlyReservedDepE[i]+1))
-            }}
+            }
+            setDepSeat(depSeats)
+            setDepFlightMaps(depFlightMap)
+            console.log("rn:", depSeats)
+            console.log("rm:", depFlightMap)
+        }
         else{
+            console.log("wrong entry")
             depFlightMap = businessDepSeats
             for(let i=0;i<recentlyReservedDepB.length;i++){
                 depSeats.push((recentlyReservedDepB[i]+1))
             }
+            setDepSeat(depSeats)
+            setDepFlightMaps(depFlightMap)
         }
         console.log("rb:", recentlyReservedDepB)
         console.log("re:", recentlyReservedDepE)
@@ -454,8 +466,8 @@ const Search = () => {
         setBusinessRetSeats(params.businessMap)
         setShowRetSeats(true)
     }
-    let retSeats = []
-    let retFlightMap = []
+    var retSeats = []
+    var retFlightMap = []
     const handleRetSeatsSelected = () => {
         setReturnSelected(true)
         setShowRetSeats(false)
@@ -464,12 +476,17 @@ const Search = () => {
             retFlightMap = economySplicedRet.flat(1)
             for(let i=0;i<recentlyReservedRetE.length;i++){
                 retSeats.push((recentlyReservedRetE[i]+1))
-            }}
+            }
+            setRetSeat(retSeats)
+            setRetFlightMaps(retFlightMap)
+        }
         else{
             retFlightMap = businessRetSeats
             for(let i=0;i<recentlyReservedRetB.length;i++){
                 retSeats.push((recentlyReservedRetB[i]+1))
             }
+            setRetSeat(retSeats)
+            setRetFlightMaps(retFlightMap)
         }
     }
     const history = useHistory()
@@ -492,7 +509,7 @@ const Search = () => {
         success, setSuccess, loading, setLoading, openConfirmDialog, handleCloseConfirm, setConfirmDialog,
         showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, economyDepSeats, economyRetSeats,
         businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, economySplicedRet,
-        handleSelectedRetSeat, handleResetRetSeats, depSeats, depFlightMap, retSeats, retFlightMap
+        handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps
     }
 }
 export default Search;

@@ -95,7 +95,7 @@ function BookFlight() {
         setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected,
         economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats, 
         handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, economySplicedRet,
-        handleResetRetSeats, depSeats, retSeats, depFlightMap, retFlightMap
+        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -180,18 +180,16 @@ function BookFlight() {
             setLoginOpen(true);
         }
         else {
-            console.log(depSeats)
-            console.log(retSeats)
             const reserveData = {
                 seats: seats,
                 cabin: cabin,
                 departureId: selectedDepFlight._id,
                 returnId: selectedRetFlight._id,
                 username: loggedUser.username,
-                depSeats: depSeats,
-                retSeats: retSeats,
-                depFlightMap: depFlightMap,
-                retFlightMap: retFlightMap
+                depSeats: depSeat,
+                retSeats: retSeat,
+                depFlightMap: depFlightMaps,
+                retFlightMap: retFlightMaps
             }
             console.log('ReserveData(i): ', reserveData);
             if (!stripe || !elements) {
