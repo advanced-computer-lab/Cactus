@@ -6,26 +6,23 @@ import CoffeeIcon from '@mui/icons-material/Coffee';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Box } from '@mui/system'
 
-var businessSeats = [{ number: 1, reserved: true }, { number: 2, reserved: false }, { number: 3, reserved: false },
-{ number: 4, reserved: false }, { number: 5, reserved: false }, { number: 6, reserved: false },
-{ number: 7, reserved: false }, { number: 8, reserved: true }, { number: 9, reserved: true }]
+// var businessSeats = [{ number: 1, reserved: true }, { number: 2, reserved: false }, { number: 3, reserved: false },
+// { number: 4, reserved: false }, { number: 5, reserved: false }, { number: 6, reserved: false },
+// { number: 7, reserved: false }, { number: 8, reserved: true }, { number: 9, reserved: true }]
 
 
-const economySeats = [{ number: 1, reserved: false }, { number: 2, reserved: false }, { number: 3, reserved: false },
-{ number: 4, reserved: false }, { number: 5, reserved: false }, { number: 6, reserved: false },
-{ number: 7, reserved: false }, { number: 8, reserved: false }, { number: 9, reserved: false },
-{ number: 10, reserved: false }, { number: 11, reserved: false }, { number: 12, reserved: false },
-{ number: 13, reserved: false }, { number: 14, reserved: false }, { number: 15, reserved: false },
-{ number: 16, reserved: false }, { number: 17, reserved: false }, { number: 18, reserved: false },
-{ number: 19, reserved: false }, { number: 20, reserved: false }]
+// const economySeats = [{ number: 1, reserved: false }, { number: 2, reserved: false }, { number: 3, reserved: false },
+// { number: 4, reserved: false }, { number: 5, reserved: false }, { number: 6, reserved: false },
+// { number: 7, reserved: false }, { number: 8, reserved: false }, { number: 9, reserved: false },
+// { number: 10, reserved: false }, { number: 11, reserved: false }, { number: 12, reserved: false },
+// { number: 13, reserved: false }, { number: 14, reserved: false }, { number: 15, reserved: false },
+// { number: 16, reserved: false }, { number: 17, reserved: false }, { number: 18, reserved: false },
+// { number: 19, reserved: false }, { number: 20, reserved: false }]
 
 var recentlyReservedB = []
 var recentlyReservedE = []
 
-const cabin = "economy"
-
 var economySpliced = []
-var temp = []
 
 
 export default function SeatSelector(props) {
@@ -33,36 +30,36 @@ export default function SeatSelector(props) {
     let temp1 = []
     let temp2 = []
     let temp3 = []
-    for (let i = 0; i < economySeats.length; i += 10) {
+    for (let i = 0; i < this.props.economySeats.length; i += 10) {
       temp1 = []
       temp2 = []
       temp3 = []
       for (let j = i; j < i + 3; j++) {
-        temp1.push(economySeats[j])
+        temp1.push(this.props.economySeats[j])
         console.log("temp1: ", temp1)
       }
       for (let k = i + 3; k < (i + 3) + 4; k++) {
-        temp2.push(economySeats[k])
+        temp2.push(this.props.economySeats[k])
         console.log("temp2: ", temp2)
       }
       for (let l = i + 7; l < (i + 7) + 3; l++) {
-        temp3.push(economySeats[l])
+        temp3.push(this.props.economySeats[l])
         console.log("temp3: ", temp3)
       }
       economySpliced.push(temp1)
       economySpliced.push(temp2)
       economySpliced.push(temp3)
     }
-  }, [economySeats])
-  const [business, setBusiness] = useState(businessSeats)
+  }, [this.props.economySeats])
+  const [business, setBusiness] = useState(this.props.businessSeats)
   const [economy, setEconomy] = useState(economySpliced)
-  const [numberOfSeats, setNumberOfSeats] = useState(3);
+  const [numberOfSeats, setNumberOfSeats] = useState(this.props.seats);
 
   const handleSelected = (e, params) => {
     e.preventDefault()
     if (!(numberOfSeats === 0)) {
       setNumberOfSeats(numberOfSeats - 1);
-      if (cabin === "business") {
+      if (this.props.cabin === "business") {
         let seat = business.find((o, i) => {
           if (o.number === params) {
             business[i] = { number: params, reserved: true };
@@ -111,7 +108,7 @@ export default function SeatSelector(props) {
   }
   const handleReset = (e) => {
     e.preventDefault()
-    if (cabin === "business") {
+    if (this.props.cabin === "business") {
       for (let index = 0; index < recentlyReservedB.length; index++) {
         business[recentlyReservedB[index]].reserved = false
         setBusiness(business)
@@ -192,7 +189,7 @@ export default function SeatSelector(props) {
             </Grid>
 
             
-            {cabin === 'economy' ?
+            {this.props.cabin === 'economy' ?
               <>
                 <Grid item sm={4}>
                   <Box style={{ display: 'flex' }}>
@@ -220,7 +217,7 @@ export default function SeatSelector(props) {
               :
               <></>
             }
-            {cabin === "business" ? business.map((seat) =>
+            {this.props.cabin === "business" ? business.map((seat) =>
               <>
                 <Grid item sm={4}>
                   <Button color="info" disabled={seat.reserved}
@@ -268,7 +265,7 @@ export default function SeatSelector(props) {
             <Grid item sm={9}></Grid>
             <Grid item sm={9}></Grid>
             <Grid item sm={3}>
-              <Button color="success" variant="outlined" onClick={() => console.log("confirmed")}fullWidth size="large">Confirm</Button>
+              <Button color="success" variant="outlined" onClick={this.props.function}fullWidth size="large">Confirm</Button>
             </Grid>
           </Grid>
         </Box>

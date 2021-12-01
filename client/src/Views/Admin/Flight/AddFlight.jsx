@@ -122,7 +122,7 @@ function AddFlight() {
             .catch((err) => {
                 console.log(err)
             })
-        console.log(data)
+        console.log("added data: ",data)
     }
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -213,7 +213,6 @@ function AddFlight() {
                                 fullWidth
                                 placeholder="Departure Time"
                                 type="time"
-                                ampm="false"
                                 onChange={DepartureTimeChange}
                                 InputLabelProps={{
                                     shrink: true,
@@ -243,7 +242,6 @@ function AddFlight() {
                                 fullWidth
                                 placeholder="Arrival Time"
                                 type="time"
-                                ampm={false}
                                 onChange={ArrivalTimeChange}
                                 InputLabelProps={{
                                     shrink: true,

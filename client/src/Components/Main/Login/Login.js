@@ -55,7 +55,6 @@ export default function SignInSide() {
     "username": username,
     "password": userPass
   }
-  // const { user, isFetching, error, dispatch } = React.useContext(AuthContext)
   const handleSubmit = (event) => {
     event.preventDefault();
     setFetching(true)

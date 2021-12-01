@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from 'axios'
 import { set } from "date-fns";
 import { useHistory } from 'react-router'
 
+var recentlyReservedDepB = []
+var recentlyReservedDepE = []
+
+var economySplicedDep = []
+
+var recentlyReservedRetB = []
+var recentlyReservedRetE = []
+
+var economySplicedRet = []
 
 const Search = () => {
     const [value, setValue] = useState(0);
@@ -26,25 +35,38 @@ const Search = () => {
     const [selectedRetFlight, setSelectedRet] = useState()
     const [loginOpen, setLoginOpen] = useState(false);
     const [openConfirmDialog, setConfirmDialog] = useState(false)
-  
-
-
+    const [showDepSeats, setShowDepSeats] = useState(false)
+    const [showRetSeats, setShowRetSeats] = useState(false)
+    const [economyDepSeats, setEconomyDepSeats] = useState([])
+    const [businessDepSeats, setBusinessDepSeats] = useState([])
+    const [economyRetSeats, setEconomyRetSeats] = useState([])
+    const [businessRetSeats, setBusinessRetSeats] = useState([])
+    const [numberOfSeats, setNumberOfSeats] = useState(0);
 
     const depDate = new Date(date[0]);
-    var depDateFormat = (depDate.getDate()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
-    if ((depDate.getMonth()) < 10) {
-        depDateFormat = (depDate.getDate()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
+    var depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
+    if ((depDate.getMonth() + 1) < 10) {
+        depDateFormat = (depDate.getFullYear()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
         if ((depDate.getDate()) < 10) {
-            depDateFormat = "0" + (depDate.getDate()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getFullYear())
+            depDateFormat = (depDate.getFullYear()) + "-0" + (depDate.getMonth() + 1) + "-0" + (depDate.getDate())
+        }
+    } else {
+        if ((depDate.getDate()) < 10) {
+            depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-0" + (depDate.getDate())
         }
     }
 
+
     const returnDate = new Date(date[1]);
-    var returnDateFormat = (returnDate.getDate()) + "-" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
-    if ((depDate.getMonth()) < 10) {
-        returnDateFormat = (returnDate.getDate()) + "-0" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
+    var returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
+    if ((depDate.getMonth() + 1) < 10) {
+        returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
         if ((returnDate.getDate()) < 10) {
-            returnDateFormat = "0" + (returnDate.getDate()) + "-0" + (returnDate.getMonth() + 1) + "-" + (returnDate.getFullYear())
+            returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
+        }
+    } else {
+        if ((returnDate.getDate()) < 10) {
+            returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
         }
     }
 
@@ -58,7 +80,7 @@ const Search = () => {
             setCounterChild(counterChild - 1)
         }
         else {
-            setCounterChild(1)
+            setCounterChild(0)
         }
     }
 
@@ -110,7 +132,6 @@ const Search = () => {
     }
     const handleFindFlight = (e) => {
         e.preventDefault()
-        console.log(data);
         setFetching(true)
         if (search) {
             setSearch(false)
@@ -126,39 +147,207 @@ const Search = () => {
                 setSearch(true)
                 setFetching(false)
                 setDepartureFlights(response.data)
+                console.log("response: ",response.data)
             })
             .catch((err) => {
                 console.log(err)
             })
+            console.log("dep flights: ", departureFlights)
     }
+
     const handleReturnFlight = (params, e) => {
         e.preventDefault()
         console.log(returnData);
         axios.post('/Users/getFlights', returnData)
             .then((response) => {
                 setSearch(false)
-                setDepSelected(true)
+                // setDepSelected(true)
                 setReturnFlights(response.data)
                 setSelectedDep(params)
+                setEconomyDepSeats(params.economyMap)
+                setBusinessDepSeats(params.businessMap)
+                setNumberOfSeats(seats)
+                setShowDepSeats(true)
+                console.log("params: ",params)
+                console.log("eSeatMap: ", economyDepSeats)
+                console.log("bSeatMap: ", businessDepSeats)
             })
             .catch((err) => {
                 console.log(err)
             })
     }
+    // Splicing economy seats
+    useEffect(() => {
+        // Departure Seats
+        if(!(economyDepSeats === undefined))
+        {let temp1 = []
+        let temp2 = []
+        let temp3 = []
+        for (let i = 0; i < economyDepSeats.length; i += 10) {
+          temp1 = []
+          temp2 = []
+          temp3 = []
+          for (let j = i; j < i + 3; j++) {
+            temp1.push(economyDepSeats[j])
+            console.log("temp1: ", temp1)
+          }
+          for (let k = i + 3; k < (i + 3) + 4; k++) {
+            temp2.push(economyDepSeats[k])
+            console.log("temp2: ", temp2)
+          }
+          for (let l = i + 7; l < (i + 7) + 3; l++) {
+            temp3.push(economyDepSeats[l])
+            console.log("temp3: ", temp3)
+          }
+          economySplicedDep.push(temp1)
+          economySplicedDep.push(temp2)
+          economySplicedDep.push(temp3)
+        }}
+        if(!(economyRetSeats === undefined))
+        {let temp4 = []
+        let temp5 = []
+        let temp6 = []
+        for (let i = 0; i < economyRetSeats.length; i += 10) {
+            temp4 = []
+            temp5 = []
+            temp6 = []
+            for (let j = i; j < i + 3; j++) {
+              temp4.push(economyRetSeats[j])
+              console.log("temp1: ", temp4)
+            }
+            for (let k = i + 3; k < (i + 3) + 4; k++) {
+              temp5.push(economyRetSeats[k])
+              console.log("temp2: ", temp5)
+            }
+            for (let l = i + 7; l < (i + 7) + 3; l++) {
+              temp6.push(economyRetSeats[l])
+              console.log("temp3: ", temp6)
+            }
+            economySplicedRet.push(temp4)
+            economySplicedRet.push(temp5)
+            economySplicedRet.push(temp6)
+          }}
+      }, [economyRetSeats, economyDepSeats])
+
+    const handleDepSeatsSelected = () => {
+        setNumberOfSeats(seats)
+    }
+    const handleSelectedDepSeat = (e, params) => {
+        e.preventDefault()
+        if (!(numberOfSeats === 0)) {
+            setNumberOfSeats(numberOfSeats - 1);
+            if (cabin === "business") {
+                let seat = businessDepSeats.find((o, i) => {
+                    if (o.number === params) {
+                        businessDepSeats[i] = { number: params, reserved: true };
+                        recentlyReservedDepB.push(i)
+                        setBusinessDepSeats(businessDepSeats)
+                        return true;
+                    }
+                })
+            }
+            else {
+                const flatArray = economySplicedDep.flat(1)
+                let seat = flatArray.find((o, i) => {
+                    if (o.number === params) {
+                        flatArray[i] = { number: params, reserved: true };
+                        recentlyReservedDepE.push(i)
+                        return true;
+                    }
+                })
+                economySplicedDep = []
+                let temp1 = []
+                let temp2 = []
+                let temp3 = []
+                for (let i = 0; i < flatArray.length; i += 10) {
+                    temp1 = []
+                    temp2 = []
+                    temp3 = []
+                    for (let j = i; j < i + 3; j++) {
+                        temp1.push(flatArray[j])
+                        console.log("temp1: ", temp1)
+                    }
+                    for (let k = i + 3; k < (i + 3) + 4; k++) {
+                        temp2.push(flatArray[k])
+                        console.log("temp2: ", temp2)
+                    }
+                    for (let l = i + 7; l < (i + 7) + 3; l++) {
+                        temp3.push(flatArray[l])
+                        console.log("temp3: ", temp3)
+                    }
+                    economySplicedDep.push(temp1)
+                    economySplicedDep.push(temp2)
+                    economySplicedDep.push(temp3)
+                }
+                setEconomyDepSeats(economySplicedDep)
+            }
+        }
+    }
+    const handleResetDepSeats = (e) =>{
+        e.preventDefault()
+        if (cabin === "business") {
+          for (let index = 0; index < recentlyReservedDepB.length; index++) {
+            businessDepSeats[recentlyReservedDepB[index]].reserved = false
+            setBusinessDepSeats(businessDepSeats)
+          }
+          recentlyReservedDepB = []
+          console.log(businessDepSeats)
+        }
+        else {
+          const flatArray = economySplicedDep.flat(1)
+          for (let index = 0; index < recentlyReservedDepE.length; index++) {
+            flatArray[recentlyReservedDepE[index]].reserved = false
+          }
+          recentlyReservedDepE = []
+          economySplicedDep = []
+          let temp1 = []
+          let temp2 = []
+          let temp3 = []
+          for (let i = 0; i < flatArray.length; i += 10) {
+            temp1 = []
+            temp2 = []
+            temp3 = []
+            for (let j = i; j < i + 3; j++) {
+              temp1.push(flatArray[j])
+              console.log("temp1: ", temp1)
+            }
+            for (let k = i + 3; k < (i + 3) + 4; k++) {
+              temp2.push(flatArray[k])
+              console.log("temp2: ", temp2)
+            }
+            for (let l = i + 7; l < (i + 7) + 3; l++) {
+              temp3.push(flatArray[l])
+              console.log("temp3: ", temp3)
+            }
+            economySplicedDep.push(temp1)
+            economySplicedDep.push(temp2)
+            economySplicedDep.push(temp3)
+          }
+          setEconomyDepSeats(economySplicedDep)
+          console.log(economyDepSeats)
+        }
+    }
+
     const handleReturnSelected = (params, e) => {
         e.preventDefault()
         setDepSelected(false)
-        setReturnSelected(true)
+        // setReturnSelected(true)
         setSelectedRet(params)
+        setEconomyRetSeats(params.economyMap)
+        setBusinessRetSeats(params.businessMap)
+        setShowRetSeats(true)
+    }
+    const handleRetSeatsSelected = () => {
+
     }
     const history = useHistory()
 
-    const handleCloseConfirm = () =>{
+    const handleCloseConfirm = () => {
         history.push("/")
     }
-    const [success, setSuccess] = useState(false)    
+    const [success, setSuccess] = useState(false)
     const [loading, setLoading] = useState(false)
-    
+
     return {
         handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
         handleFromChange, handleToChange, data, returnData, handleDecrement, handleIncrement,
@@ -167,8 +356,10 @@ const Search = () => {
         seats, setSeats, cabin, setCabin, counterChild, setCounterChild, depSelected, setDepSelected,
         returnSelected, setReturnSelected, departureFlights, setDepartureFlights, departureId,
         setDepartureId, isFetching, setFetching, showCheckout, setShowCheckout, returnFlights, setReturnFlights,
-        selectedDepFlight, selectedRetFlight, handleReturnSelected, loginOpen, setLoginOpen, 
-        success, setSuccess, loading, setLoading, openConfirmDialog,handleCloseConfirm, setConfirmDialog
+        selectedDepFlight, selectedRetFlight, handleReturnSelected, loginOpen, setLoginOpen,
+        success, setSuccess, loading, setLoading, openConfirmDialog, handleCloseConfirm, setConfirmDialog,
+        showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, economyDepSeats, economyRetSeats,
+        businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats
     }
 }
 export default Search;
