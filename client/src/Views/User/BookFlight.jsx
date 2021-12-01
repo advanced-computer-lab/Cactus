@@ -93,7 +93,9 @@ function BookFlight() {
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
         loginOpen, setLoginOpen, loading, setLoading, success, setSuccess, openConfirmDialog, handleCloseConfirm,
         setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected,
-        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats
+        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats, 
+        handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, economySplicedRet,
+        handleResetRetSeats, depSeats, retSeats, depFlightMap, retFlightMap
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -178,12 +180,18 @@ function BookFlight() {
             setLoginOpen(true);
         }
         else {
+            console.log(depSeats)
+            console.log(retSeats)
             const reserveData = {
                 seats: seats,
                 cabin: cabin,
                 departureId: selectedDepFlight._id,
                 returnId: selectedRetFlight._id,
-                username: loggedUser.username
+                username: loggedUser.username,
+                depSeats: depSeats,
+                retSeats: retSeats,
+                depFlightMap: depFlightMap,
+                retFlightMap: retFlightMap
             }
             console.log('ReserveData(i): ', reserveData);
             if (!stripe || !elements) {
@@ -283,7 +291,7 @@ function BookFlight() {
                                         id="country-select-demo"
                                         options={countries}
                                         autoHighlight
-                                        getOptionLabel={(option) => option.airport}
+                                        getOptionLabel={(option) => option.code}
                                         renderOption={(props, option) => (
                                             <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
                                                 <img
@@ -639,22 +647,22 @@ function BookFlight() {
                                                     </>
                                                 )
                                                     :
-                                                    economyDepSeats.map((seat) =>
+                                                    economySplicedDep.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                                {/* {seat.map((eseat) => */}
-                                                                    <Button color="info"
-                                                                        disabled={seat.reserved}
-                                                                        onClick={(e) => { handleSelectedDepSeat(e, seat.number) }}
-                                                                        variant="contained"
-                                                                        size="medium"
-                                                                        style={{ marginRight: '5px' }}
-                                                                    >
-                                                                        {seat.number}
-                                                                    </Button>
-                                                                {/* )
-                                                                } */}
-                                                            </Grid>
+                                                            {seat.map((eseat) =>
+                                                            <Button color="info"
+                                                                disabled={eseat.reserved}
+                                                                onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
+                                                                variant="contained"
+                                                                size="medium"
+                                                                style={{ marginRight: '5px' }}
+                                                            >
+                                                                {eseat.number}
+                                                            </Button>
+                                                            )
+                                                            }
+                                                        </Grid>
                                                         </>
                                                     )
                                                 }
@@ -841,6 +849,145 @@ function BookFlight() {
                                 :
                                 <></>
                             }
+                             {showRetSeats ?
+                                <>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                        <Box>
+                                            <Grid container spacing={3}>
+
+                                                <Grid item sm={12}>
+                                                    <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Typography variant="h4" color="secondary">Pick Your Seats</Typography>
+                                                    </Box>
+                                                    <br />
+                                                    <Divider varaint="middle" />
+                                                    <br />
+                                                </Grid>
+                                                <Grid item sm={10}></Grid>
+                                                <Grid item sm={2}>
+                                                    <Tooltip title="Reset Seats">
+                                                        <IconButton color="error" onClick={handleResetRetSeats} aria-label="reset">
+                                                            <RestoreIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Grid>
+                                                <Grid item sm={3}>
+                                                    <Button variant="contained" endIcon={<ExitToAppIcon />} fullWidth color="error">Exit</Button>
+                                                </Grid>
+                                                <Grid item sm={6}>
+                                                    <Box style={{ display: 'flex', marginLeft: '600px' }}>
+                                                        <IconButton variant="contained" fullWidth color="primary">
+                                                            <CoffeeIcon />
+                                                        </IconButton>
+                                                        <IconButton variant="contained" fullWidth color="primary">
+                                                            <WcIcon />
+                                                        </IconButton>
+                                                    </Box>
+                                                    <br />
+                                                    <Divider varaint="middle" />
+                                                    <br />
+                                                </Grid>
+
+
+                                                {cabin === 'economy' ?
+                                                    <>
+                                                        <Grid item sm={4}>
+                                                            <Box style={{ display: 'flex' }}>
+                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>A</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '50px' }}>B</Typography>
+                                                                <Typography variant="h5">C</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sm={4}>
+                                                            <Box style={{ display: 'flex' }}>
+                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>D</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '50px' }}>E</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '50px' }}>F</Typography>
+                                                                <Typography variant="h5">G</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sm={4}>
+                                                            <Box style={{ display: 'flex' }}>
+                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>H</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '50px' }}>I</Typography>
+                                                                <Typography variant="h5">J</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <Grid item sm={4}>
+                                                            <Box style={{ display: 'flex' }}>
+                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '320px' }}>A</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '320px' }}>B</Typography>
+                                                                <Typography variant="h5">C</Typography>
+                                                            </Box>
+                                                        </Grid>
+                                                        <Grid item sm={8}></Grid>
+                                                    </>
+                                                }
+                                                {cabin === "business" ? businessRetSeats.map((seat) =>
+                                                    <>
+                                                        <Grid item sm={4}>
+                                                            <Button color="info" disabled={seat.reserved}
+                                                                onClick={(e) => { handleSelectedRetSeat(e, seat.number) }} variant="contained" key={seat.number}
+                                                            >{seat.number}</Button>
+                                                        </Grid>
+                                                    </>
+                                                )
+                                                    :
+                                                    economySplicedRet.map((seat) =>
+                                                        <>
+                                                            <Grid item sm={4}>
+                                                            {seat.map((eseat) =>
+                                                            <Button color="info"
+                                                                disabled={eseat.reserved}
+                                                                onClick={(e) => { handleSelectedRetSeat(e, eseat.number) }}
+                                                                variant="contained"
+                                                                size="medium"
+                                                                style={{ marginRight: '5px' }}
+                                                            >
+                                                                {eseat.number}
+                                                            </Button>
+                                                            )
+                                                            }
+                                                        </Grid>
+                                                        </>
+                                                    )
+                                                }
+                                                <Grid item sm={3}>
+                                                    <br />
+                                                    <Box style={{ marginLeft: '80px' }}>
+                                                        <IconButton variant="contained" fullWidth color="primary"><WcIcon /></IconButton>
+                                                    </Box>
+                                                </Grid>
+                                                <Grid item sm={6}></Grid>
+                                                <Grid item sm={3}>
+                                                    <br />
+                                                    <Box>
+                                                        <IconButton variant="contained" fullWidth color="primary"><WcIcon /></IconButton>
+                                                    </Box>
+                                                </Grid>
+                                                <Grid item sm={3}>
+                                                    <Button variant="contained" endIcon={<ExitToAppIcon />} fullWidth color="error">Exit</Button>
+                                                </Grid>
+                                                <Grid item sm={9}></Grid>
+                                                <Grid item sm={9}></Grid>
+                                                <Grid item sm={3}>
+                                                    <Button color="success" variant="outlined"
+                                                        onClick={handleRetSeatsSelected}
+                                                        fullWidth size="large"
+                                                    >
+                                                        Confirm
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    </Paper>
+                                </>
+                                :
+                                <></>
+                            }
                             {returnSelected ?
                                 <>
                                     <Grid container spacing={3}>
@@ -1013,7 +1160,7 @@ function BookFlight() {
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} Cairo, {selectedDepFlight.from} <br /> Terminal 1</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} {selectedDepFlight.depCountry}, {selectedDepFlight.from} <br /> Terminal 1</TimelineContent>
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineSeparator>
@@ -1071,7 +1218,7 @@ function BookFlight() {
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} Los Angeles, {selectedRetFlight.from} <br /> Terminal 6A</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.desCountry}, {selectedRetFlight.from} <br /> Terminal 6A</TimelineContent>
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineSeparator>
