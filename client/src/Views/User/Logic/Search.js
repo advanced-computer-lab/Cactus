@@ -43,6 +43,64 @@ const Search = () => {
     const [businessRetSeats, setBusinessRetSeats] = useState([])
     const [numberOfSeats, setNumberOfSeats] = useState(0);
 
+    // Splicing economy seats
+    useEffect(() => {
+        // Departure Seats
+        if (economyDepSeats) {
+            let temp1 = []
+            let temp2 = []
+            let temp3 = []
+            for (let i = 0; i < economyDepSeats.length; i += 10) {
+                temp1 = []
+                temp2 = []
+                temp3 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp1.push(economyDepSeats[j])
+                    console.log("temp1: ", temp1)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp2.push(economyDepSeats[k])
+                    console.log("temp2: ", temp2)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp3.push(economyDepSeats[l])
+                    console.log("temp3: ", temp3)
+                }
+                economySplicedDep.push(temp1)
+                economySplicedDep.push(temp2)
+                economySplicedDep.push(temp3)
+                console.log("economySpliced: ", economySplicedDep)
+            }
+            setEconomyDepSeats(economySplicedDep)
+        }
+        if (economyRetSeats) {
+            let temp4 = []
+            let temp5 = []
+            let temp6 = []
+            for (let i = 0; i < economyRetSeats.length; i += 10) {
+                temp4 = []
+                temp5 = []
+                temp6 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp4.push(economyRetSeats[j])
+                    console.log("temp1: ", temp4)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp5.push(economyRetSeats[k])
+                    console.log("temp2: ", temp5)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp6.push(economyRetSeats[l])
+                    console.log("temp3: ", temp6)
+                }
+                economySplicedRet.push(temp4)
+                economySplicedRet.push(temp5)
+                economySplicedRet.push(temp6)
+            }
+            setEconomyRetSeats(economySplicedRet)
+        }
+    }, [economyRetSeats, economyDepSeats])
+
     const depDate = new Date(date[0]);
     var depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
     if ((depDate.getMonth() + 1) < 10) {
@@ -116,6 +174,7 @@ const Search = () => {
     const handleToChange = (e) => {
         setTo(e.target.value)
     }
+
     const data = {
         departureDate: depDateFormat,
         destinationAirport: to,
@@ -123,6 +182,7 @@ const Search = () => {
         cabin: cabin,
         seats: seats
     }
+
     const returnData = {
         departureDate: returnDateFormat,
         destinationAirport: from,
@@ -130,6 +190,7 @@ const Search = () => {
         cabin: cabin,
         seats: seats
     }
+
     const handleFindFlight = (e) => {
         e.preventDefault()
         setFetching(true)
@@ -147,12 +208,12 @@ const Search = () => {
                 setSearch(true)
                 setFetching(false)
                 setDepartureFlights(response.data)
-                console.log("response: ",response.data)
+                console.log("response: ", response.data)
             })
             .catch((err) => {
                 console.log(err)
             })
-            console.log("dep flights: ", departureFlights)
+        console.log("dep flights: ", departureFlights)
     }
 
     const handleReturnFlight = (params, e) => {
@@ -168,70 +229,17 @@ const Search = () => {
                 setBusinessDepSeats(params.businessMap)
                 setNumberOfSeats(seats)
                 setShowDepSeats(true)
-                console.log("params: ",params)
-                console.log("eSeatMap: ", economyDepSeats)
-                console.log("bSeatMap: ", businessDepSeats)
             })
             .catch((err) => {
                 console.log(err)
             })
     }
-    // Splicing economy seats
-    useEffect(() => {
-        // Departure Seats
-        if(!(economyDepSeats === undefined))
-        {let temp1 = []
-        let temp2 = []
-        let temp3 = []
-        for (let i = 0; i < economyDepSeats.length; i += 10) {
-          temp1 = []
-          temp2 = []
-          temp3 = []
-          for (let j = i; j < i + 3; j++) {
-            temp1.push(economyDepSeats[j])
-            console.log("temp1: ", temp1)
-          }
-          for (let k = i + 3; k < (i + 3) + 4; k++) {
-            temp2.push(economyDepSeats[k])
-            console.log("temp2: ", temp2)
-          }
-          for (let l = i + 7; l < (i + 7) + 3; l++) {
-            temp3.push(economyDepSeats[l])
-            console.log("temp3: ", temp3)
-          }
-          economySplicedDep.push(temp1)
-          economySplicedDep.push(temp2)
-          economySplicedDep.push(temp3)
-        }}
-        if(!(economyRetSeats === undefined))
-        {let temp4 = []
-        let temp5 = []
-        let temp6 = []
-        for (let i = 0; i < economyRetSeats.length; i += 10) {
-            temp4 = []
-            temp5 = []
-            temp6 = []
-            for (let j = i; j < i + 3; j++) {
-              temp4.push(economyRetSeats[j])
-              console.log("temp1: ", temp4)
-            }
-            for (let k = i + 3; k < (i + 3) + 4; k++) {
-              temp5.push(economyRetSeats[k])
-              console.log("temp2: ", temp5)
-            }
-            for (let l = i + 7; l < (i + 7) + 3; l++) {
-              temp6.push(economyRetSeats[l])
-              console.log("temp3: ", temp6)
-            }
-            economySplicedRet.push(temp4)
-            economySplicedRet.push(temp5)
-            economySplicedRet.push(temp6)
-          }}
-      }, [economyRetSeats, economyDepSeats])
 
     const handleDepSeatsSelected = () => {
         setNumberOfSeats(seats)
+        setDepSelected(true)
     }
+
     const handleSelectedDepSeat = (e, params) => {
         e.preventDefault()
         if (!(numberOfSeats === 0)) {
@@ -239,7 +247,7 @@ const Search = () => {
             if (cabin === "business") {
                 let seat = businessDepSeats.find((o, i) => {
                     if (o.number === params) {
-                        businessDepSeats[i] = { number: params, reserved: true };
+                        businessDepSeats[i] = { number: params, reserved: true, _id: o._id };
                         recentlyReservedDepB.push(i)
                         setBusinessDepSeats(businessDepSeats)
                         return true;
@@ -250,7 +258,7 @@ const Search = () => {
                 const flatArray = economySplicedDep.flat(1)
                 let seat = flatArray.find((o, i) => {
                     if (o.number === params) {
-                        flatArray[i] = { number: params, reserved: true };
+                        flatArray[i] = { number: params, reserved: true, _id: o._id };
                         recentlyReservedDepE.push(i)
                         return true;
                     }
@@ -283,49 +291,51 @@ const Search = () => {
             }
         }
     }
-    const handleResetDepSeats = (e) =>{
+
+    const handleResetDepSeats = (e) => {
         e.preventDefault()
         if (cabin === "business") {
-          for (let index = 0; index < recentlyReservedDepB.length; index++) {
-            businessDepSeats[recentlyReservedDepB[index]].reserved = false
-            setBusinessDepSeats(businessDepSeats)
-          }
-          recentlyReservedDepB = []
-          console.log(businessDepSeats)
+            for (let index = 0; index < recentlyReservedDepB.length; index++) {
+                businessDepSeats[recentlyReservedDepB[index]].reserved = false
+                setBusinessDepSeats(businessDepSeats)
+            }
+            recentlyReservedDepB = []
+            console.log(businessDepSeats)
         }
         else {
-          const flatArray = economySplicedDep.flat(1)
-          for (let index = 0; index < recentlyReservedDepE.length; index++) {
-            flatArray[recentlyReservedDepE[index]].reserved = false
-          }
-          recentlyReservedDepE = []
-          economySplicedDep = []
-          let temp1 = []
-          let temp2 = []
-          let temp3 = []
-          for (let i = 0; i < flatArray.length; i += 10) {
-            temp1 = []
-            temp2 = []
-            temp3 = []
-            for (let j = i; j < i + 3; j++) {
-              temp1.push(flatArray[j])
-              console.log("temp1: ", temp1)
+            const flatArray = economySplicedDep.flat(1)
+            for (let index = 0; index < recentlyReservedDepE.length; index++) {
+                flatArray[recentlyReservedDepE[index]].reserved = false
             }
-            for (let k = i + 3; k < (i + 3) + 4; k++) {
-              temp2.push(flatArray[k])
-              console.log("temp2: ", temp2)
+            recentlyReservedDepE = []
+            economySplicedDep = []
+            let temp1 = []
+            let temp2 = []
+            let temp3 = []
+            for (let i = 0; i < flatArray.length; i += 10) {
+                temp1 = []
+                temp2 = []
+                temp3 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp1.push(flatArray[j])
+                    console.log("temp1: ", temp1)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp2.push(flatArray[k])
+                    console.log("temp2: ", temp2)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp3.push(flatArray[l])
+                    console.log("temp3: ", temp3)
+                }
+                economySplicedDep.push(temp1)
+                economySplicedDep.push(temp2)
+                economySplicedDep.push(temp3)
             }
-            for (let l = i + 7; l < (i + 7) + 3; l++) {
-              temp3.push(flatArray[l])
-              console.log("temp3: ", temp3)
-            }
-            economySplicedDep.push(temp1)
-            economySplicedDep.push(temp2)
-            economySplicedDep.push(temp3)
-          }
-          setEconomyDepSeats(economySplicedDep)
-          console.log(economyDepSeats)
+            setEconomyDepSeats(economySplicedDep)
+            console.log(economyDepSeats)
         }
+        setNumberOfSeats(seats)
     }
 
     const handleReturnSelected = (params, e) => {

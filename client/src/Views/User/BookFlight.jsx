@@ -554,7 +554,7 @@ function BookFlight() {
                             {/* departure flight seat selector */}
                             {showDepSeats ?
                                 <>
-                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
                                         <Box>
                                             <Grid container spacing={3}>
 
@@ -621,11 +621,12 @@ function BookFlight() {
                                                     <>
                                                         <Grid item sm={4}>
                                                             <Box style={{ display: 'flex' }}>
-                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '250px' }}>A</Typography>
-                                                                <Typography variant="h5" style={{ marginRight: '50px' }}>B</Typography>
+                                                                <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '320px' }}>A</Typography>
+                                                                <Typography variant="h5" style={{ marginRight: '320px' }}>B</Typography>
                                                                 <Typography variant="h5">C</Typography>
                                                             </Box>
                                                         </Grid>
+                                                        <Grid item sm={8}></Grid>
                                                     </>
                                                 }
                                                 {cabin === "business" ? businessDepSeats.map((seat) =>
@@ -641,18 +642,18 @@ function BookFlight() {
                                                     economyDepSeats.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                                {seat.map((eseat) =>
+                                                                {/* {seat.map((eseat) => */}
                                                                     <Button color="info"
-                                                                        disabled={eseat.reserved}
-                                                                        onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
+                                                                        disabled={seat.reserved}
+                                                                        onClick={(e) => { handleSelectedDepSeat(e, seat.number) }}
                                                                         variant="contained"
                                                                         size="medium"
                                                                         style={{ marginRight: '5px' }}
                                                                     >
-                                                                        {eseat.number}
+                                                                        {seat.number}
                                                                     </Button>
-                                                                )
-                                                                }
+                                                                {/* )
+                                                                } */}
                                                             </Grid>
                                                         </>
                                                     )

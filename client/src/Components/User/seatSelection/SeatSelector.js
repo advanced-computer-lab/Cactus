@@ -26,43 +26,54 @@ var economySpliced = []
 
 
 export default function SeatSelector(props) {
+  const [numberOfSeats, setNumberOfSeats] = useState(props.seats);
+
+  const economySeats = props.economy
+  const businessSeats = props.business
+  const cabin = props.cabin
+
+  console.log("cabin: ", cabin)
+  console.log("economySeats: ", economySeats)
+  console.log("businessSeats: ", businessSeats)
+
+  const [business, setBusiness] = useState(businessSeats)
+  const [economy, setEconomy] = useState([])
+  
   useEffect(() => {
     let temp1 = []
     let temp2 = []
     let temp3 = []
-    for (let i = 0; i < this.props.economySeats.length; i += 10) {
+    for (let i = 0; i < economySeats.length; i += 10) {
       temp1 = []
       temp2 = []
       temp3 = []
       for (let j = i; j < i + 3; j++) {
-        temp1.push(this.props.economySeats[j])
+        temp1.push(economySeats[j])
         console.log("temp1: ", temp1)
       }
       for (let k = i + 3; k < (i + 3) + 4; k++) {
-        temp2.push(this.props.economySeats[k])
+        temp2.push(economySeats[k])
         console.log("temp2: ", temp2)
       }
       for (let l = i + 7; l < (i + 7) + 3; l++) {
-        temp3.push(this.props.economySeats[l])
+        temp3.push(economySeats[l])
         console.log("temp3: ", temp3)
       }
       economySpliced.push(temp1)
       economySpliced.push(temp2)
       economySpliced.push(temp3)
     }
-  }, [this.props.economySeats])
-  const [business, setBusiness] = useState(this.props.businessSeats)
-  const [economy, setEconomy] = useState(economySpliced)
-  const [numberOfSeats, setNumberOfSeats] = useState(this.props.seats);
+  }, [economySeats])
+  
 
   const handleSelected = (e, params) => {
     e.preventDefault()
     if (!(numberOfSeats === 0)) {
       setNumberOfSeats(numberOfSeats - 1);
-      if (this.props.cabin === "business") {
+      if (cabin === "business") {
         let seat = business.find((o, i) => {
           if (o.number === params) {
-            business[i] = { number: params, reserved: true };
+            business[i] = { number: params, reserved: true, _id: o._id };
             recentlyReservedB.push(i)
             setBusiness(business)
             return true;
@@ -73,7 +84,7 @@ export default function SeatSelector(props) {
         const flatArray = economySpliced.flat(1)
         let seat = flatArray.find((o, i) => {
           if (o.number === params) {
-            flatArray[i] = { number: params, reserved: true };
+            flatArray[i] = { number: params, reserved: true, _id: o._id  };
             recentlyReservedE.push(i)
             return true;
           }
@@ -108,7 +119,7 @@ export default function SeatSelector(props) {
   }
   const handleReset = (e) => {
     e.preventDefault()
-    if (this.props.cabin === "business") {
+    if (cabin === "business") {
       for (let index = 0; index < recentlyReservedB.length; index++) {
         business[recentlyReservedB[index]].reserved = false
         setBusiness(business)
@@ -151,7 +162,7 @@ export default function SeatSelector(props) {
 
   return (
     <div>
-      <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', width: '1000px' }}>
+      <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
         <Box>
           <Grid container spacing={3}>
             
@@ -189,7 +200,7 @@ export default function SeatSelector(props) {
             </Grid>
 
             
-            {this.props.cabin === 'economy' ?
+            {cabin === 'economy' ?
               <>
                 <Grid item sm={4}>
                   <Box style={{ display: 'flex' }}>
@@ -217,7 +228,7 @@ export default function SeatSelector(props) {
               :
               <></>
             }
-            {this.props.cabin === "business" ? business.map((seat) =>
+            {cabin === "business" ? business.map((seat) =>
               <>
                 <Grid item sm={4}>
                   <Button color="info" disabled={seat.reserved}
@@ -265,7 +276,7 @@ export default function SeatSelector(props) {
             <Grid item sm={9}></Grid>
             <Grid item sm={9}></Grid>
             <Grid item sm={3}>
-              <Button color="success" variant="outlined" onClick={this.props.function}fullWidth size="large">Confirm</Button>
+              <Button color="success" variant="outlined" onClick={()=>console.log("clicked")}fullWidth size="large">Confirm</Button>
             </Grid>
           </Grid>
         </Box>
