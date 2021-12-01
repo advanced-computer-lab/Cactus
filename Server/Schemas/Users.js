@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 const Reservation = require('../Schemas/Reservation').schema
 
 const UserSchema = new Schema({
-    firstname:{
+    firstName:{
         type:String,
         required: true,
         min: 2,
         max: 25,
     },
-    lastname:{
+    lastName:{
         type:String,
         required: true,
         min: 2,

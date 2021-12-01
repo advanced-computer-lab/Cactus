@@ -120,8 +120,10 @@ UserRouter.post('/reserveFlight', (req, res) => {
     var returnDate = ""
     var departureTime = ""
     var returnTime = ""
-    var depSeatNumbers = req.body.depSeats
-    var retSeatNumbers = req.body.retSeats
+    console.log(req.body.depSeats)
+    console.log(req.body.retSeats)
+    console.log(req.body.depFlightMap)
+    console.log(req.body.retFlightMap)
     Flight.findById(req.body.departureId)
     .then((flight) => {
         if(req.body.cabin === 'business'){
@@ -174,8 +176,8 @@ UserRouter.post('/reserveFlight', (req, res) => {
         reserve.returnPrice = returnPrice
         reserve.seats = req.body.seats
         reserve.cabin =  req.body.cabin 
-        reserve.depSeatNumbers = depSeatNumbers
-        reserve.retSeatNumbers = retSeatNumbers
+        reserve.depSeatNumbers = req.body.depSeats
+        reserve.retSeatNumbers = req.body.retSeats
         users[0].reservations.push(reserve)
         reserve.save()
         users[0].save().then(()=> res.send(reserve))
