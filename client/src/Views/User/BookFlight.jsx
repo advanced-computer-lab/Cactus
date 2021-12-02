@@ -93,9 +93,9 @@ function BookFlight() {
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
         loginOpen, setLoginOpen, loading, setLoading, success, setSuccess, openConfirmDialog, handleCloseConfirm,
         setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected,
-        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats, 
+        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats,
         handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, economySplicedRet,
-        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps
+        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight, handleChangeRetFlight
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -560,7 +560,7 @@ function BookFlight() {
                             {/* departure flight seat selector */}
                             {showDepSeats ?
                                 <>
-                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
                                         <Box>
                                             <Grid container spacing={3}>
 
@@ -648,19 +648,19 @@ function BookFlight() {
                                                     economySplicedDep.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                            {seat.map((eseat) =>
-                                                            <Button color="info"
-                                                                disabled={eseat.reserved}
-                                                                onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
-                                                                variant="contained"
-                                                                size="medium"
-                                                                style={{ marginRight: '5px' }}
-                                                            >
-                                                                {eseat.number}
-                                                            </Button>
-                                                            )
-                                                            }
-                                                        </Grid>
+                                                                {seat.map((eseat) =>
+                                                                    <Button color="info"
+                                                                        disabled={eseat.reserved}
+                                                                        onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
+                                                                        variant="contained"
+                                                                        size="medium"
+                                                                        style={{ marginRight: '5px' }}
+                                                                    >
+                                                                        {eseat.number}
+                                                                    </Button>
+                                                                )
+                                                                }
+                                                            </Grid>
                                                         </>
                                                     )
                                                 }
@@ -847,9 +847,9 @@ function BookFlight() {
                                 :
                                 <></>
                             }
-                             {showRetSeats ?
+                            {showRetSeats ?
                                 <>
-                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
                                         <Box>
                                             <Grid container spacing={3}>
 
@@ -937,19 +937,19 @@ function BookFlight() {
                                                     economySplicedRet.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                            {seat.map((eseat) =>
-                                                            <Button color="info"
-                                                                disabled={eseat.reserved}
-                                                                onClick={(e) => { handleSelectedRetSeat(e, eseat.number) }}
-                                                                variant="contained"
-                                                                size="medium"
-                                                                style={{ marginRight: '5px' }}
-                                                            >
-                                                                {eseat.number}
-                                                            </Button>
-                                                            )
-                                                            }
-                                                        </Grid>
+                                                                {seat.map((eseat) =>
+                                                                    <Button color="info"
+                                                                        disabled={eseat.reserved}
+                                                                        onClick={(e) => { handleSelectedRetSeat(e, eseat.number) }}
+                                                                        variant="contained"
+                                                                        size="medium"
+                                                                        style={{ marginRight: '5px' }}
+                                                                    >
+                                                                        {eseat.number}
+                                                                    </Button>
+                                                                )
+                                                                }
+                                                            </Grid>
                                                         </>
                                                     )
                                                 }
@@ -1003,9 +1003,8 @@ function BookFlight() {
                                                         <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                             <TimelineItem>
                                                                 <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                    {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime} {from}<br />
-                                                                    Cairo, Cairo International Airport<br />
-                                                                    Egypt
+                                                                    {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime}<br />
+                                                                    {selectedDepFlight.depCountry}, {from}<br />
                                                                 </TimelineOppositeContent>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot />
@@ -1015,9 +1014,8 @@ function BookFlight() {
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                    {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime} {to}<br />
-                                                                    Los Angeles, Los Angeles Airport<br />
-                                                                    United States
+                                                                    {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime}<br />
+                                                                    {selectedDepFlight.destCountry}, {to}<br />
                                                                 </TimelineOppositeContent>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot />
@@ -1030,10 +1028,7 @@ function BookFlight() {
                                                     <Grid item sx={4}>
                                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                             <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
-                                                            <Button variant="outlined" onClick={() => {
-                                                                setSearch(true)
-                                                                setReturnSelected(false)
-                                                            }}>
+                                                            <Button variant="outlined" onClick={handleChangeDepFlight}>
                                                                 Change this flight
                                                             </Button>
                                                         </Box>
@@ -1043,9 +1038,8 @@ function BookFlight() {
                                                         <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                             <TimelineItem>
                                                                 <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                    {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime} {to}<br />
-                                                                    Los Angeles, Los Angeles Airport<br />
-                                                                    United Stated
+                                                                    {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime}<br />
+                                                                    {selectedRetFlight.depCountry}, {from}<br />
                                                                 </TimelineOppositeContent>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot />
@@ -1055,9 +1049,8 @@ function BookFlight() {
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineOppositeContent color="text.secondary" width="500px">
-                                                                    {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime} {from} <br />
-                                                                    Cairo, Cairo International Airport<br />
-                                                                    Egypt
+                                                                    {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime}<br />
+                                                                    {selectedRetFlight.depCountry}, {to}<br />
                                                                 </TimelineOppositeContent>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot />
@@ -1070,10 +1063,7 @@ function BookFlight() {
                                                     <Grid item sx={4}>
                                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                             <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
-                                                            <Button variant="outlined" onClick={() => {
-                                                                setDepSelected(true)
-                                                                setReturnSelected(false)
-                                                            }}>
+                                                            <Button variant="outlined" onClick={handleChangeRetFlight}>
                                                                 Change this flight
                                                             </Button>
                                                         </Box>
@@ -1158,13 +1148,13 @@ function BookFlight() {
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} {selectedDepFlight.depCountry}, {selectedDepFlight.from} <br /> Terminal 1</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} {selectedDepFlight.depCountry}, {from} <br /> Terminal 1</TimelineContent>
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.arrivalTime} Los Angeles, {selectedDepFlight.to} <br /> Terminal 2</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.arrivalTime} {selectedDepFlight.destCountry}, {to} <br /> Terminal 2</TimelineContent>
                                                             </TimelineItem>
                                                         </Timeline>
                                                     </Grid>
@@ -1174,8 +1164,8 @@ function BookFlight() {
                                                             <br />
                                                             <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
                                                             <br />
-                                                            <Typography variant="subtitle1" >Cabin: {selectedDepFlight.cabin}</Typography>
-                                                            <Typography variant="subtitle1" >Seats: E4,E5,E6</Typography>
+                                                            <Typography variant="subtitle1" >Cabin: {cabin}</Typography>
+                                                            <Typography variant="subtitle1" >Seats: </Typography>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item sm={2}>
@@ -1216,13 +1206,13 @@ function BookFlight() {
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.desCountry}, {selectedRetFlight.from} <br /> Terminal 6A</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.desCountry}, {from} <br /> Terminal 6A</TimelineContent>
                                                             </TimelineItem>
                                                             <TimelineItem>
                                                                 <TimelineSeparator>
                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                 </TimelineSeparator>
-                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.arrivalDate} Cairo, {selectedRetFlight.to} <br /> Terminal 2</TimelineContent>
+                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.arrivalDate} {selectedRetFlight.depCountry}, {to} <br /> Terminal 2</TimelineContent>
                                                             </TimelineItem>
                                                         </Timeline>
                                                     </Grid>
@@ -1232,8 +1222,8 @@ function BookFlight() {
                                                             <br />
                                                             <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
                                                             <br />
-                                                            <Typography variant="subtitle1" >Cabin: Business</Typography>
-                                                            <Typography variant="subtitle1" >Seats: A4,A5,A6</Typography>
+                                                            <Typography variant="subtitle1" >Cabin: {cabin}</Typography>
+                                                            <Typography variant="subtitle1" >Seats:</Typography>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item sm={2}>
@@ -1265,13 +1255,11 @@ function BookFlight() {
                                             </Box>
                                         </DialogContent>
                                         <DialogActions>
-
                                             <Button onClick={handleCloseConfirm} autoFocus color="success" variant="outlined">
                                                 Confirm
                                             </Button>
                                         </DialogActions>
                                     </Dialog>
-                                    <SeatSelector seats={seats} />
                                 </>
                                 :
                                 <></>}
@@ -1361,12 +1349,10 @@ function BookFlight() {
                         </TabPanel>
                         <TabPanel value={value} index={1} >
                             <Schedule />
-
                         </TabPanel>
                     </Box>
                 </Paper>
             </div>
-            {/* <SeatSelector seats={seats} /> */}
         </>
     );
 }

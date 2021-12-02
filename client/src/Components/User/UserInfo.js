@@ -10,8 +10,15 @@ import { Box } from '@mui/system'
 import {
     IconButton, Typography, Tab, Tabs, Button, Grid, ButtonGroup, Divider,
     Paper, TextField, MenuItem, Menu, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
-    DialogContentText, Collapse, Backdrop
+    DialogContentText, Collapse, Backdrop, Accordion, AccordionDetails, AccordionSummary, Tooltip
 } from '@mui/material'
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 
 // ___________MATERIAL UI ICONS____________
 import PersonIcon from '@mui/icons-material/Person';
@@ -21,12 +28,14 @@ import PasswordIcon from '@mui/icons-material/Password';
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import SaveIcon from '@mui/icons-material/Save';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
 import EventNoteIcon from '@mui/icons-material/EventNote'
 import CircularProgress from '@mui/material/CircularProgress';
@@ -96,26 +105,26 @@ export default function UserInfo() {
     const [lName, setLName] = React.useState(loggedUser.lastName)
     const [cc1, setCc1] = React.useState(loggedUser.countryCode[0])
     const [cc2, setCc2] = React.useState(() => {
-        if(loggedUser.countryCode.length > 1)
+        if (loggedUser.countryCode.length > 1)
             return loggedUser.countryCode[1]
         else
             return ""
     })
     const [cc3, setCc3] = React.useState(() => {
-        if(loggedUser.countryCode.length > 2)
+        if (loggedUser.countryCode.length > 2)
             return loggedUser.countryCode[2]
         else
             return ""
     })
     const [phone1, setPhone1] = React.useState(loggedUser.telephones[0])
     const [phone2, setPhone2] = React.useState(() => {
-        if(loggedUser.telephones.length > 1)
+        if (loggedUser.telephones.length > 1)
             return loggedUser.telephones[1]
         else
             return ""
     })
     const [phone3, setPhone3] = React.useState(() => {
-        if(loggedUser.telephones.length > 2)
+        if (loggedUser.telephones.length > 2)
             return loggedUser.telephones[2]
         else
             return ""
@@ -198,33 +207,33 @@ export default function UserInfo() {
     const UpdateUser = () => {
         const phones = [phone1]
         const codes = [cc1]
-        if(phone2 !== "" && cc2 !== ""){
+        if (phone2 !== "" && cc2 !== "") {
             phones.push(phone2)
             codes.push(cc2)
         }
-        if(phone3 !== "" && cc3 !== ""){
+        if (phone3 !== "" && cc3 !== "") {
             phones.push(phone3)
             codes.push(cc3)
         }
-        const data={
-        'email' : email,
-        'firstName' : fName,
-        'lastName' : lName,
-        'passportNumber' : passport,
-        'telephones' : phones,
-        'countryCode' : codes,
-        'country' : country,
-        'city' : city,
-        'password' : loggedUser.password,
-        '_id' : loggedUser._id,
-        'reservations' : loggedUser.reservations
+        const data = {
+            'email': email,
+            'firstName': fName,
+            'lastName': lName,
+            'passportNumber': passport,
+            'telephones': phones,
+            'countryCode': codes,
+            'country': country,
+            'city': city,
+            'password': loggedUser.password,
+            '_id': loggedUser._id,
+            'reservations': loggedUser.reservations
         }
         console.log(data)
         axios.put('/Users/updateUser', data)
-        .then((response) => {console.log(response)})
-        .catch((err) => {
-             console.log(err)
-         })
+            .then((response) => { console.log(response) })
+            .catch((err) => {
+                console.log(err)
+            })
     }
     const [success, setSuccess] = React.useState(false)
     const [backdropOpen, setBackdropOpen] = React.useState(false);
@@ -264,7 +273,7 @@ export default function UserInfo() {
                                 elevation={2}
                                 square
                                 variant="outlined"
-                                style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '700px' }}
+                                style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '1000px' }}
                             >
                                 <Box >
                                     <Box sx={{ width: '100%' }}>
@@ -373,7 +382,7 @@ export default function UserInfo() {
                                                             </Grid>
                                                             <Grid item sm={8}>
                                                                 <TextField fullWidth variant="outlined" label="Phone Number 3" defaultValue={phone3} onChange={p3Change} type="tel" />
-                                                            </Grid> 
+                                                            </Grid>
                                                             <Grid item sm={6}>
                                                                 <TextField fullWidth variant="outlined" label="Country/Region" defaultValue={country} onChange={countryChange} type="text" required />
                                                             </Grid>
@@ -395,69 +404,158 @@ export default function UserInfo() {
                                                     {isFetching ? <><CircularProgress /> <h4>Just a second, The planes are refueling</h4></> :
                                                         reservations.length === 0 ? <><Alert severity="warning">You don't have any upcoming flights</Alert></> : reservations.map((reservation) =>
                                                             <>
-                                                                <Paper elevation={2} variant="outlined" style={{ padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '650px', marginLeft: '-200px' }}>
+                                                                <Paper
+                                                                    elevation={0}
+                                                                    variant="outlined"
+                                                                    style={{
+                                                                        padding: '30px', marginTop: '30px', borderRadius: '1rem', width: '650px',
+                                                                        boxShadow: '0px 0px 0px 0px', border: 'none'
+                                                                    }}
+                                                                >
                                                                     <Box>
-                                                                        <Grid container spacing={2}>
-                                                                            <Grid item sm={10}>
+                                                                        <Accordion style={{ borderRadius: '8px', width: '900px', padding: '30px', marginLeft: '-250px' }}>
+                                                                            <AccordionSummary
+                                                                                expandIcon={<ExpandMoreIcon />}
+                                                                                aria-controls="panel1a-content"
+                                                                                id="panel1a-header"
+
+                                                                            >
                                                                                 <Grid container spacing={2}>
-                                                                                    <Grid item sm={5}>
-                                                                                        <Typography variant="h6" component="h6">{reservation.destination}</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={2}>
-                                                                                        <CompareArrowsIcon />
-                                                                                    </Grid>
-                                                                                    <Grid item sm={5}>
-                                                                                        <Typography variant="h6" component="h6">{reservation.return}</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={5}>
-                                                                                        <Typography variant="h6" component="h6">{reservation.departureDate} {reservation.departureTime}</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={2}>
-                                                                                        <AccessTimeIcon />
-                                                                                    </Grid>
-                                                                                    <Grid item sm={5}>
-                                                                                        <Typography variant="h6" component="h6">{reservation.returnDate} {reservation.returnTime}</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={4}>
-                                                                                        <AirlineSeatReclineNormalIcon />
-                                                                                        <Typography variant="h6" component="h6">{reservation.seats} seats</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={4}>
-                                                                                        <AttachMoneyIcon />
-                                                                                        <Typography variant="h6" component="h6">{(reservation.departurePrice + reservation.returnPrice) * reservation.seats}</Typography>
-                                                                                    </Grid>
-                                                                                    <Grid item sm={4}>
-                                                                                        <AirlineSeatReclineExtraIcon />
-                                                                                        <Typography variant="h6" component="h6">{reservation.cabin}</Typography>
+                                                                                    <Grid item sm={10}>
+                                                                                        <Grid container spacing={2}>
+
+                                                                                            <Grid item sm={5}>
+                                                                                                <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
+                                                                                                    {reservation.destCountry}, {reservation.destination}</Typography>
+                                                                                            </Grid>
+                                                                                            <Grid item sm={2}>
+                                                                                                <CompareArrowsIcon style={{ marginLeft: '50px' }} />
+                                                                                            </Grid>
+                                                                                            <Grid item sm={5}>
+                                                                                                <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
+                                                                                                    {reservation.retCountry}, {reservation.return}</Typography>
+                                                                                            </Grid>
+                                                                                            <Grid item sm={5}>
+                                                                                                <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
+                                                                                                    {reservation.departureDate} {reservation.departureTime}</Typography>
+                                                                                            </Grid>
+                                                                                            <Grid item sm={2}>
+                                                                                                <AccessTimeIcon style={{ marginLeft: '50px' }} />
+                                                                                            </Grid>
+                                                                                            <Grid item sm={5}>
+                                                                                                <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
+                                                                                                    {reservation.returnDate} {reservation.returnTime}</Typography>
+                                                                                            </Grid>
+                                                                                        </Grid>
                                                                                     </Grid>
                                                                                 </Grid>
-                                                                            </Grid>
-                                                                            <Grid item sm={2}>
-                                                                                <IconButton
-                                                                                    id="basic-button"
-                                                                                    aria-controls="basic-menu"
-                                                                                    aria-haspopup="true"
-                                                                                    aria-expanded={open ? 'true' : undefined}
-                                                                                    onClick={handleClick}
-                                                                                >
-                                                                                    <MoreVertIcon color="secondary" />
-                                                                                </IconButton>
-                                                                                <Menu
-                                                                                    id="basic-menu"
-                                                                                    anchorEl={anchorEl}
-                                                                                    open={open}
-                                                                                    onClose={handleClose}
-                                                                                    MenuListProps={{
-                                                                                        'aria-labelledby': 'basic-button',
-                                                                                    }}
-                                                                                >
-                                                                                    <MenuItem onClick={handleClose}><Button variant="contained" color="warning" fullWidth>View Details</Button></MenuItem>
-                                                                                    <Divider variant="middle" />
-                                                                                    <MenuItem onClick={handleOpenDialog}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
-                                                                                </Menu>
-
-                                                                            </Grid>
-                                                                        </Grid>
+                                                                            </AccordionSummary>
+                                                                            <AccordionDetails>
+                                                                                <Grid container spacing={2} >
+                                                                                    <Grid item sm={6}>
+                                                                                        <Timeline style={{ marginLeft: '-200px', marginTop: '-15px' }}>
+                                                                                            <TimelineItem>
+                                                                                                <TimelineOppositeContent>
+                                                                                                    C001*
+                                                                                                </TimelineOppositeContent>
+                                                                                                <TimelineSeparator>
+                                                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                                                </TimelineSeparator>
+                                                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
+                                                                                                    Country*, {reservation.destination} <br /> {reservation.departureDate} {"-"} {reservation.departureTime}
+                                                                                                </TimelineContent>
+                                                                                            </TimelineItem>
+                                                                                            <TimelineItem>
+                                                                                                <TimelineOppositeContent>
+                                                                                                    C001*
+                                                                                                </TimelineOppositeContent>
+                                                                                                <TimelineSeparator>
+                                                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                                                </TimelineSeparator>
+                                                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
+                                                                                                    Country*, {reservation.return} <br /> {reservation.returnDate} {"-"} {reservation.returnTime}
+                                                                                                </TimelineContent>
+                                                                                            </TimelineItem>
+                                                                                        </Timeline>
+                                                                                    </Grid>
+                                                                                    <Grid item sm={6}>
+                                                                                        <Timeline style={{ marginLeft: '-200px', marginTop: '-15px' }}>
+                                                                                            <TimelineItem>
+                                                                                                <TimelineOppositeContent>
+                                                                                                    C001*
+                                                                                                </TimelineOppositeContent>
+                                                                                                <TimelineSeparator>
+                                                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                                                    <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                                                                                                </TimelineSeparator>
+                                                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
+                                                                                                    Country*, {reservation.destination} <br /> {reservation.departureDate} {"-"} {reservation.departureTime}
+                                                                                                </TimelineContent>
+                                                                                            </TimelineItem>
+                                                                                            <TimelineItem>
+                                                                                                <TimelineOppositeContent>
+                                                                                                    C001*
+                                                                                                </TimelineOppositeContent>
+                                                                                                <TimelineSeparator>
+                                                                                                    <TimelineDot variant="outlined" color="secondary" />
+                                                                                                </TimelineSeparator>
+                                                                                                <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
+                                                                                                    Country*, {reservation.return} <br /> {reservation.returnDate} {"-"} {reservation.returnTime}
+                                                                                                </TimelineContent>
+                                                                                            </TimelineItem>
+                                                                                        </Timeline>
+                                                                                    </Grid>
+                                                                                    <Grid item={3}>
+                                                                                        <Box style={{ display: 'flex', flexDirection: 'column', marginLeft: '50px' }}>
+                                                                                            <Box style={{ display: 'flex', }}>
+                                                                                                {reservation.depSeatNumbers.map((seat) =>
+                                                                                                    <>
+                                                                                                        <IconButton color="secondary">
+                                                                                                            <AirlineSeatReclineNormalIcon />{seat}
+                                                                                                        </IconButton>
+                                                                                                    </>
+                                                                                                )}
+                                                                                                <Tooltip title="Edit Seats">
+                                                                                                    <IconButton onClick={()=> setOpenDepSeats(true)}>
+                                                                                                        <EditIcon />
+                                                                                                    </IconButton>
+                                                                                                </Tooltip>
+                                                                                            </Box>
+                                                                                            <Alert icon={<AttachMoneyIcon />} severity="info">
+                                                                                                Total Price: EGP {reservation.departurePrice * reservation.seats}
+                                                                                            </Alert>
+                                                                                        </Box>
+                                                                                    </Grid>
+                                                                                    <Grid item sm={3}>
+                                                                                        <Box style={{ marginLeft: '50px' }}>
+                                                                                            <Typography variant="h6">{(reservation.cabin).toUpperCase()}</Typography>
+                                                                                        </Box>
+                                                                                    </Grid>
+                                                                                    <Grid item={3}>
+                                                                                        <Box style={{ display: 'flex', flexDirection: 'column', marginLeft: '50px' }}>
+                                                                                            <Box style={{ display: 'flex', }}>
+                                                                                                {reservation.retSeatNumbers.map((seat) =>
+                                                                                                    <>
+                                                                                                        <IconButton color="secondary">
+                                                                                                            <AirlineSeatReclineNormalIcon />{seat}
+                                                                                                        </IconButton>
+                                                                                                    </>
+                                                                                                )}
+                                                                                                <Tooltip title="Edit Seats">
+                                                                                                    <IconButton onClick={()=> setOpenRetSeats(true)}>
+                                                                                                        <EditIcon />
+                                                                                                    </IconButton>
+                                                                                                </Tooltip>
+                                                                                            </Box>
+                                                                                            <Alert icon={<AttachMoneyIcon />} severity="info">
+                                                                                                Total Price: EGP {reservation.returnPrice * reservation.seats}
+                                                                                            </Alert>
+                                                                                        </Box>
+                                                                                    </Grid>
+                                                                                </Grid>
+                                                                            </AccordionDetails>
+                                                                        </Accordion>
                                                                     </Box>
                                                                 </Paper>
                                                                 <Dialog
@@ -487,6 +585,34 @@ export default function UserInfo() {
                                                                 >
                                                                     <CircularProgress color="inherit" />
                                                                 </Backdrop>
+                                                                <Dialog
+                                                                    open={openDepSeats}
+                                                                    onClose={()=>setOpenDepSeats(false)}
+                                                                >
+                                                                    <DialogTitle>
+                                                                        Change Departure Flight Seats
+                                                                    </DialogTitle>
+                                                                    <DialogContent>
+
+                                                                    </DialogContent>
+                                                                    <DialogActions>
+                                                                        <Button onClick={()=>setOpenDepSeats(false)}
+                                                                        variant="outlined"
+                                                                        color="warning"
+                                                                        >
+                                                                            Cancel
+                                                                            
+                                                                        </Button>
+                                                                        <Button 
+                                                                        onClick={handleDepSeatsChanged}
+                                                                        variant="outlined"
+                                                                        color="success"
+                                                                        >
+                                                                            Confirm
+                                                                        </Button>
+                                                                    </DialogActions>
+                                                                </Dialog>
+
                                                             </>
                                                         )
                                                     }
