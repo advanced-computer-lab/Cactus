@@ -93,9 +93,9 @@ function BookFlight() {
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
         loginOpen, setLoginOpen, loading, setLoading, success, setSuccess, openConfirmDialog, handleCloseConfirm,
         setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected,
-        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats, 
+        economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats,
         handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, economySplicedRet,
-        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps
+        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight, handleChangeRetFlight
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -560,7 +560,7 @@ function BookFlight() {
                             {/* departure flight seat selector */}
                             {showDepSeats ?
                                 <>
-                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
                                         <Box>
                                             <Grid container spacing={3}>
 
@@ -648,19 +648,19 @@ function BookFlight() {
                                                     economySplicedDep.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                            {seat.map((eseat) =>
-                                                            <Button color="info"
-                                                                disabled={eseat.reserved}
-                                                                onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
-                                                                variant="contained"
-                                                                size="medium"
-                                                                style={{ marginRight: '5px' }}
-                                                            >
-                                                                {eseat.number}
-                                                            </Button>
-                                                            )
-                                                            }
-                                                        </Grid>
+                                                                {seat.map((eseat) =>
+                                                                    <Button color="info"
+                                                                        disabled={eseat.reserved}
+                                                                        onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
+                                                                        variant="contained"
+                                                                        size="medium"
+                                                                        style={{ marginRight: '5px' }}
+                                                                    >
+                                                                        {eseat.number}
+                                                                    </Button>
+                                                                )
+                                                                }
+                                                            </Grid>
                                                         </>
                                                     )
                                                 }
@@ -847,9 +847,9 @@ function BookFlight() {
                                 :
                                 <></>
                             }
-                             {showRetSeats ?
+                            {showRetSeats ?
                                 <>
-                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem',marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                    <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
                                         <Box>
                                             <Grid container spacing={3}>
 
@@ -937,19 +937,19 @@ function BookFlight() {
                                                     economySplicedRet.map((seat) =>
                                                         <>
                                                             <Grid item sm={4}>
-                                                            {seat.map((eseat) =>
-                                                            <Button color="info"
-                                                                disabled={eseat.reserved}
-                                                                onClick={(e) => { handleSelectedRetSeat(e, eseat.number) }}
-                                                                variant="contained"
-                                                                size="medium"
-                                                                style={{ marginRight: '5px' }}
-                                                            >
-                                                                {eseat.number}
-                                                            </Button>
-                                                            )
-                                                            }
-                                                        </Grid>
+                                                                {seat.map((eseat) =>
+                                                                    <Button color="info"
+                                                                        disabled={eseat.reserved}
+                                                                        onClick={(e) => { handleSelectedRetSeat(e, eseat.number) }}
+                                                                        variant="contained"
+                                                                        size="medium"
+                                                                        style={{ marginRight: '5px' }}
+                                                                    >
+                                                                        {eseat.number}
+                                                                    </Button>
+                                                                )
+                                                                }
+                                                            </Grid>
                                                         </>
                                                     )
                                                 }
@@ -1030,10 +1030,7 @@ function BookFlight() {
                                                     <Grid item sx={4}>
                                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                             <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
-                                                            <Button variant="outlined" onClick={() => {
-                                                                setSearch(true)
-                                                                setReturnSelected(false)
-                                                            }}>
+                                                            <Button variant="outlined" onClick={handleChangeDepFlight}>
                                                                 Change this flight
                                                             </Button>
                                                         </Box>
@@ -1070,10 +1067,7 @@ function BookFlight() {
                                                     <Grid item sx={4}>
                                                         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                             <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
-                                                            <Button variant="outlined" onClick={() => {
-                                                                setDepSelected(true)
-                                                                setReturnSelected(false)
-                                                            }}>
+                                                            <Button variant="outlined" onClick={handleChangeRetFlight}>
                                                                 Change this flight
                                                             </Button>
                                                         </Box>

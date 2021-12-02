@@ -96,26 +96,26 @@ export default function UserInfo() {
     const [lName, setLName] = React.useState(loggedUser.lastName)
     const [cc1, setCc1] = React.useState(loggedUser.countryCode[0])
     const [cc2, setCc2] = React.useState(() => {
-        if(loggedUser.countryCode.length > 1)
+        if (loggedUser.countryCode.length > 1)
             return loggedUser.countryCode[1]
         else
             return ""
     })
     const [cc3, setCc3] = React.useState(() => {
-        if(loggedUser.countryCode.length > 2)
+        if (loggedUser.countryCode.length > 2)
             return loggedUser.countryCode[2]
         else
             return ""
     })
     const [phone1, setPhone1] = React.useState(loggedUser.telephones[0])
     const [phone2, setPhone2] = React.useState(() => {
-        if(loggedUser.telephones.length > 1)
+        if (loggedUser.telephones.length > 1)
             return loggedUser.telephones[1]
         else
             return ""
     })
     const [phone3, setPhone3] = React.useState(() => {
-        if(loggedUser.telephones.length > 2)
+        if (loggedUser.telephones.length > 2)
             return loggedUser.telephones[2]
         else
             return ""
@@ -198,33 +198,33 @@ export default function UserInfo() {
     const UpdateUser = () => {
         const phones = [phone1]
         const codes = [cc1]
-        if(phone2 !== "" && cc2 !== ""){
+        if (phone2 !== "" && cc2 !== "") {
             phones.push(phone2)
             codes.push(cc2)
         }
-        if(phone3 !== "" && cc3 !== ""){
+        if (phone3 !== "" && cc3 !== "") {
             phones.push(phone3)
             codes.push(cc3)
         }
-        const data={
-        'email' : email,
-        'firstName' : fName,
-        'lastName' : lName,
-        'passportNumber' : passport,
-        'telephones' : phones,
-        'countryCode' : codes,
-        'country' : country,
-        'city' : city,
-        'password' : loggedUser.password,
-        '_id' : loggedUser._id,
-        'reservations' : loggedUser.reservations
+        const data = {
+            'email': email,
+            'firstName': fName,
+            'lastName': lName,
+            'passportNumber': passport,
+            'telephones': phones,
+            'countryCode': codes,
+            'country': country,
+            'city': city,
+            'password': loggedUser.password,
+            '_id': loggedUser._id,
+            'reservations': loggedUser.reservations
         }
         console.log(data)
         axios.put('/Users/updateUser', data)
-        .then((response) => {console.log(response)})
-        .catch((err) => {
-             console.log(err)
-         })
+            .then((response) => { console.log(response) })
+            .catch((err) => {
+                console.log(err)
+            })
     }
     const [success, setSuccess] = React.useState(false)
     const [backdropOpen, setBackdropOpen] = React.useState(false);
@@ -373,7 +373,7 @@ export default function UserInfo() {
                                                             </Grid>
                                                             <Grid item sm={8}>
                                                                 <TextField fullWidth variant="outlined" label="Phone Number 3" defaultValue={phone3} onChange={p3Change} type="tel" />
-                                                            </Grid> 
+                                                            </Grid>
                                                             <Grid item sm={6}>
                                                                 <TextField fullWidth variant="outlined" label="Country/Region" defaultValue={country} onChange={countryChange} type="text" required />
                                                             </Grid>
@@ -452,6 +452,8 @@ export default function UserInfo() {
                                                                                     }}
                                                                                 >
                                                                                     <MenuItem onClick={handleClose}><Button variant="contained" color="warning" fullWidth>View Details</Button></MenuItem>
+                                                                                    <MenuItem onClick={handleClose}><Button variant="contained" color="warning" fullWidth>Edit return</Button></MenuItem>
+                                                                                    <MenuItem onClick={handleClose}><Button variant="contained" color="warning" fullWidth>Edit departure</Button></MenuItem>
                                                                                     <Divider variant="middle" />
                                                                                     <MenuItem onClick={handleOpenDialog}><Button variant="contained" color="error">Cancel Booking</Button></MenuItem>
                                                                                 </Menu>
@@ -487,6 +489,27 @@ export default function UserInfo() {
                                                                 >
                                                                     <CircularProgress color="inherit" />
                                                                 </Backdrop>
+                                                                <Dialog
+                                                                    open={openDialog}
+                                                                    onClose={handleCloseDialog}
+                                                                    aria-labelledby="alert-dialog-title"
+                                                                    aria-describedby="alert-dialog-description"
+                                                                >
+
+                                                                    <DialogTitle id="alert-dialog-title">
+                                                                        Cancel Booking
+                                                                    </DialogTitle>
+                                                                    <DialogContent>
+                                                                        <DialogContentText id="alert-dialog-description">
+
+                                                                        </DialogContentText>
+                                                                    </DialogContent>
+                                                                    <DialogActions>
+                                                                        <Button onClick={(e) => { handleCancleBooking(e, reservation) }} autoFocus color="error" variant="contained">
+                                                                            Cancel Booking
+                                                                        </Button>
+                                                                    </DialogActions>
+                                                                </Dialog>
                                                             </>
                                                         )
                                                     }
