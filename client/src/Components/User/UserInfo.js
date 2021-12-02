@@ -1,5 +1,5 @@
 // ___________MIDDLEWARE____________
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useHistory } from 'react-router'
@@ -32,8 +32,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import WcIcon from '@mui/icons-material/Wc';
+import RestoreIcon from '@mui/icons-material/Restore';
+import CoffeeIcon from '@mui/icons-material/Coffee';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
@@ -44,6 +46,7 @@ import CloseIcon from '@mui/icons-material/Close';
 // ___________COMPONENTS____________
 import UserNavBar from '../../Components/User/UserNavBar'
 import { UserContext } from '../../Context/UserContext';
+
 
 
 function TabPanel(props) {
@@ -79,6 +82,16 @@ function a11yProps(index) {
     };
 }
 
+var recentlyReservedDepB = []
+var recentlyReservedDepE = []
+
+var economySplicedDep = []
+
+var recentlyReservedRetB = []
+var recentlyReservedRetE = []
+
+var economySplicedRet = []
+
 export default function UserInfo() {
     const history = useHistory()
     // user context
@@ -96,49 +109,56 @@ export default function UserInfo() {
         }
     }
 
-    const [value, setValue] = React.useState(0);
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [reservations, setReservations] = React.useState([])
-    const [isFetching, setFetching] = React.useState(false)
-    const [email, setEmail] = React.useState(loggedUser.email)
-    const [fName, setFName] = React.useState(loggedUser.firstName)
-    const [lName, setLName] = React.useState(loggedUser.lastName)
-    const [cc1, setCc1] = React.useState(loggedUser.countryCode[0])
-    const [cc2, setCc2] = React.useState(() => {
+    const [value, setValue] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [reservations, setReservations] = useState([])
+    const [isFetching, setFetching] = useState(false)
+    const [openDepSeats, setOpenDepSeats] = useState(false)
+    const [openRetSeats, setOpenRetSeats] = useState(false)
+    const [email, setEmail] = useState(loggedUser.email)
+    const [fName, setFName] = useState(loggedUser.firstName)
+    const [lName, setLName] = useState(loggedUser.lastName)
+    const [cc1, setCc1] = useState(loggedUser.countryCode[0])
+    const [cc2, setCc2] = useState(() => {
         if (loggedUser.countryCode.length > 1)
             return loggedUser.countryCode[1]
         else
             return ""
     })
-    const [cc3, setCc3] = React.useState(() => {
+    const [cc3, setCc3] = useState(() => {
         if (loggedUser.countryCode.length > 2)
             return loggedUser.countryCode[2]
         else
             return ""
     })
-    const [phone1, setPhone1] = React.useState(loggedUser.telephones[0])
-    const [phone2, setPhone2] = React.useState(() => {
+    const [phone1, setPhone1] = useState(loggedUser.telephones[0])
+    const [phone2, setPhone2] = useState(() => {
         if (loggedUser.telephones.length > 1)
             return loggedUser.telephones[1]
         else
             return ""
     })
-    const [phone3, setPhone3] = React.useState(() => {
+    const [phone3, setPhone3] = useState(() => {
         if (loggedUser.telephones.length > 2)
             return loggedUser.telephones[2]
         else
             return ""
     })
-    const [passport, setPassport] = React.useState(loggedUser.passportNumber)
-    const [country, setCountry] = React.useState(loggedUser.homeAddress.country)
-    const [city, setCity] = React.useState(loggedUser.homeAddress.city)
+    const [passport, setPassport] = useState(loggedUser.passportNumber)
+    const [country, setCountry] = useState(loggedUser.homeAddress.country)
+    const [city, setCity] = useState(loggedUser.homeAddress.city)
     const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const [economyRetSeats, setEconomyRetSeats] = useState([])
+    const [businessRetSeats, setBusinessRetSeats] = useState([])
+    const [economyDepSeats, setEconomyDepSeats] = useState([])
+    const [businessDepSeats, setBusinessDepSeats] = useState([])
+    const [numberOfSeats, setNumberOfSeats] = useState(0);
+    const [seats, setSeats] = useState(0)
+    const [cabin, setCabin] = useState('')
+    const [depSeat, setDepSeat] = useState([])
+    const [retSeat, setRetSeat] = useState([])
+    const [depFlightMaps, setDepFlightMaps] = useState([])
+    const [retFlightMaps, setRetFlightMaps] = useState([])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -148,17 +168,19 @@ export default function UserInfo() {
     useEffect(() => {
         if (!(loggedUser === null)) {
             const fetchReservations = async () => {
-                axios.post('/Users/getAllReservations', { username: loggedUser.username })
-                    .then((res) => {
-                        setReservations(res.data)
-                        setFetching(false)
-                    })
-                    .catch((error) => { console.log(error.message) })
+                const res = await axios.post('/Users/getAllReservations', { username: loggedUser.username })
+                    setReservations(res.data)
+                    setNumberOfSeats(res.data[0].reservation.seats)
+                    setSeats(res.data[0].reservation.seats)
+                    setCabin(res.data[0].reservation.cabin)
+                    setFetching(false)
             };
+            console.log("I fetched")
             fetchReservations();
         }
-    }, [reservations, loggedUser])
-    const [openDialog, setOpenDialog] = React.useState(false);
+    }, [])
+
+    const [openDialog, setOpenDialog] = useState(false);
 
     const emailChange = (e) => {
         setEmail(e.target.value)
@@ -196,9 +218,6 @@ export default function UserInfo() {
     const cc3Change = (e) => {
         setCc3(e.target.value)
     }
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -235,8 +254,9 @@ export default function UserInfo() {
                 console.log(err)
             })
     }
-    const [success, setSuccess] = React.useState(false)
-    const [backdropOpen, setBackdropOpen] = React.useState(false);
+    const [success, setSuccess] = useState(false)
+    const [backdropOpen, setBackdropOpen] = useState(false);
+
     const handleCancleBooking = (e, params) => {
         e.preventDefault()
         const data = {
@@ -259,6 +279,212 @@ export default function UserInfo() {
             .catch((error) => {
                 console.log(error)
             })
+    }
+    var depSeats = []
+    var depFlightMap = []
+    var retSeats = []
+    var retFlightMap = []
+
+    const handleOpenDepSeats = (e, depSeatsB, depSeatsE, reserved) => {
+        setOpenDepSeats(true)
+        setEconomyDepSeats(depSeatsE)
+        setBusinessDepSeats(depSeatsB)
+        if (cabin === 'economy') {
+            const reservedSeats = []
+            for (let i = 0; i < reserved.length; i++) {
+                const found = depSeatsE.find((seat) => {
+                    return seat.number === reserved[i]
+                })
+                reservedSeats.push(found.number - 1)
+            }
+            recentlyReservedDepE = reservedSeats
+            for (let i = 0; i < recentlyReservedDepE; i++){
+                depSeatsE[recentlyReservedDepE[i]].reserved = false
+                console.log("depSeatsEReset: ", depSeatsE)
+
+            }
+            recentlyReservedDepE = []
+            economySplicedDep = []
+            for (let i = 0; i < depSeatsE.length; i += 10) {
+                let temp1 = []
+                let temp2 = []
+                let temp3 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp1.push(depSeatsE[j])
+                    console.log("temp1: ", temp1)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp2.push(depSeatsE[k])
+                    console.log("temp2: ", temp2)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp3.push(depSeatsE[l])
+                    console.log("temp3: ", temp3)
+                }
+                economySplicedDep.push(temp1)
+                economySplicedDep.push(temp2)
+                economySplicedDep.push(temp3)
+                console.log("economySpliced: ", economySplicedDep)
+            }
+        }
+        else {
+            const reservedSeats = []
+            for (let i = 0; i < reserved.length; i++) {
+                const found = depSeatsB.find((seat) => {
+                    return seat.number === reserved[i]
+                })
+                reservedSeats.push(found)
+            }
+            recentlyReservedDepB = reservedSeats
+        }
+
+        console.log("depSeatsE: ", depSeatsE)
+
+    }
+    const handleDepSeatsChanged = (e) => {
+        setOpenDepSeats(false)
+    }
+
+    const handleSelectedDepSeat = (e, params) => {
+        e.preventDefault()
+        if (!(numberOfSeats === 0)) {
+            setNumberOfSeats(numberOfSeats - 1);
+            if (cabin === "business") {
+                let seat = businessDepSeats.find((o, i) => {
+                    if (o.number === params) {
+                        businessDepSeats[i] = { number: params, reserved: true, _id: o._id };
+                        recentlyReservedDepB.push(i)
+                        setBusinessDepSeats(businessDepSeats)
+                        return true;
+                    }
+                })
+            }
+            else {
+                const flatArray = economySplicedDep.flat(1)
+                let seat = flatArray.find((o, i) => {
+                    if (o.number === params) {
+                        flatArray[i] = { number: params, reserved: true, _id: o._id };
+                        recentlyReservedDepE.push(i)
+                        return true;
+                    }
+                })
+                economySplicedDep = []
+                let temp1 = []
+                let temp2 = []
+                let temp3 = []
+                for (let i = 0; i < flatArray.length; i += 10) {
+                    temp1 = []
+                    temp2 = []
+                    temp3 = []
+                    for (let j = i; j < i + 3; j++) {
+                        temp1.push(flatArray[j])
+                        console.log("temp1: ", temp1)
+                    }
+                    for (let k = i + 3; k < (i + 3) + 4; k++) {
+                        temp2.push(flatArray[k])
+                        console.log("temp2: ", temp2)
+                    }
+                    for (let l = i + 7; l < (i + 7) + 3; l++) {
+                        temp3.push(flatArray[l])
+                        console.log("temp3: ", temp3)
+                    }
+                    economySplicedDep.push(temp1)
+                    economySplicedDep.push(temp2)
+                    economySplicedDep.push(temp3)
+                }
+            }
+        }
+    }
+    const handleResetRetSeats = (e) => {
+        e.preventDefault()
+        if (cabin === "business") {
+            for (let index = 0; index < recentlyReservedRetB.length; index++) {
+                businessRetSeats[recentlyReservedRetB[index]].reserved = false
+                setBusinessRetSeats(businessRetSeats)
+            }
+            recentlyReservedRetB = []
+            console.log(businessRetSeats)
+        }
+        else {
+            const flatArray = economySplicedRet.flat(1)
+            for (let index = 0; index < recentlyReservedRetE.length; index++) {
+                flatArray[recentlyReservedRetE[index]].reserved = false
+            }
+            recentlyReservedRetE = []
+            economySplicedRet = []
+            let temp1 = []
+            let temp2 = []
+            let temp3 = []
+            for (let i = 0; i < flatArray.length; i += 10) {
+                temp1 = []
+                temp2 = []
+                temp3 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp1.push(flatArray[j])
+                    console.log("temp1: ", temp1)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp2.push(flatArray[k])
+                    console.log("temp2: ", temp2)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp3.push(flatArray[l])
+                    console.log("temp3: ", temp3)
+                }
+                economySplicedRet.push(temp1)
+                economySplicedRet.push(temp2)
+                economySplicedRet.push(temp3)
+            }
+            // setEconomyDepSeats(economySplicedDep)
+            console.log(economyRetSeats)
+        }
+        setNumberOfSeats(seats)
+    }
+    const handleResetDepSeats = (e) => {
+        e.preventDefault()
+        if (cabin === "business") {
+            for (let index = 0; index < recentlyReservedDepB.length; index++) {
+                businessDepSeats[recentlyReservedDepB[index]].reserved = false
+                setBusinessDepSeats(businessDepSeats)
+            }
+            recentlyReservedDepB = []
+        }
+        else {
+            const flatArray = economySplicedDep.flat(1)
+            for (let index = 0; index < recentlyReservedDepE.length; index++) {
+                flatArray[recentlyReservedDepE[index]].reserved = false
+            }
+            recentlyReservedDepE = []
+            economySplicedDep = []
+            let temp1 = []
+            let temp2 = []
+            let temp3 = []
+            for (let i = 0; i < flatArray.length; i += 10) {
+                temp1 = []
+                temp2 = []
+                temp3 = []
+                for (let j = i; j < i + 3; j++) {
+                    temp1.push(flatArray[j])
+                    console.log("temp1: ", temp1)
+                }
+                for (let k = i + 3; k < (i + 3) + 4; k++) {
+                    temp2.push(flatArray[k])
+                    console.log("temp2: ", temp2)
+                }
+                for (let l = i + 7; l < (i + 7) + 3; l++) {
+                    temp3.push(flatArray[l])
+                    console.log("temp3: ", temp3)
+                }
+                economySplicedDep.push(temp1)
+                economySplicedDep.push(temp2)
+                economySplicedDep.push(temp3)
+            }
+        }
+        setNumberOfSeats(seats)
+    }
+
+    const handleRetSeatsChanged = (e) => {
+
     }
     return (
         <>
@@ -426,25 +652,25 @@ export default function UserInfo() {
 
                                                                                             <Grid item sm={5}>
                                                                                                 <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
-                                                                                                    {reservation.destCountry}, {reservation.destination}</Typography>
+                                                                                                    {reservation.departureFlight.depCountry}, {reservation.departureFlight.departureAirport}</Typography>
                                                                                             </Grid>
                                                                                             <Grid item sm={2}>
                                                                                                 <CompareArrowsIcon style={{ marginLeft: '50px' }} />
                                                                                             </Grid>
                                                                                             <Grid item sm={5}>
                                                                                                 <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
-                                                                                                    {reservation.retCountry}, {reservation.return}</Typography>
+                                                                                                    {reservation.returnFlight.depCountry}, {reservation.returnFlight.departureAirport}</Typography>
                                                                                             </Grid>
                                                                                             <Grid item sm={5}>
                                                                                                 <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
-                                                                                                    {reservation.departureDate} {reservation.departureTime}</Typography>
+                                                                                                    {reservation.reservation.departureDate} {reservation.reservation.departureTime}</Typography>
                                                                                             </Grid>
                                                                                             <Grid item sm={2}>
                                                                                                 <AccessTimeIcon style={{ marginLeft: '50px' }} />
                                                                                             </Grid>
                                                                                             <Grid item sm={5}>
                                                                                                 <Typography variant="h6" component="h6" style={{ marginLeft: '50px' }}>
-                                                                                                    {reservation.returnDate} {reservation.returnTime}</Typography>
+                                                                                                    {reservation.reservation.returnDate} {reservation.reservation.returnTime}</Typography>
                                                                                             </Grid>
                                                                                         </Grid>
                                                                                     </Grid>
@@ -456,25 +682,22 @@ export default function UserInfo() {
                                                                                         <Timeline style={{ marginLeft: '-200px', marginTop: '-15px' }}>
                                                                                             <TimelineItem>
                                                                                                 <TimelineOppositeContent>
-                                                                                                    C001*
+                                                                                                    {reservation.departureFlight.flightNumber}
                                                                                                 </TimelineOppositeContent>
                                                                                                 <TimelineSeparator>
                                                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                                                 </TimelineSeparator>
                                                                                                 <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
-                                                                                                    Country*, {reservation.destination} <br /> {reservation.departureDate} {"-"} {reservation.departureTime}
+                                                                                                    {reservation.departureFlight.depCountry}, {reservation.departureFlight.departureAirport} <br /> {reservation.departureFlight.departureDate} {"-"} {reservation.departureFlight.departureTime}
                                                                                                 </TimelineContent>
                                                                                             </TimelineItem>
                                                                                             <TimelineItem>
-                                                                                                <TimelineOppositeContent>
-                                                                                                    C001*
-                                                                                                </TimelineOppositeContent>
                                                                                                 <TimelineSeparator>
                                                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                                                 </TimelineSeparator>
                                                                                                 <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
-                                                                                                    Country*, {reservation.return} <br /> {reservation.returnDate} {"-"} {reservation.returnTime}
+                                                                                                    {reservation.departureFlight.destCountry}, {reservation.departureFlight.destinationAirport} <br /> {reservation.departureFlight.arrivalDate} {"-"} {reservation.departureFlight.arrivalTime}
                                                                                                 </TimelineContent>
                                                                                             </TimelineItem>
                                                                                         </Timeline>
@@ -483,25 +706,23 @@ export default function UserInfo() {
                                                                                         <Timeline style={{ marginLeft: '-200px', marginTop: '-15px' }}>
                                                                                             <TimelineItem>
                                                                                                 <TimelineOppositeContent>
-                                                                                                    C001*
+                                                                                                    {reservation.returnFlight.flightNumber}
                                                                                                 </TimelineOppositeContent>
                                                                                                 <TimelineSeparator>
                                                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                                                     <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                                                                 </TimelineSeparator>
                                                                                                 <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
-                                                                                                    Country*, {reservation.destination} <br /> {reservation.departureDate} {"-"} {reservation.departureTime}
+                                                                                                    {reservation.returnFlight.depCountry}, {reservation.returnFlight.departureAirport} <br /> {reservation.returnFlight.departureDate} {"-"} {reservation.returnFlight.departureTime}
                                                                                                 </TimelineContent>
                                                                                             </TimelineItem>
                                                                                             <TimelineItem>
-                                                                                                <TimelineOppositeContent>
-                                                                                                    C001*
-                                                                                                </TimelineOppositeContent>
+
                                                                                                 <TimelineSeparator>
                                                                                                     <TimelineDot variant="outlined" color="secondary" />
                                                                                                 </TimelineSeparator>
                                                                                                 <TimelineContent style={{ fontWeight: 'bold' }} width="500px">
-                                                                                                    Country*, {reservation.return} <br /> {reservation.returnDate} {"-"} {reservation.returnTime}
+                                                                                                    {reservation.returnFlight.destCountry}, {reservation.returnFlight.destinationAirport} <br /> {reservation.returnFlight.arrivalDate} {"-"} {reservation.returnFlight.arrivalTime}
                                                                                                 </TimelineContent>
                                                                                             </TimelineItem>
                                                                                         </Timeline>
@@ -509,7 +730,7 @@ export default function UserInfo() {
                                                                                     <Grid item={3}>
                                                                                         <Box style={{ display: 'flex', flexDirection: 'column', marginLeft: '50px' }}>
                                                                                             <Box style={{ display: 'flex', }}>
-                                                                                                {reservation.depSeatNumbers.map((seat) =>
+                                                                                                {reservation.reservation.depSeatNumbers.map((seat) =>
                                                                                                     <>
                                                                                                         <IconButton color="secondary">
                                                                                                             <AirlineSeatReclineNormalIcon />{seat}
@@ -517,25 +738,28 @@ export default function UserInfo() {
                                                                                                     </>
                                                                                                 )}
                                                                                                 <Tooltip title="Edit Seats">
-                                                                                                    <IconButton onClick={()=> setOpenDepSeats(true)}>
+                                                                                                    <IconButton
+                                                                                                        onClick={
+                                                                                                            (e) => handleOpenDepSeats(e, reservation.departureFlight.businessMap, reservation.departureFlight.economyMap, reservation.reservation.depSeatNumbers)
+                                                                                                        }>
                                                                                                         <EditIcon />
                                                                                                     </IconButton>
                                                                                                 </Tooltip>
                                                                                             </Box>
                                                                                             <Alert icon={<AttachMoneyIcon />} severity="info">
-                                                                                                Total Price: EGP {reservation.departurePrice * reservation.seats}
+                                                                                                Total Price: EGP {reservation.reservation.departurePrice * reservation.reservation.seats}
                                                                                             </Alert>
                                                                                         </Box>
                                                                                     </Grid>
                                                                                     <Grid item sm={3}>
                                                                                         <Box style={{ marginLeft: '50px' }}>
-                                                                                            <Typography variant="h6">{(reservation.cabin).toUpperCase()}</Typography>
+                                                                                            <Typography variant="h6">{(reservation.reservation.cabin).toUpperCase()}</Typography>
                                                                                         </Box>
                                                                                     </Grid>
                                                                                     <Grid item={3}>
                                                                                         <Box style={{ display: 'flex', flexDirection: 'column', marginLeft: '50px' }}>
                                                                                             <Box style={{ display: 'flex', }}>
-                                                                                                {reservation.retSeatNumbers.map((seat) =>
+                                                                                                {reservation.reservation.retSeatNumbers.map((seat) =>
                                                                                                     <>
                                                                                                         <IconButton color="secondary">
                                                                                                             <AirlineSeatReclineNormalIcon />{seat}
@@ -543,13 +767,13 @@ export default function UserInfo() {
                                                                                                     </>
                                                                                                 )}
                                                                                                 <Tooltip title="Edit Seats">
-                                                                                                    <IconButton onClick={()=> setOpenRetSeats(true)}>
+                                                                                                    <IconButton onClick={() => setOpenRetSeats(true)}>
                                                                                                         <EditIcon />
                                                                                                     </IconButton>
                                                                                                 </Tooltip>
                                                                                             </Box>
                                                                                             <Alert icon={<AttachMoneyIcon />} severity="info">
-                                                                                                Total Price: EGP {reservation.returnPrice * reservation.seats}
+                                                                                                Total Price: EGP {reservation.reservation.returnPrice * reservation.reservation.seats}
                                                                                             </Alert>
                                                                                         </Box>
                                                                                     </Grid>
@@ -585,28 +809,156 @@ export default function UserInfo() {
                                                                 >
                                                                     <CircularProgress color="inherit" />
                                                                 </Backdrop>
+                                                                {/* dep seats */}
                                                                 <Dialog
                                                                     open={openDepSeats}
-                                                                    onClose={()=>setOpenDepSeats(false)}
+                                                                    onClose={() => setOpenDepSeats(false)}
+                                                                    maxWidth="xl"
                                                                 >
                                                                     <DialogTitle>
                                                                         Change Departure Flight Seats
                                                                     </DialogTitle>
                                                                     <DialogContent>
+                                                                        <>
+                                                                            <Paper elevation={3} variant="outlined" style={{ borderRadius: '1rem', marginLeft: '150px', marginTop: '50px', padding: '30px', width: '1000px' }}>
+                                                                                <Box>
+                                                                                    <Grid container spacing={3}>
 
+                                                                                        <Grid item sm={12}>
+                                                                                            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                                                <Typography variant="h4" color="secondary">Pick Your Seats</Typography>
+                                                                                            </Box>
+                                                                                            <br />
+                                                                                            <Divider varaint="middle" />
+                                                                                            <br />
+                                                                                        </Grid>
+                                                                                        <Grid item sm={10}></Grid>
+                                                                                        <Grid item sm={2}>
+                                                                                            <Tooltip title="Reset Seats">
+                                                                                                <IconButton color="error" onClick={handleResetDepSeats} aria-label="reset">
+                                                                                                    <RestoreIcon />
+                                                                                                </IconButton>
+                                                                                            </Tooltip>
+                                                                                        </Grid>
+                                                                                        <Grid item sm={3}>
+                                                                                            <Button variant="contained" endIcon={<ExitToAppIcon />} fullWidth color="error">Exit</Button>
+                                                                                        </Grid>
+                                                                                        <Grid item sm={6}>
+                                                                                            <Box style={{ display: 'flex', marginLeft: '600px' }}>
+                                                                                                <IconButton variant="contained" fullWidth color="primary">
+                                                                                                    <CoffeeIcon />
+                                                                                                </IconButton>
+                                                                                                <IconButton variant="contained" fullWidth color="primary">
+                                                                                                    <WcIcon />
+                                                                                                </IconButton>
+                                                                                            </Box>
+                                                                                            <br />
+                                                                                            <Divider varaint="middle" />
+                                                                                            <br />
+                                                                                        </Grid>
+
+
+                                                                                        {cabin === 'economy' ?
+                                                                                            <>
+                                                                                                <Grid item sm={4}>
+                                                                                                    <Box style={{ display: 'flex' }}>
+                                                                                                        <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>A</Typography>
+                                                                                                        <Typography variant="h5" style={{ marginRight: '50px' }}>B</Typography>
+                                                                                                        <Typography variant="h5">C</Typography>
+                                                                                                    </Box>
+                                                                                                </Grid>
+                                                                                                <Grid item sm={4}>
+                                                                                                    <Box style={{ display: 'flex' }}>
+                                                                                                        <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>D</Typography>
+                                                                                                        <Typography variant="h5" style={{ marginRight: '50px' }}>E</Typography>
+                                                                                                        <Typography variant="h5" style={{ marginRight: '50px' }}>F</Typography>
+                                                                                                        <Typography variant="h5">G</Typography>
+                                                                                                    </Box>
+                                                                                                </Grid>
+                                                                                                <Grid item sm={4}>
+                                                                                                    <Box style={{ display: 'flex' }}>
+                                                                                                        <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '50px' }}>H</Typography>
+                                                                                                        <Typography variant="h5" style={{ marginRight: '50px' }}>I</Typography>
+                                                                                                        <Typography variant="h5">J</Typography>
+                                                                                                    </Box>
+                                                                                                </Grid>
+                                                                                            </>
+                                                                                            :
+                                                                                            <>
+                                                                                                <Grid item sm={4}>
+                                                                                                    <Box style={{ display: 'flex' }}>
+                                                                                                        <Typography variant="h5" style={{ marginLeft: '25px', marginRight: '320px' }}>A</Typography>
+                                                                                                        <Typography variant="h5" style={{ marginRight: '320px' }}>B</Typography>
+                                                                                                        <Typography variant="h5">C</Typography>
+                                                                                                    </Box>
+                                                                                                </Grid>
+                                                                                                <Grid item sm={8}></Grid>
+                                                                                            </>
+                                                                                        }
+                                                                                        {cabin === "business" ? businessDepSeats.map((seat) =>
+                                                                                            <>
+                                                                                                <Grid item sm={4}>
+                                                                                                    <Button color="info" disabled={seat.reserved}
+                                                                                                        onClick={(e) => { handleSelectedDepSeat(e, seat.number) }} variant="contained" key={seat.number}
+                                                                                                    >{seat.number}</Button>
+                                                                                                </Grid>
+                                                                                            </>
+                                                                                        )
+                                                                                            :
+                                                                                            economySplicedDep.map((seat) =>
+                                                                                                <>
+                                                                                                    <Grid item sm={4}>
+                                                                                                        {seat.map((eseat) =>
+                                                                                                            <Button color="info"
+                                                                                                                disabled={eseat.reserved}
+                                                                                                                onClick={(e) => { handleSelectedDepSeat(e, eseat.number) }}
+                                                                                                                variant="contained"
+                                                                                                                size="medium"
+                                                                                                                style={{ marginRight: '5px' }}
+                                                                                                            >
+                                                                                                                {eseat.number}
+                                                                                                            </Button>
+                                                                                                        )
+                                                                                                        }
+                                                                                                    </Grid>
+                                                                                                </>
+                                                                                            )
+                                                                                        }
+                                                                                        <Grid item sm={3}>
+                                                                                            <br />
+                                                                                            <Box style={{ marginLeft: '80px' }}>
+                                                                                                <IconButton variant="contained" fullWidth color="primary"><WcIcon /></IconButton>
+                                                                                            </Box>
+                                                                                        </Grid>
+                                                                                        <Grid item sm={6}></Grid>
+                                                                                        <Grid item sm={3}>
+                                                                                            <br />
+                                                                                            <Box>
+                                                                                                <IconButton variant="contained" fullWidth color="primary"><WcIcon /></IconButton>
+                                                                                            </Box>
+                                                                                        </Grid>
+                                                                                        <Grid item sm={3}>
+                                                                                            <Button variant="contained" endIcon={<ExitToAppIcon />} fullWidth color="error">Exit</Button>
+                                                                                        </Grid>
+                                                                                        <Grid item sm={9}></Grid>
+                                                                                        <Grid item sm={9}></Grid>
+                                                                                    </Grid>
+                                                                                </Box>
+                                                                            </Paper>
+                                                                        </>
                                                                     </DialogContent>
                                                                     <DialogActions>
-                                                                        <Button onClick={()=>setOpenDepSeats(false)}
-                                                                        variant="outlined"
-                                                                        color="warning"
+                                                                        <Button onClick={() => setOpenDepSeats(false)}
+                                                                            variant="outlined"
+                                                                            color="warning"
                                                                         >
                                                                             Cancel
-                                                                            
+
                                                                         </Button>
-                                                                        <Button 
-                                                                        onClick={handleDepSeatsChanged}
-                                                                        variant="outlined"
-                                                                        color="success"
+                                                                        <Button
+                                                                            onClick={handleDepSeatsChanged}
+                                                                            variant="outlined"
+                                                                            color="success"
                                                                         >
                                                                             Confirm
                                                                         </Button>

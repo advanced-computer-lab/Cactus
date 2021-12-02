@@ -54,7 +54,6 @@ const Search = () => {
         let temp1 = []
         let temp2 = []
         let temp3 = []
-        console.log("seats: ", economyDepSeats)
         for (let i = 0; i < economyDepSeats.length; i += 10) {
             temp1 = []
             temp2 = []
