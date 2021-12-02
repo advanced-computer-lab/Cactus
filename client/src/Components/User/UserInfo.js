@@ -167,18 +167,21 @@ export default function UserInfo() {
     };
     useEffect(() => {
         if (!(loggedUser === null)) {
-            const fetchReservations = async () => {
-                const res = await axios.post('/Users/getAllReservations', { username: loggedUser.username })
-                    setReservations(res.data)
-                    setNumberOfSeats(res.data[0].reservation.seats)
-                    setSeats(res.data[0].reservation.seats)
-                    setCabin(res.data[0].reservation.cabin)
-                    setFetching(false)
+            const fetchReservations = () => {
+                axios.post('/Users/getAllReservations', { username: loggedUser.username })
+                    .then((res) => {
+                        setReservations(res.data)
+                        setNumberOfSeats(res.data[0].reservation.seats)
+                        setSeats(res.data[0].reservation.seats)
+                        setCabin(res.data[0].reservation.cabin)
+                        setFetching(false)
+                    })
+                    .catch((error) => { console.log(error.message) })
             };
-            console.log("I fetched")
+
             fetchReservations();
         }
-    }, [])
+    }, [reservations, loggedUser])
 
     const [openDialog, setOpenDialog] = useState(false);
 
@@ -285,61 +288,32 @@ export default function UserInfo() {
     var retSeats = []
     var retFlightMap = []
 
-    const handleOpenDepSeats = (e, depSeatsB, depSeatsE, reserved) => {
+    const handleOpenDepSeats = (e, depSeatsE, depSeatsB, reservedE, reservedB) => {
         setOpenDepSeats(true)
         setEconomyDepSeats(depSeatsE)
         setBusinessDepSeats(depSeatsB)
-        if (cabin === 'economy') {
-            const reservedSeats = []
-            for (let i = 0; i < reserved.length; i++) {
-                const found = depSeatsE.find((seat) => {
-                    return seat.number === reserved[i]
-                })
-                reservedSeats.push(found.number - 1)
-            }
-            recentlyReservedDepE = reservedSeats
-            for (let i = 0; i < recentlyReservedDepE; i++){
-                depSeatsE[recentlyReservedDepE[i]].reserved = false
-                console.log("depSeatsEReset: ", depSeatsE)
 
+        for (let i = 0; i < economyDepSeats.length; i += 10) {
+            let temp1 = []
+            let temp2 = []
+            let temp3 = []
+            for (let j = i; j < i + 3; j++) {
+                temp1.push(economyDepSeats[j])
+                console.log("temp1: ", temp1)
             }
-            recentlyReservedDepE = []
-            economySplicedDep = []
-            for (let i = 0; i < depSeatsE.length; i += 10) {
-                let temp1 = []
-                let temp2 = []
-                let temp3 = []
-                for (let j = i; j < i + 3; j++) {
-                    temp1.push(depSeatsE[j])
-                    console.log("temp1: ", temp1)
-                }
-                for (let k = i + 3; k < (i + 3) + 4; k++) {
-                    temp2.push(depSeatsE[k])
-                    console.log("temp2: ", temp2)
-                }
-                for (let l = i + 7; l < (i + 7) + 3; l++) {
-                    temp3.push(depSeatsE[l])
-                    console.log("temp3: ", temp3)
-                }
-                economySplicedDep.push(temp1)
-                economySplicedDep.push(temp2)
-                economySplicedDep.push(temp3)
-                console.log("economySpliced: ", economySplicedDep)
+            for (let k = i + 3; k < (i + 3) + 4; k++) {
+                temp2.push(economyDepSeats[k])
+                console.log("temp2: ", temp2)
             }
+            for (let l = i + 7; l < (i + 7) + 3; l++) {
+                temp3.push(economyDepSeats[l])
+                console.log("temp3: ", temp3)
+            }
+            economySplicedDep.push(temp1)
+            economySplicedDep.push(temp2)
+            economySplicedDep.push(temp3)
         }
-        else {
-            const reservedSeats = []
-            for (let i = 0; i < reserved.length; i++) {
-                const found = depSeatsB.find((seat) => {
-                    return seat.number === reserved[i]
-                })
-                reservedSeats.push(found)
-            }
-            recentlyReservedDepB = reservedSeats
-        }
-
-        console.log("depSeatsE: ", depSeatsE)
-
+        console.log("economy: ",economySplicedDep)
     }
     const handleDepSeatsChanged = (e) => {
         setOpenDepSeats(false)
@@ -738,10 +712,7 @@ export default function UserInfo() {
                                                                                                     </>
                                                                                                 )}
                                                                                                 <Tooltip title="Edit Seats">
-                                                                                                    <IconButton
-                                                                                                        onClick={
-                                                                                                            (e) => handleOpenDepSeats(e, reservation.departureFlight.businessMap, reservation.departureFlight.economyMap, reservation.reservation.depSeatNumbers)
-                                                                                                        }>
+                                                                                                    <IconButton onClick={(e) => handleOpenDepSeats(e, reservation.departureFlight.businessMap, reservation.departureFlight.economyMap)}>
                                                                                                         <EditIcon />
                                                                                                     </IconButton>
                                                                                                 </Tooltip>
@@ -813,7 +784,7 @@ export default function UserInfo() {
                                                                 <Dialog
                                                                     open={openDepSeats}
                                                                     onClose={() => setOpenDepSeats(false)}
-                                                                    maxWidth="xl"
+                                                                    maxWidth="lg"
                                                                 >
                                                                     <DialogTitle>
                                                                         Change Departure Flight Seats
