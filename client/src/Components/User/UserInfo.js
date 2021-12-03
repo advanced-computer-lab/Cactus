@@ -9,7 +9,7 @@ import { useHistory } from 'react-router'
 import { Box } from '@mui/system'
 import {
     IconButton, Typography, Tab, Tabs, Button, Grid, ButtonGroup, Divider,
-    Paper, TextField, MenuItem, Menu, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
+    Paper, TextField, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
     DialogContentText, Collapse, Backdrop, Accordion, AccordionDetails, AccordionSummary, Tooltip
 } from '@mui/material'
 import Timeline from '@mui/lab/Timeline';
@@ -175,12 +175,7 @@ export default function UserInfo() {
                 let res = await axios.post('/Users/getAllReservations', { username: loggedUser.username })
                 let data = await res.data
                 setReservations(data)
-                setNumberOfSeats(data[0].reservation)
-                setSeats(data[0].reservation.seats)
-                setCabin(data[0].reservation.cabin)
                 setFetching(false)
-                console.log("data: ",data)
-                console.log("reservation", reservations)
             } catch (error) {
                 console.log(error)
             }
@@ -297,10 +292,13 @@ export default function UserInfo() {
     var retSeats = []
     var retFlightMap = []
 
-    const handleOpenDepSeats = (e, depSeatsB, depSeatsE, reserved) => {
+    const handleOpenDepSeats = (e, depSeatsB, depSeatsE, reserved, cabin, seats) => {
         setOpenDepSeats(true)
         let tempEconomy = depSeatsE
         let tempBusiness = depSeatsB
+        setNumberOfSeats(seats)
+        setSeats(seats)
+        setCabin(cabin)
         if(cabin === "economy"){
             const reservedSeats = []
             for(let i = 0; i < reserved.length; i++){
@@ -749,7 +747,10 @@ export default function UserInfo() {
                                                                                                     </>
                                                                                                 )}
                                                                                                 <Tooltip title="Edit Seats">
-                                                                                                    <IconButton onClick={(e) => handleOpenDepSeats(e, reservation.departureFlight.businessMap, reservation.departureFlight.economyMap, reservation.reservation.depSeatNumbers)}>
+                                                                                                    <IconButton onClick={
+                                                                                                        (e) => handleOpenDepSeats(e, reservation.departureFlight.businessMap, 
+                                                                                                        reservation.departureFlight.economyMap, reservation.reservation.depSeatNumbers, reservation.reservation.cabin,
+                                                                                                        reservation.reservation.seats)}>
                                                                                                         <EditIcon />
                                                                                                     </IconButton>
                                                                                                 </Tooltip>

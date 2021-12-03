@@ -336,7 +336,7 @@ UserRouter.post('/getAllReservations', (req, res) => {
         .then((user) => {
             var array = []
             const reserves = user[0].reservations
-            for (var i = -0; i < reserves.length; i++) {
+            for (var i = 0; i < reserves.length; i++) {
                 var single = {
                     reservation: new Reservation(),
                     departureFlight: new Flight(),
@@ -354,6 +354,7 @@ UserRouter.post('/getAllReservations', (req, res) => {
                                 single.returnFlight = flight2
                                 array.push(single)
                                 if (m === n) {
+                                    console.log("array: ", array)
                                     res.send(array)
                                 }
                             })
