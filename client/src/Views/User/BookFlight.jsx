@@ -95,7 +95,8 @@ function BookFlight() {
         setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected,
         economyDepSeats, economyRetSeats, businessDepSeats, businessRetSeats,
         handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, economySplicedRet,
-        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight, handleChangeRetFlight
+        handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight, 
+        handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -105,6 +106,7 @@ function BookFlight() {
     const [isFetchingUser, setFetchingUser] = React.useState(false)
     const [alertOpen, setAlertOpen] = React.useState(false)
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+    
     const elements = useElements()
     const stripe = useStripe()
 
@@ -686,6 +688,7 @@ function BookFlight() {
                                                     <Button color="success" variant="outlined"
                                                         onClick={handleDepSeatsSelected}
                                                         fullWidth size="large"
+                                                        disabled={!allDepSeatsSelected}
                                                     >
                                                         Confirm
                                                     </Button>
@@ -975,6 +978,7 @@ function BookFlight() {
                                                     <Button color="success" variant="outlined"
                                                         onClick={handleRetSeatsSelected}
                                                         fullWidth size="large"
+                                                        disabled={!allRetSeatsSelected}
                                                     >
                                                         Confirm
                                                     </Button>

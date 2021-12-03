@@ -47,6 +47,8 @@ const Search = () => {
     const [depFlightMaps, setDepFlightMaps] = useState([])
     const [retFlightMaps, setRetFlightMaps] = useState([])
     const [changeDepSummary, setChangeDepSummary] = useState(false)
+    const [allDepSeatsSelected, setAllDepSeatsSelected] = useState(false)
+    const [allRetSeatsSelected, setAllRetSeatsSelected] = useState(false)
 
     // Splicing economy seats
     useEffect(() => {
@@ -264,8 +266,6 @@ const Search = () => {
             setDepSeat(depSeats)
             setDepFlightMaps(depFlightMap)
         }
-        console.log("rb:", recentlyReservedDepB)
-        console.log("re:", recentlyReservedDepE)
     }
     const handleSelectedRetSeat = (e, params) => {
         e.preventDefault()
@@ -319,6 +319,9 @@ const Search = () => {
                 // setEconomyDepSeats(economySplicedDep)
             }
         }
+        else{
+            setAllRetSeatsSelected(true)
+        }
     }
     const handleSelectedDepSeat = (e, params) => {
         e.preventDefault()
@@ -371,6 +374,9 @@ const Search = () => {
                 // setEconomyDepSeats([])
                 // setEconomyDepSeats(economySplicedDep)
             }
+        }
+        else{
+            setAllDepSeatsSelected(true)
         }
     }
     const handleResetRetSeats = (e) => {
@@ -530,7 +536,8 @@ const Search = () => {
         success, setSuccess, loading, setLoading, openConfirmDialog, handleCloseConfirm, setConfirmDialog,
         showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, economyDepSeats, economyRetSeats,
         businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, economySplicedRet,
-        handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps, handleChangeDepFlight, handleChangeRetFlight
+        handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps,
+         handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected
     }
 }
 export default Search;
