@@ -331,36 +331,37 @@ UserRouter.post('/updateReservation', (req, res) => {
             })
 })
 
-UserRouter.post('/getAllReservations', (req, res) => {
-    User.find({ "username": req.body.username })
-        .then((user) => {
-            var array = []
-            const reserves = user[0].reservations
-            for (var i = 0; i < reserves.length; i++) {
-                var single = {
-                    reservation: new Reservation(),
-                    departureFlight: new Flight(),
-                    returnFlight: new Flight()
-                }
-                single.reservation = reserves[i]
-                const current = reserves[i]
-                const m = i
-                const n = reserves.length - 1
-                Flight.findById(current.departureId)
-                    .then((flight1) => {
-                        single.departureFlight = flight1
-                        Flight.findById(current.returnId)
-                            .then((flight2) => {
-                                single.returnFlight = flight2
-                                array.push(single)
-                                if (m === n) {
-                                    console.log("array: ", array)
-                                    res.send(array)
-                                }
-                            })
-                    })
+UserRouter.post('/getAllReservations', async (req, res) => {
+    try{
+        const user = await User.find({ "username": req.body.username })
+        var array = []
+        const reserves = user[0].reservations
+        for (var i = -0; i < reserves.length; i++) {
+            var dep = new Flight()
+            var ret = new Flight()
+            var single = {}
+            single.reservation = reserves[i]
+            const current = reserves[i]
+            try{
+                dep = await Flight.findById(current.departureId)
             }
+            catch(e){
+                console.log(e)
+            }
+            try{
+                ret = await Flight.findById(current.returnId)  
+                }
+            catch(e){
+                console.log(e)
+            }
+                
+            single.departureFlight = await dep
+            single.returnFlight = await ret
+            array.push(single);
+        }
+        res.send(array)
+    }
+    catch(e){console.log(e)}
         })
-})
 
 module.exports = UserRouter;
