@@ -71,7 +71,9 @@ function App() {
               <Route path="/login">
                 <Login />
               </Route>
-              {loggedUser ? <Route path="/UserProfile" component={UserProfile} /> : <Route path="/login" component={Login}/>}
+              <Route path="/UserProfile">
+                <UserProfile />
+              </Route>
             </UserContext.Provider>
           </Switch>
         </Router>

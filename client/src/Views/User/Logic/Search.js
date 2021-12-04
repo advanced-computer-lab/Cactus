@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from 'axios'
-import { set } from "date-fns";
 import { useHistory } from 'react-router'
 
 var recentlyReservedDepB = []
@@ -15,13 +14,17 @@ var economySplicedRet = []
 
 const Search = () => {
     const [value, setValue] = useState(0);
-    const [date, setDate] = useState([Date.now(), Date.now()]);
+    const [date, setDate] = useState(["", ""]);
+    const [depDateValidation ,setDepDateValidation] = useState({ error: false, label: 'Departure Date' })
+    const [retDateValidation ,setRetDateValidation] = useState({ error: false, label: 'Return Date' })
     const [open, setOpen] = useState(false);
     const [counter, setCounter] = useState(1);
     const [search, setSearch] = useState(false)
-    const [from, setFrom] = useState()
-    const [to, setTo] = useState()
-    const [seats, setSeats] = useState()
+    const [from, setFrom] = useState("")
+    const [fromValidation, setFromValidation] = useState({ error: false, label: 'From' })
+    const [to, setTo] = useState("")
+    const [toValidation, setToValidation] = useState({ error: false, label: 'To' })
+    const [seats, setSeats] = useState(1)
     const [cabin, setCabin] = useState('economy')
     const [counterChild, setCounterChild] = useState(0);
     const [depSelected, setDepSelected] = useState(false)
@@ -47,6 +50,8 @@ const Search = () => {
     const [depFlightMaps, setDepFlightMaps] = useState([])
     const [retFlightMaps, setRetFlightMaps] = useState([])
     const [changeDepSummary, setChangeDepSummary] = useState(false)
+    const [allDepSeatsSelected, setAllDepSeatsSelected] = useState(false)
+    const [allRetSeatsSelected, setAllRetSeatsSelected] = useState(false)
 
     // Splicing economy seats
     useEffect(() => {
@@ -54,7 +59,6 @@ const Search = () => {
         let temp1 = []
         let temp2 = []
         let temp3 = []
-        console.log("seats: ", economyDepSeats)
         for (let i = 0; i < economyDepSeats.length; i += 10) {
             temp1 = []
             temp2 = []
@@ -194,14 +198,40 @@ const Search = () => {
     const handleFindFlight = (e) => {
         e.preventDefault()
         setFetching(true)
-        if (search) {
-            setSearch(false)
+        setSearch(false)
+        setDepSelected(false)
+        setReturnSelected(false)
+        setShowDepSeats(false)
+        setShowRetSeats(false)
+        setShowCheckout(false)
+        let isError = false
+        if (from === "") {
+            setFromValidation({ error: true, label: "This field is required" })
+            isError = true
+        }else{
+            setFromValidation({ error: false, label: "From" })
         }
-        if (depSelected) {
-            setDepSelected(false)
+        if (to === ""){
+            setToValidation({ error: true, label: "This field is required" })             
+            isError = true
+        }else{
+            setToValidation({ error: false, label: "To" })
         }
-        if (returnSelected) {
-            setReturnSelected(false)
+        if(date[0] === ""){
+            setDepDateValidation({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setDepDateValidation({error:false, label:"Departure Date"})
+        }
+        if(date[1] === "" ){
+            setRetDateValidation({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setRetDateValidation({error:false, label:"Return Date"})
+        }
+        if(isError){
+            setFetching(false)
+            return
         }
         axios.post('/Users/getFlights', data)
             .then((response) => {
@@ -222,7 +252,6 @@ const Search = () => {
         axios.post('/Users/getFlights', returnData)
             .then((response) => {
                 setSearch(false)
-                // setDepSelected(true)
                 setReturnFlights(response.data)
                 setSelectedDep(params)
                 setEconomyDepSeats(params.economyMap)
@@ -265,9 +294,8 @@ const Search = () => {
             setDepSeat(depSeats)
             setDepFlightMaps(depFlightMap)
         }
-        console.log("rb:", recentlyReservedDepB)
-        console.log("re:", recentlyReservedDepE)
     }
+
     const handleSelectedRetSeat = (e, params) => {
         e.preventDefault()
         if (!(numberOfSeats === 0)) {
@@ -319,6 +347,9 @@ const Search = () => {
                 // setEconomyDepSeats([])
                 // setEconomyDepSeats(economySplicedDep)
             }
+        }
+        if (numberOfSeats === 1) {
+            setAllRetSeatsSelected(true)
         }
     }
     const handleSelectedDepSeat = (e, params) => {
@@ -373,6 +404,9 @@ const Search = () => {
                 // setEconomyDepSeats(economySplicedDep)
             }
         }
+        if (numberOfSeats === 1) {
+            setAllDepSeatsSelected(true)
+        }
     }
     const handleResetRetSeats = (e) => {
         e.preventDefault()
@@ -418,6 +452,7 @@ const Search = () => {
             console.log(economyRetSeats)
         }
         setNumberOfSeats(seats)
+        setAllRetSeatsSelected(false)
     }
     const handleResetDepSeats = (e) => {
         e.preventDefault()
@@ -459,10 +494,10 @@ const Search = () => {
                 economySplicedDep.push(temp2)
                 economySplicedDep.push(temp3)
             }
-            // setEconomyDepSeats(economySplicedDep)
             console.log(economyDepSeats)
         }
         setNumberOfSeats(seats)
+        setAllDepSeatsSelected(false)
     }
 
     const handleReturnSelected = (params, e) => {
@@ -507,16 +542,28 @@ const Search = () => {
 
     const handleChangeDepFlight = (e) => {
         e.preventDefault()
+        handleResetDepSeats(e)
         setSearch(true)
         setReturnSelected(false)
         setChangeDepSummary(true)
-        handleResetDepSeats(e)
     }
     const handleChangeRetFlight = (e) => {
         e.preventDefault()
+        handleResetRetSeats(e)
         setDepSelected(true)
         setReturnSelected(false)
+    }
+    const handleCancelSeatsDep = (e) => {
+        e.preventDefault()
+        handleResetDepSeats(e)
+        setShowDepSeats(false)
+        setSearch(true)
+    }
+    const handleCancelSeatsRet = (e) => {
+        e.preventDefault()
         handleResetRetSeats(e)
+        setShowRetSeats(false)
+        setDepSelected(true)
     }
 
     return {
@@ -531,7 +578,9 @@ const Search = () => {
         success, setSuccess, loading, setLoading, openConfirmDialog, handleCloseConfirm, setConfirmDialog,
         showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, economyDepSeats, economyRetSeats,
         businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, economySplicedRet,
-        handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps, handleChangeDepFlight, handleChangeRetFlight
+        handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps,
+        handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep, 
+        handleCancelSeatsRet, fromValidation, toValidation, depDateValidation, retDateValidation
     }
 }
 export default Search;
