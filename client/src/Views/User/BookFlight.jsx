@@ -36,6 +36,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import CoffeeIcon from '@mui/icons-material/Coffee';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AirplanemodeInactiveIcon from '@mui/icons-material/AirplanemodeInactive';
+import AirlineSeatReclineNormalIcon from "@mui/icons-material/AirlineSeatReclineNormal";
 
 // ____________MATERIAL UI LAB COMPONENTS_________________
 import Timeline from '@mui/lab/Timeline';
@@ -94,9 +95,9 @@ function BookFlight() {
         counterChild, depSelected, returnSelected, departureFlights, isFetching,
         showCheckout, setShowCheckout, returnFlights, selectedDepFlight, selectedRetFlight, handleReturnSelected, seats,
         loginOpen, setLoginOpen, loading, setLoading, success, setSuccess, openConfirmDialog, handleCloseConfirm,
-        setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, businessDepSeats, 
-        businessRetSeats,handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat, 
-        economySplicedRet,handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight,
+        setConfirmDialog, showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, businessDepSeats,
+        businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat,
+        economySplicedRet, handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight,
         handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep, handleCancelSeatsRet,
         fromValidation, toValidation, depDateValidation, retDateValidation
     } = Search()
@@ -444,7 +445,7 @@ function BookFlight() {
                                                     <Paper elevation={0}
                                                         style={{ borderRadius: '1rem', marginTop: '50px', padding: '30px', boxShadow: '0px 0px 0px 0px', border: 'none' }}>
                                                         <Box sx={{ width: '100%' }}>
-                                                            <Accordion style={{borderRadius: '1rem', padding: '30px'}}>
+                                                            <Accordion style={{ borderRadius: '1rem', padding: '30px' }}>
                                                                 <AccordionSummary
                                                                     aria-controls="panel1a-content"
                                                                     id="panel1a-header"
@@ -504,8 +505,8 @@ function BookFlight() {
                                                                         <Grid item sx={3} style={{ marginTop: '70px', marginLeft: '100px' }}>
                                                                             <Button
                                                                                 variant="contained"
-                                                                                endIcon={<ExpandMoreIcon />} 
-                                                                                style={{ marginBottom: '20px', cursor: 'pointer' }} 
+                                                                                endIcon={<ExpandMoreIcon />}
+                                                                                style={{ marginBottom: '20px', cursor: 'pointer' }}
                                                                                 className="flightBtn"
                                                                             >
                                                                                 From {<br />}
@@ -1221,7 +1222,18 @@ function BookFlight() {
                                                             <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
                                                             <br />
                                                             <Typography variant="subtitle1" >Cabin: {cabin}</Typography>
-                                                            <Typography variant="subtitle1" >Seats: </Typography>
+                                                            <Typography variant="subtitle1" >Seats:
+                                                                {depSeat.map(
+                                                                    (seat) => (
+                                                                        <>
+                                                                            <IconButton color="secondary">
+                                                                                <AirlineSeatReclineNormalIcon />
+                                                                                {seat}
+                                                                            </IconButton>
+                                                                        </>
+                                                                    )
+                                                                )}
+                                                            </Typography>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item sm={2}>
@@ -1279,7 +1291,18 @@ function BookFlight() {
                                                             <Typography variant="subtitle1">Provided by Cactus Airlines</Typography>
                                                             <br />
                                                             <Typography variant="subtitle1" >Cabin: {cabin}</Typography>
-                                                            <Typography variant="subtitle1" >Seats:</Typography>
+                                                            <Typography variant="subtitle1" >Seats:
+                                                                {retSeat.map(
+                                                                    (seat) => (
+                                                                        <>
+                                                                            <IconButton color="secondary">
+                                                                                <AirlineSeatReclineNormalIcon />
+                                                                                {seat}
+                                                                            </IconButton>
+                                                                        </>
+                                                                    )
+                                                                )}
+                                                            </Typography>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item sm={2}>
