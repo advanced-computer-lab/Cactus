@@ -366,7 +366,7 @@ UserRouter.post('/getAllReservations', async (req, res) => {
 })
 
 UserRouter.post('/getUserInfo', (req,res)=>{
-    const user = User.findById({"_id": req.body.userId})
+    User.findById(req.body.userId)
         .then((user) => {
             res.send(user)
         })

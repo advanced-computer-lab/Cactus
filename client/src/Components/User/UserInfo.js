@@ -10,6 +10,7 @@ import {
     IconButton,
     Typography,
     Tab,
+    Snackbar,
     Tabs,
     Button,
     Grid,
@@ -111,7 +112,8 @@ var economySplicedRet = [];
 export default function UserInfo() {
     const history = useHistory();
     // user context
-    const { loggedUser } = useContext(UserContext);
+    const { loggedUser, setLoggedUser } = useContext(UserContext);
+    const [openSnack, setOpenSnack] = useState(false)
     var maleDisabled = false;
     var femaleDisabled = true;
     if (loggedUser) {
@@ -131,9 +133,19 @@ export default function UserInfo() {
     const [openDepSeats, setOpenDepSeats] = useState(false);
     const [openRetSeats, setOpenRetSeats] = useState(false);
     const [email, setEmail] = useState(loggedUser.email);
+    const [emailVal, setEmailVal] = useState({error: false, label: "Email"})
     const [fName, setFName] = useState(loggedUser.firstName);
+    const [fNameVal, setFNameVal] = useState({error: false, label: "First Name"})
     const [lName, setLName] = useState(loggedUser.lastName);
+    const [lNameVal, setLNameVal] = useState({error: false, label: "Last Name"})
     const [cc1, setCc1] = useState(loggedUser.countryCode[0]);
+    const [cc1Val, setCc1Val] = useState({error: false, label: "Area Code 1"})
+    
+    const [phone1Val, setPhone1Val] = useState({error: false, label: "Phone 1"})
+    
+    const [passportVal, setPassportVal] = useState({error: false, label: "Passport"})
+    const [countryVal, setCountryVal] = useState({error: false, label: "Country/Region"})
+    const [cityVal, setCityVal] = useState({error: false, label: "City"})
     const [cc2, setCc2] = useState(() => {
         if (loggedUser.countryCode.length > 1) return loggedUser.countryCode[1];
         else return "";
@@ -201,38 +213,7 @@ export default function UserInfo() {
             try {
                 let res = await axios.post("/Users/getUserInfo" , {userId: loggedUser._id});
                 let data = await res.data;
-                setEmail(data.email)
-                setFName(data.firstName)
-                setLName(data.lastName)
-                setPassport(data.passportNumber)
-                setCountry(data.homeAddress.country)
-                setCity(data.homeAddress.city)
-                setCc1(data.countryCode[0])
-                if(data.countryCode[1]){
-                    setCc2(data.countryCode[1])
-                }
-                else{
-                    setCc2("")
-                }
-                if(data.countryCode[2]){
-                    setCc3(data.countryCode[2])
-                }
-                else{
-                    setCc3("")
-                }
-                setPhone1(data.telephones[0])
-                if(data.telephones[1]){
-                    setPhone2(data.telephones[1])
-                }
-                else{
-                    setPhone2("")
-                }
-                if(data.telephones[2]){
-                    setPhone3(data.telephones[2])
-                }
-                else{
-                    setPhone3("")
-                }
+                setLoggedUser(data)
             } catch (error) {
                 console.log(error)
             }
@@ -281,6 +262,9 @@ export default function UserInfo() {
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
+    const handleCloseSnack = () => {
+        setOpenSnack(false);
+    }
 
     const UpdateUser = () => {
         setEditing(true)
@@ -307,12 +291,66 @@ export default function UserInfo() {
             _id: loggedUser._id,
             reservations: loggedUser.reservations,
         };
+        var isError = false;
+        if(email === "" ){
+            setEmailVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setEmailVal({error:false, label:"Email"})
+        }
+        if(fName === "" ){
+            setFNameVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setFNameVal({error:false, label:"First Name"})
+        }
+        if(lName === "" ){
+            setLNameVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setLNameVal({error:false, label:"Last Name"})
+        }
+        if(phone1 === "" ){
+            setPhone1Val({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setPhone1Val({error:false, label:"Phone"})
+        }
+        if(cc1 === "" ){
+            setCc1Val({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setCc1Val({error:false, label:"Area Code"})
+        }
+        if(passport === "" ){
+            setPassportVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setPhone1Val({error:false, label:"First Name"})
+        }
+        if(country === "" ){
+            setCountryVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setCountryVal({error:false, label:"Country/Region"})
+        }
+        if(city === "" ){
+            setCityVal({error:true, label:"This field is required"})
+            isError = true
+        }else{
+            setCityVal({error:false, label:"City"})
+        }
+        if(isError){
+            setEditing(false)
+            return
+        }
         console.log(data);
         axios
             .put("/Users/updateUser", data)
             .then((response) => {
                 console.log(response);
                 setEditing(false)
+                setOpenSnack(true);
                 setUpdateUser((prevState) => !prevState);
             })
             .catch((err) => {
@@ -872,6 +910,11 @@ export default function UserInfo() {
                                                             {...a11yProps(1)}
                                                         />
                                                     </Tabs>
+                                                    <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleCloseSnack}>
+                                                        <Alert onClose={handleCloseSnack} severity="success" sx={{ width: '100%' }}>
+                                                            Your information has been edited Successfully
+                                                        </Alert>
+                                                    </Snackbar>
                                                 </Box>
                                                 {/* User personal info */}
                                                 <TabPanel value={value} index={0}>
@@ -920,18 +963,21 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="First Name"
+                                                                    label={fNameVal.label}
+                                                                    error={fNameVal.error}
                                                                     defaultValue={fName}
                                                                     onChange={fnameChange}
                                                                     type="text"
                                                                     required
+                                                                    
                                                                 />
                                                             </Grid>
                                                             <Grid item sm={6}>
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Last Name"
+                                                                    label={lNameVal.label}
+                                                                    error={lNameVal.error}
                                                                     defaultValue={lName}
                                                                     onChange={lnameChange}
                                                                     type="text"
@@ -942,7 +988,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Email"
+                                                                    label={emailVal.label}
+                                                                    error={emailVal.error}
                                                                     defaultValue={email}
                                                                     onChange={emailChange}
                                                                     type="email"
@@ -953,7 +1000,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Area Code 1"
+                                                                    label={cc1Val.label}
+                                                                    error={cc1Val.error}
                                                                     defaultValue={cc1}
                                                                     onChange={cc1Change}
                                                                     type="text"
@@ -963,7 +1011,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Phone Number 1"
+                                                                    label={phone1Val.label}
+                                                                    error={phone1Val.error}
                                                                     defaultValue={phone1}
                                                                     onChange={p1Change}
                                                                     type="tel"
@@ -984,7 +1033,7 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Phone Number 2"
+                                                                    label="Phone 2"
                                                                     defaultValue={phone2}
                                                                     onChange={p2Change}
                                                                     type="tel"
@@ -1004,7 +1053,7 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Phone Number 3"
+                                                                    label="Phone 3"
                                                                     defaultValue={phone3}
                                                                     onChange={p3Change}
                                                                     type="tel"
@@ -1014,7 +1063,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Country/Region"
+                                                                    label={countryVal.label}
+                                                                    error={countryVal.error}
                                                                     defaultValue={country}
                                                                     onChange={countryChange}
                                                                     type="text"
@@ -1025,7 +1075,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="City"
+                                                                    label={cityVal.label}
+                                                                    error={cityVal.error}
                                                                     defaultValue={city}
                                                                     onChange={cityChange}
                                                                     type="text"
@@ -1036,7 +1087,8 @@ export default function UserInfo() {
                                                                 <TextField
                                                                     fullWidth
                                                                     variant="outlined"
-                                                                    label="Passport Number"
+                                                                    label={passportVal.label}
+                                                                    error={passportVal.error}
                                                                     defaultValue={passport}
                                                                     onChange={passportChange}
                                                                     type="text"
