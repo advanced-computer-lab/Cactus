@@ -1,7 +1,6 @@
 //___________Middleware___________
 const express = require('express')
 const AuthRouter = express.Router()
-const mongoose = require('mongoose')
 AuthRouter.use(express.json())
 require("dotenv").config()
 const Stripe = require('stripe');

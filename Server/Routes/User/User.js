@@ -12,7 +12,6 @@ const Reservation = require('../../Schemas/Reservation')
 //___________Flight Router___________
 UserRouter.use(express.json())
 
-//////USER DATA (HIMSELF)/////
 
 UserRouter.get('/getallusers', (req, res) => {
     User.find()
