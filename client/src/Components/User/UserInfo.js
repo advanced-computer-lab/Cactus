@@ -200,6 +200,7 @@ export default function UserInfo() {
                 let data = await res.data;
                 setReservations(data);
                 setFetching(false);
+                console.log(data)
             } catch (error) {
                 console.log(error);
             }
