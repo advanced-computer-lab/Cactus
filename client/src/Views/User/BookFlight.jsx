@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { UserContext } from '../../Context/UserContext';
 import axios from 'axios'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { useHistory } from "react-router";
+import { useLocation } from 'react-router-dom'
 
 // ____________CUSTOM COMPONENTS_________________
 import Schedule from '../../Components/User/flightSchedule/Schedule';
@@ -67,7 +69,7 @@ function BookFlight() {
         businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat,
         economySplicedRet, handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight,
         handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep, handleCancelSeatsRet,
-        fromValidation, toValidation, depDateValidation, retDateValidation, change
+        fromValidation, toValidation, depDateValidation, retDateValidation
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -77,7 +79,11 @@ function BookFlight() {
     const [isFetchingUser, setFetchingUser] = React.useState(false)
     const [alertOpen, setAlertOpen] = React.useState(false)
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
-
+    const history = useHistory();
+    const location = useLocation();
+    const change = location.state.change;
+    const reservation = location.state.reservation;
+    const departure = location.state.departure;
     const elements = useElements()
     const stripe = useStripe()
 
@@ -129,9 +135,6 @@ function BookFlight() {
                     setFetchingUser(false)
                     setAlertOpen(true)
                 } else {
-                    res.json().then(data => {
-                        localStorage.setItem('token', data.token)
-                    })
                     setLoggedUser(res.data)
                     console.log(res.data)
                     setLoginOpen(false)
@@ -271,7 +274,7 @@ function BookFlight() {
                                                     sx={{ input: { color: '#fff' } }}
                                                     required
                                                     onChange={handleFromChange}
-                                                    disabled={disableFromTo}
+                                                    disabled={change}
                                                     inputProps={{
                                                         ...params.inputProps,
                                                         autoComplete: 'off', // disable autocomplete and autofill
@@ -289,6 +292,7 @@ function BookFlight() {
                                             id="country-select-demo"
                                             options={countries}
                                             autoHighlight
+                                            disabled={change}
                                             getOptionLabel={(option) => option.label}
                                             renderOption={(props, option) => (
                                                 <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
@@ -335,7 +339,6 @@ function BookFlight() {
                                                 endText="RETURN DATE"
                                                 allowSameDateSelection={false}
                                                 value={date}
-                                                readOnly={disableFromTo}
                                                 onChange={(newDate) => {
                                                     setDate(newDate);
                                                 }}
@@ -347,6 +350,7 @@ function BookFlight() {
                                                             sx={{ input: { color: '#fff' } }}
                                                             required
                                                             fullWidth
+                                                            disabled={!departure}
                                                             error={depDateValidation.error}
                                                             placeholder={depDateValidation.label}
                                                             InputLabelProps={{
@@ -359,6 +363,7 @@ function BookFlight() {
                                                             color='white'
                                                             sx={{ input: { color: '#fff' } }}
                                                             focused
+                                                            disabled={departure}
                                                             fullWidth
                                                             error={retDateValidation.error}
                                                             placeholder={retDateValidation.label}

@@ -90,14 +90,14 @@ function Register() {
     const handleNext = () => {
         index++;
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        if(index === 2){
-            axios.post('/Authentication/Register',newUser)
-            .then((res)=>{
-                console.log(res.data)
-            })
-            .catch((error)=>{
-                console.log(error.message)
-            })
+        if (index === 2) {
+            axios.post('/Authentication/Register', newUser)
+                .then((res) => {
+                    console.log(res.data)
+                })
+                .catch((error) => {
+                    console.log(error.message)
+                })
         }
 
     };
@@ -113,279 +113,285 @@ function Register() {
     };
 
     return (
-        <div >
-            <UserNavBar />
-            <div style={{ display: "flex", justifyContent: "center", marginTop: '30px' }}>
+        <div style={{ background: 'linear-gradient(-160deg, #004080,#004080 60%, white 60%, white)' }}>
+            <div>
+                <UserNavBar />
+                <div style={{ display: "flex", justifyContent: "center", marginTop: '30px' }}>
 
-                <Paper elevation={3}
-                    variant="outlined"
-                    square
-                    style={{ borderRadius: '1rem', width: '1000px', padding: '30px' }}
-                >
-                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                            <LockOutlinedIcon />
-                        </Avatar>
-                        <Typography component="h1" variant="h5">
-                            Sign up
-                        </Typography>
-                    </Box>
-                    <Box sx={{ maxWidth: 800 }} style={{ marginLeft: '70px' }}>
-                        <Stepper activeStep={activeStep} orientation="vertical">
-                            <Step key="credentials">
-                                <StepLabel>
-                                    <Typography variant="caption">Your Credentials</Typography>
-                                </StepLabel>
-                                {/* credentials */}
-                                <StepContent>
-                                    <Grid container spacing={2}>
-                                        <Grid item lg={6}>
-                                            <TextField
-                                                required
-                                                id="username"
-                                                label="Username"
-                                                placeholder="Username"
-                                                type="text"
-                                                fullWidth
-                                                onChange={(e)=>{
-                                                    setUsername(e.target.value)
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item lg={6}></Grid>
-                                        <Grid item lg={12}>
-                                            <TextField
-                                                required
-                                                id="email"
-                                                label="Email Address"
-                                                placeholder="user@email.com"
-                                                type="email"
-                                                fullWidth
-                                                onChange={(e)=>{
-                                                    setEmail(e.target.value)
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item lg={6}>
-                                            <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
-                                                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                                                <OutlinedInput
-                                                    id="outlined-adornment-password"
-                                                    type={password.showPassword ? 'text' : 'password'}
-                                                    fullWidth
-                                                    value={password.password}
-                                                    onChange={handlePasswordChange('password')}
-                                                    endAdornment={
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                aria-label="toggle password visibility"
-                                                                onClick={handleClickShowPassword}
-                                                                onMouseDown={handleMouseDownPassword}
-                                                                edge="end"
-                                                            >
-                                                                {password.showPassword ? <VisibilityOff /> : <Visibility />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    }
-                                                    label="Password"
-                                                />
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item lg={6}>
-                                            <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
-                                                <InputLabel htmlFor="outlined-adornment-password">Retype Password</InputLabel>
-                                                <OutlinedInput
-                                                    id="outlined-adornment-password"
-                                                    type={password.showRetypePassword ? 'text' : 'password'}
-                                                    fullWidth
-                                                    value={password.retypePassword}
-                                                    onChange={handleRetypePasswordChange('retypePassword')}
-                                                    endAdornment={
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                aria-label="toggle password visibility"
-                                                                onClick={handleClickShowRetypePassword}
-                                                                onMouseDown={handleMouseDownRetypePassword}
-                                                                edge="end"
-                                                            >
-                                                                {password.showRetypePassword ? <VisibilityOff /> : <Visibility />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    }
-                                                    label="Retype Password"
-                                                />
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item lg={4}>
-                                            <AreaCodeBox />
-                                        </Grid>
-                                        <Grid item lg={8}>
-                                            <TextField
-                                                required
-                                                id="phoneNumber"
-                                                label="Phone Number"
-                                                placeholder="XXXXXXXX"
-                                                type="tel"
-                                                fullWidth
-                                                onChange={(e)=>{
-                                                    setPhoneNumber(e.target.value)
-                                                }}
-                                            />
-                                        </Grid>
-
-                                    </Grid>
-                                    <Box sx={{ mb: 2 }}>
-                                        <div>
-                                            <Button
-                                                variant="contained"
-                                                onClick={handleNext}
-                                                sx={{ mt: 1, mr: 1 }}
-                                            >
-                                                {index === 2 ? 'Finish' : 'Continue'}
-                                            </Button>
-                                            <Button
-                                                disabled={index === 0}
-                                                onClick={handleBack}
-                                                sx={{ mt: 1, mr: 1 }}
-                                            >
-                                                Back
-                                            </Button>
-                                        </div>
-                                    </Box>
-                                </StepContent>
-                            </Step>
-                            <Step key="personalDetails">
-                                <StepLabel>
-                                    <Typography variant="caption">Your Personal Information</Typography>
-                                </StepLabel>
-                                {/* Personal Info */}
-                                <StepContent>
-                                    <Box>
+                    <Paper elevation={3}
+                        variant="outlined"
+                        square
+                        style={{ borderRadius: '1rem', width: '1000px', padding: '30px' }}
+                    >
+                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                                <LockOutlinedIcon />
+                            </Avatar>
+                            <Typography component="h1" variant="h5">
+                                Sign up
+                            </Typography>
+                        </Box>
+                        <Box sx={{ maxWidth: 800 }} style={{ marginLeft: '70px' }}>
+                            <Stepper activeStep={activeStep} orientation="vertical">
+                                <Step key="credentials">
+                                    <StepLabel>
+                                        <Typography variant="caption">Your Credentials</Typography>
+                                    </StepLabel>
+                                    {/* credentials */}
+                                    <StepContent>
                                         <Grid container spacing={2}>
-                                            <Grid item lg={2}>
-                                                <FormControl sm={{ m: 1 }} fullWidth>
-                                                    <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
-                                                    <Select
-                                                        labelId="demo-simple-select-helper-label"
-                                                        id="demo-simple-select-helper"
-                                                        value={title}
-                                                        label="Title"
-                                                        onChange={handleChange}
-                                                    >
-                                                        <MenuItem value="">
-                                                            <em>None</em>
-                                                        </MenuItem>
-                                                        <MenuItem value="MR">MR</MenuItem>
-                                                        <MenuItem value="MISS">MISS</MenuItem>
-                                                        <MenuItem value="MRS">MRS</MenuItem>
-                                                    </Select>
+                                            <Grid item lg={6}>
+                                                <TextField
+                                                    required
+                                                    id="username"
+                                                    label="Username"
+                                                    placeholder="Username"
+                                                    type="text"
+                                                    fullWidth
+                                                    onChange={(e) => {
+                                                        setUsername(e.target.value)
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item lg={6}></Grid>
+                                            <Grid item lg={12}>
+                                                <TextField
+                                                    required
+                                                    id="email"
+                                                    label="Email Address"
+                                                    placeholder="user@email.com"
+                                                    type="email"
+                                                    fullWidth
+                                                    onChange={(e) => {
+                                                        setEmail(e.target.value)
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item lg={6}>
+                                                <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                                                    <OutlinedInput
+                                                        id="outlined-adornment-password"
+                                                        type={password.showPassword ? 'text' : 'password'}
+                                                        fullWidth
+                                                        value={password.password}
+                                                        onChange={handlePasswordChange('password')}
+                                                        endAdornment={
+                                                            <InputAdornment position="end">
+                                                                <IconButton
+                                                                    aria-label="toggle password visibility"
+                                                                    onClick={handleClickShowPassword}
+                                                                    onMouseDown={handleMouseDownPassword}
+                                                                    edge="end"
+                                                                >
+                                                                    {password.showPassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        }
+                                                        label="Password"
+                                                    />
                                                 </FormControl>
                                             </Grid>
-                                            <Grid item lg={5}>
-                                                <TextField
-                                                    required
-                                                    id="firstName"
-                                                    label="First Name"
-                                                    placeholder="First Name (as per passport)"
-                                                    type="text"
-                                                    fullWidth
-                                                    onChange={(e)=>{
-                                                        setFName(e.target.value)
-                                                    }}
-                                                />
-                                            </Grid>
-                                            <Grid item lg={5}>
-                                                <TextField
-                                                    required
-                                                    id="lastName"
-                                                    label="Last Name"
-                                                    placeholder="Last Name (as per passport)"
-                                                    type="text"
-                                                    fullWidth
-                                                    onChange={(e)=>{
-                                                        setLName(e.target.value)
-                                                    }}
-                                                />
-                                            </Grid>
-                                            <Grid item lg={12}>
-                                                <TextField
-                                                    id="outlined-textarea"
-                                                    label="Passport Number"
-                                                    fullWidth
-                                                    type="text"
-                                                    required
-                                                    onChange={(e)=>{
-                                                        setPassportNumber(e.target.value)
-                                                    }}
-                                                />
-                                            </Grid>
-                                            <Grid item lg={12}>
-                                                <CountryBox />
-                                            </Grid>
-                                            <Grid item lg={7}>
-                                                <TextField
-                                                    id="outlined-textarea"
-                                                    label="Date of Birth"
-                                                    fullWidth
-                                                    type="date"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                    required
-                                                    onChange={(e)=>{
-                                                        setDoB(e.target.value)
-                                                    }}
-                                                />
+                                            <Grid item lg={6}>
+                                                <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                    <InputLabel htmlFor="outlined-adornment-password">Retype Password</InputLabel>
+                                                    <OutlinedInput
+                                                        id="outlined-adornment-password"
+                                                        type={password.showRetypePassword ? 'text' : 'password'}
+                                                        fullWidth
+                                                        value={password.retypePassword}
+                                                        onChange={handleRetypePasswordChange('retypePassword')}
+                                                        endAdornment={
+                                                            <InputAdornment position="end">
+                                                                <IconButton
+                                                                    aria-label="toggle password visibility"
+                                                                    onClick={handleClickShowRetypePassword}
+                                                                    onMouseDown={handleMouseDownRetypePassword}
+                                                                    edge="end"
+                                                                >
+                                                                    {password.showRetypePassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        }
+                                                        label="Retype Password"
+                                                    />
+                                                </FormControl>
                                             </Grid>
                                             <Grid item lg={4}>
-                                                <FormControl component="fieldset">
-                                                    <FormLabel component="legend" style={{ textAlign: 'start' }}>Gender</FormLabel>
-                                                    <RadioGroup 
-                                                    row-aria-label="gender" 
-                                                    name="row-radio-button-group" 
-                                                    row
-                                                    onChange={(e)=>{
-                                                        setGender(e.target.value)
-                                                    }}
-                                                    >
-                                                        <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                                                        <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                                                    </RadioGroup>
-                                                </FormControl>
+                                                <AreaCodeBox />
                                             </Grid>
+                                            <Grid item lg={8}>
+                                                <TextField
+                                                    required
+                                                    id="phoneNumber"
+                                                    label="Phone Number"
+                                                    placeholder="XXXXXXXX"
+                                                    type="tel"
+                                                    fullWidth
+                                                    onChange={(e) => {
+                                                        setPhoneNumber(e.target.value)
+                                                    }}
+                                                />
+                                            </Grid>
+
                                         </Grid>
-                                    </Box>
-                                    <Box sx={{ mb: 2 }}>
-                                        <div>
-                                            <Button
-                                                variant="contained"
-                                                onClick={handleNext}
-                                                sx={{ mt: 1, mr: 1 }}
-                                            >
-                                                {index === 1 ? 'Finish' : 'Continue'}
-                                            </Button>
-                                            <Button
-                                                disabled={index === 0}
-                                                onClick={handleBack}
-                                                sx={{ mt: 1, mr: 1 }}
-                                            >
-                                                Back
-                                            </Button>
-                                        </div>
-                                    </Box>
-                                </StepContent>
-                            </Step>
-                        </Stepper>
-                        {activeStep === 1 && (
-                            <Paper square elevation={0} lg={{ p: 3 }}>
-                                <Typography>All steps completed - you&apos;re finished</Typography>
-                                <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-                                    Reset
-                                </Button>
-                            </Paper>
-                        )}
-                    </Box>
-                </Paper>
+                                        <Box sx={{ mb: 2 }}>
+                                            <div>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleNext}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    {index === 2 ? 'Finish' : 'Continue'}
+                                                </Button>
+                                                <Button
+                                                    disabled={index === 0}
+                                                    onClick={handleBack}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </StepContent>
+                                </Step>
+                                <Step key="personalDetails">
+                                    <StepLabel>
+                                        <Typography variant="caption">Your Personal Information</Typography>
+                                    </StepLabel>
+                                    {/* Personal Info */}
+                                    <StepContent>
+                                        <Box>
+                                            <Grid container spacing={2}>
+                                                <Grid item lg={2}>
+                                                    <FormControl sm={{ m: 1 }} fullWidth>
+                                                        <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-helper-label"
+                                                            id="demo-simple-select-helper"
+                                                            value={title}
+                                                            label="Title"
+                                                            onChange={handleChange}
+                                                        >
+                                                            <MenuItem value="">
+                                                                <em>None</em>
+                                                            </MenuItem>
+                                                            <MenuItem value="MR">MR</MenuItem>
+                                                            <MenuItem value="MISS">MISS</MenuItem>
+                                                            <MenuItem value="MRS">MRS</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid item lg={5}>
+                                                    <TextField
+                                                        required
+                                                        id="firstName"
+                                                        label="First Name"
+                                                        placeholder="First Name (as per passport)"
+                                                        type="text"
+                                                        fullWidth
+                                                        onChange={(e) => {
+                                                            setFName(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={5}>
+                                                    <TextField
+                                                        required
+                                                        id="lastName"
+                                                        label="Last Name"
+                                                        placeholder="Last Name (as per passport)"
+                                                        type="text"
+                                                        fullWidth
+                                                        onChange={(e) => {
+                                                            setLName(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={12}>
+                                                    <TextField
+                                                        id="outlined-textarea"
+                                                        label="Passport Number"
+                                                        fullWidth
+                                                        type="text"
+                                                        required
+                                                        onChange={(e) => {
+                                                            setPassportNumber(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={12}>
+                                                    <CountryBox />
+                                                </Grid>
+                                                <Grid item lg={7}>
+                                                    <TextField
+                                                        id="outlined-textarea"
+                                                        label="Date of Birth"
+                                                        fullWidth
+                                                        type="date"
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                        required
+                                                        onChange={(e) => {
+                                                            setDoB(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={4}>
+                                                    <FormControl component="fieldset">
+                                                        <FormLabel component="legend" style={{ textAlign: 'start' }}>Gender</FormLabel>
+                                                        <RadioGroup
+                                                            row-aria-label="gender"
+                                                            name="row-radio-button-group"
+                                                            row
+                                                            onChange={(e) => {
+                                                                setGender(e.target.value)
+                                                            }}
+                                                        >
+                                                            <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                                                            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                                                        </RadioGroup>
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                        <Box sx={{ mb: 2 }}>
+                                            <div>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleNext}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    {index === 1 ? 'Finish' : 'Continue'}
+                                                </Button>
+                                                <Button
+                                                    disabled={index === 0}
+                                                    onClick={handleBack}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </StepContent>
+                                </Step>
+                            </Stepper>
+                            {activeStep === 1 && (
+                                <Paper square elevation={0} lg={{ p: 3 }}>
+                                    <Button 
+                                    onClick={handleReset} 
+                                    color="error" 
+                                    variant="contained" sx={{ mt: 1, mr: 1 }}
+                                    style={{marginLeft: '800px'}}
+                                    >
+                                        Reset
+                                    </Button>
+                                </Paper>
+                            )}
+                        </Box>
+                    </Paper>
+                </div>
             </div>
         </div>
     )

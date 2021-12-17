@@ -21,6 +21,7 @@ import UserProfile from './Views/User/UserProfile'
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
 import { useState } from 'react';
+import ChangePassword from './Views/User/ChangePassword';
 
 
 
@@ -80,6 +81,7 @@ function App() {
               <Route path="/UserProfile">
                 <UserProfile />
               </Route>
+              <Route path={"/ChangePassword"} component={ChangePassword} />
             </UserContext.Provider>
           </Switch>
         </Router>

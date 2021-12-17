@@ -777,7 +777,7 @@ export default function UserInfo() {
         }
     };
     return (
-        <>
+        <div style={{background:'linear-gradient(160deg, #004080,#004080 60%, white 60%, white)'}}>
             <div>
                 <UserNavBar />
             </div>
@@ -844,7 +844,7 @@ export default function UserInfo() {
                                         </Grid>
                                         {/* Navigation */}
                                         <Grid item sx={5}>
-                                            <Typography variant="h4" component="h4">
+                                            <Typography variant="h4" component="h4" style={{marginLeft: '20px'}}>
                                                 {loggedUser.title} {loggedUser.firstName}{" "}
                                                 {loggedUser.lastName}
                                             </Typography>
@@ -868,7 +868,7 @@ export default function UserInfo() {
                                                     startIcon={<FlightTakeoffIcon />}
                                                     color="secondary"
                                                     onClick={() => {
-                                                        history.push("/");
+                                                        history.push("/BookFlight");
                                                     }}
                                                 >
                                                     Book Flight
@@ -1453,7 +1453,7 @@ export default function UserInfo() {
                                                                                             <Button 
                                                                                             color="warning" 
                                                                                             variant="outlined"
-                                                                                            onClick={handleEditDepFlight}
+                                                                                            onClick={(e)=>{handleEditDepFlight(e,reservation.reservation)}}
                                                                                             >
                                                                                                 Change Flight
                                                                                             </Button>
@@ -1592,7 +1592,7 @@ export default function UserInfo() {
                             <Dialog
                                 open={openRetSeats}
                                 onClose={() => setOpenRetSeats(false)}
-                                maxWidth="lg"
+                                maxWidth="xl"
                             >
                                 <DialogTitle>
                                     Change Retarture Flight Seats
@@ -1604,7 +1604,6 @@ export default function UserInfo() {
                                             variant="outlined"
                                             style={{
                                                 borderRadius: "1rem",
-                                                marginLeft: "150px",
                                                 marginTop: "50px",
                                                 padding: "30px",
                                                 width: "1000px",
@@ -2288,6 +2287,6 @@ export default function UserInfo() {
                     </>
                 )}
             </div>
-        </>
+        </div>
     );
 }

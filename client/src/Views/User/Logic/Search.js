@@ -555,10 +555,19 @@ const Search = () => {
         setShowRetSeats(false)
         setDepSelected(true)
     }
-    const handleEditDepFlight = (e) => {
+    const handleEditDepFlight = (e, reserve) => {
         e.preventDefault()
-        setChange(true);
-        history.push("/BookFlight")
+        history.push(
+            {
+                pathname: "/BookFlight",
+                search: '?query=abc',
+                state: {
+                    change: true,
+                    departure: true,
+                    reservation: reserve
+                }
+            }
+        )
     }
 
     return {
