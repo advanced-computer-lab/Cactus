@@ -407,6 +407,7 @@ const Search = () => {
         if (numberOfSeats === 1) {
             setAllDepSeatsSelected(true)
         }
+        console.log("retFlightTest: ",selectedRetFlight)
     }
     const handleResetRetSeats = (e) => {
         e.preventDefault()
@@ -554,9 +555,10 @@ const Search = () => {
         handleResetRetSeats(e)
         setShowRetSeats(false)
         setDepSelected(true)
-    }
-    const handleEditDepFlight = (e, reserve) => {
+    } 
+    const handleEditDepFlight = (e, reserve,depFlight,retFlight) => {
         e.preventDefault()
+        setSelectedRet(retFlight)
         history.push(
             {
                 pathname: "/BookFlight",
@@ -564,10 +566,93 @@ const Search = () => {
                 state: {
                     change: true,
                     departure: true,
-                    reservation: reserve
+                    reservation: reserve,
+                    flight: depFlight,
+                    other: retFlight
                 }
             }
         )
+    }
+    const handleEditRetFlight = (e, reserve,depFlight,retFlight) => {
+        e.preventDefault()
+        setSelectedDep(depFlight)
+        history.push(
+            {
+                pathname: "/BookFlight",
+                search: '?query=abc',
+                state: {
+                    change: true,
+                    departure: false,
+                    reservation: reserve,
+                    flight: retFlight,
+                    other: depFlight
+                }
+            }
+        )
+    }
+    const handleEditSearch = (e,depCountry,destCountry,cabin,seats,depEditDate,retEditDate,dep,other) => {
+        const depDate = new Date(depEditDate);
+        var depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
+        if ((depDate.getMonth() + 1) < 10) {
+            depDateFormat = (depDate.getFullYear()) + "-0" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
+            if ((depDate.getDate()) < 10) {
+                depDateFormat = (depDate.getFullYear()) + "-0" + (depDate.getMonth() + 1) + "-0" + (depDate.getDate())
+            }
+        } else {
+            if ((depDate.getDate()) < 10) {
+                depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-0" + (depDate.getDate())
+            }
+        }
+        const returnDate = new Date(retEditDate);
+        var returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
+        if ((depDate.getMonth() + 1) < 10) {
+            returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
+            if ((returnDate.getDate()) < 10) {
+                returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
+            }
+        } else {
+            if ((returnDate.getDate()) < 10) {
+                returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
+            }
+        }
+        e.preventDefault();
+        var data = {}
+        if(dep){
+            data.departureDate= depDateFormat
+            data.destinationAirport= destCountry
+            data.departureAirport= depCountry
+            data.cabin= cabin
+            data.seats= seats
+            }
+        else{
+            data.departureDate= returnDateFormat
+            data.destinationAirport= destCountry
+            data.departureAirport= depCountry
+            data.cabin= cabin
+            data.seats= seats
+        }
+        console.log("data: ",data)
+        axios.post('/Users/getFlights', data)
+            .then((response) => {
+                if(dep){
+                    setSearch(true)
+                    setFetching(false)
+                    setDepartureFlights(response.data)
+                    setSelectedRet(other)
+                    setChangeDepSummary(true)
+                }
+                else{
+                    setSearch(false)
+                    setFetching(false)
+                    setDepSelected(true)
+                    setSelectedDep(other)
+                    setReturnFlights(response.data)
+                }
+                console.log("selectssssss: ",selectedRetFlight)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     }
 
     return {
@@ -585,7 +670,7 @@ const Search = () => {
         handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps,
         handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep,
         handleCancelSeatsRet, fromValidation, toValidation, depDateValidation, retDateValidation, change, setChange,
-        handleEditDepFlight
+        handleEditDepFlight,handleEditSearch, handleEditRetFlight
     }
 }
 export default Search;

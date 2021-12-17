@@ -112,7 +112,7 @@ var economySplicedRet = [];
 
 export default function UserInfo() {
     const history = useHistory();
-    const { handleEditDepFlight } = Search();
+    const { handleEditDepFlight, handleEditRetFlight } = Search();
     // user context
     const { loggedUser, setLoggedUser } = useContext(UserContext);
     const [openSnack, setOpenSnack] = useState(false)
@@ -1453,7 +1453,7 @@ export default function UserInfo() {
                                                                                             <Button 
                                                                                             color="warning" 
                                                                                             variant="outlined"
-                                                                                            onClick={(e)=>{handleEditDepFlight(e,reservation.reservation)}}
+                                                                                            onClick={(e)=>{handleEditDepFlight(e,reservation.reservation,reservation.departureFlight,reservation.returnFlight)}}
                                                                                             >
                                                                                                 Change Flight
                                                                                             </Button>
@@ -1511,7 +1511,9 @@ export default function UserInfo() {
                                                                                                     reservation.reservation.seats}
                                                                                             </Alert>
                                                                                             <br />
-                                                                                            <Button color="warning" variant="outlined">Change Flight</Button>
+                                                                                            <Button color="warning" variant="outlined"
+                                                                                            onClick={(e)=>{handleEditRetFlight(e,reservation.reservation,reservation.departureFlight,reservation.returnFlight)}}
+                                                                                            >Change Flight</Button>
                                                                                         </Box>
                                                                                     </Grid>
                                                                                     <Grid item sm={9}></Grid>

@@ -50,6 +50,7 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePicker from '@mui/lab/DatePicker';
 
 
 // ____________STYLESHEETS AND LOGIC_________________
@@ -69,7 +70,7 @@ function BookFlight() {
         businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, handleSelectedRetSeat,
         economySplicedRet, handleResetRetSeats, depSeat, retSeat, depFlightMaps, retFlightMaps, handleChangeDepFlight,
         handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep, handleCancelSeatsRet,
-        fromValidation, toValidation, depDateValidation, retDateValidation
+        fromValidation, toValidation, depDateValidation, retDateValidation, handleEditSearch
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
@@ -78,22 +79,29 @@ function BookFlight() {
     const [userPass, setPassword] = React.useState('');
     const [isFetchingUser, setFetchingUser] = React.useState(false)
     const [alertOpen, setAlertOpen] = React.useState(false)
-    const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+    const [depEditDate, setDepEditDate] = React.useState()
+    const [retEditDate, setRetEditDate] = React.useState()
+    const {loggedUser, setLoggedUser} = React.useContext(UserContext)
     const history = useHistory();
     const location = useLocation();
-    const change = location.state.change;
-    const reservation = location.state.reservation;
-    const departure = location.state.departure;
+    var change = false
+    var departure = false
+    var reservation = null
+    var flight = null
+    var other = null
+    const checker = () =>{
+        if(location.state){
+            change = location.state.change;
+            reservation = location.state.reservation;
+            departure = location.state.departure;
+            flight = location.state.flight
+            other = location.state.other
+        }
+    }
+    checker()
+    
     const elements = useElements()
     const stripe = useStripe()
-
-    const [disableFromTo, setDisableFromTo] = React.useState(false)
-    React.useEffect(() => {
-        if (change) {
-            setDisableFromTo(true)
-        }
-        console.log("change: ", change)
-    }, [change])
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -232,6 +240,97 @@ function BookFlight() {
                             <img src={suitCase} alt="suitcase" />
                         </Grid>
                         <Grid item sm={6} style={{ marginLeft: '-100px' }}>
+                            {change? 
+                            <>
+                            <Paper elevation={1}>
+                                <Grid container spacing={3}>
+                                    <Grid item sm={6}>
+                                        <TextField 
+                                            label="From"
+                                            disabled={true}
+                                            value={flight.depCountry}
+                                        />
+                                    </Grid>
+                                    <Grid item sm={6}>
+                                    <TextField 
+                                            label="To"
+                                            disabled={true}
+                                            value={flight.destCountry}
+                                        />
+                                    </Grid>
+                                    <Grid item sm={6}>
+                                    <TextField 
+                                        label="Cabin"
+                                        disabled={true}
+                                        value={reservation.cabin}
+                                        />
+                                    </Grid>
+                                    <Grid item sm={6}>
+                                    <TextField 
+                                        label="Seats"
+                                        disabled={true}
+                                        value={reservation.seats}
+                                        />
+                                    </Grid>
+                                    <Grid item sm={6}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        label="Departure Date"
+                                        value={depEditDate}
+                                        defaultValue={reservation.departureDate}
+                                        inputFormat="yyyy/MM/dd"
+                                        disabled={!departure}
+                                        readOnly={!departure}
+                                        maxDate={new Date(reservation.rerturnDate)}
+                                        disablePast
+                                        onChange={(newValue) => {
+                                        setDepEditDate(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                    </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item sm={6}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        label="Departure Date"
+                                        value={retEditDate}
+                                        minDate={new Date(reservation.departureDate)}
+                                        defaultValue={reservation.rerturnDate}
+                                        formatDate="yyyy/MM/dd"
+                                        disabled={departure}
+                                        readOnly={departure}
+                                        disablePast={departure}
+                                        onChange={(newValue) => {
+                                        setRetEditDate(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                    </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item sm={12}>
+                                        <Button 
+                                        variant="contained" 
+                                        color="secondary" 
+                                        fullWidth
+                                        onClick={(e)=>{
+                                            handleEditSearch(
+                                                e,flight.depCountry,
+                                                flight.destCountry,
+                                                reservation.cabin,
+                                                reservation.seats,
+                                                depEditDate, retEditDate,
+                                                departure,other)}}
+                                        >
+                                            Search
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </Paper>
+
+                            </> 
+                            : 
+                            <>
                             <Paper elevation={1}
                                 style={{
                                     padding: '50px',
@@ -246,7 +345,6 @@ function BookFlight() {
                                         <Autocomplete
                                             id="country-select-demo"
                                             options={countries}
-                                            disabled={disableFromTo}
                                             autoHighlight
                                             getOptionLabel={(option) => option.label}
                                             color="white"
@@ -274,7 +372,6 @@ function BookFlight() {
                                                     sx={{ input: { color: '#fff' } }}
                                                     required
                                                     onChange={handleFromChange}
-                                                    disabled={change}
                                                     inputProps={{
                                                         ...params.inputProps,
                                                         autoComplete: 'off', // disable autocomplete and autofill
@@ -292,7 +389,6 @@ function BookFlight() {
                                             id="country-select-demo"
                                             options={countries}
                                             autoHighlight
-                                            disabled={change}
                                             getOptionLabel={(option) => option.label}
                                             renderOption={(props, option) => (
                                                 <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
@@ -318,7 +414,6 @@ function BookFlight() {
                                                     fullWidth
                                                     required
                                                     onChange={handleToChange}
-                                                    disabled={change}
                                                     inputProps={{
                                                         ...params.inputProps,
                                                         autoComplete: 'off', // disable autocomplete and autofill
@@ -350,7 +445,6 @@ function BookFlight() {
                                                             sx={{ input: { color: '#fff' } }}
                                                             required
                                                             fullWidth
-                                                            disabled={!departure}
                                                             error={depDateValidation.error}
                                                             placeholder={depDateValidation.label}
                                                             InputLabelProps={{
@@ -363,7 +457,6 @@ function BookFlight() {
                                                             color='white'
                                                             sx={{ input: { color: '#fff' } }}
                                                             focused
-                                                            disabled={departure}
                                                             fullWidth
                                                             error={retDateValidation.error}
                                                             placeholder={retDateValidation.label}
@@ -450,7 +543,8 @@ function BookFlight() {
                                         </Button>
                                     </Grid>
                                 </Grid>
-                            </Paper>
+                            </Paper></>}
+                            
                         </Grid>
                     </Grid>
                     <Box sx={{ width: '100%' }}>
@@ -1103,12 +1197,12 @@ function BookFlight() {
                                             </Box>
                                             <Grid container spacing={2}>
                                                 <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">{from} to {to}</Typography>
+                                                    <Typography variant="h6" component="h6" color="primary">{selectedDepFlight.depCountry} to {selectedDepFlight.destCountry}</Typography>
                                                     <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
                                                                 {selectedDepFlight.departureDate} - {selectedDepFlight.departureTime}<br />
-                                                                {from}, {selectedDepFlight.departureAirport}<br />
+                                                                {selectedDepFlight.depCountry}, {selectedDepFlight.departureAirport}<br />
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
@@ -1119,7 +1213,7 @@ function BookFlight() {
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
                                                                 {selectedDepFlight.arrivalDate} - {selectedDepFlight.arrivalTime}<br />
-                                                                {to}, {selectedDepFlight.destinationAirport}<br />
+                                                                {selectedDepFlight.destCountry}, {selectedDepFlight.destinationAirport}<br />
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
@@ -1138,12 +1232,12 @@ function BookFlight() {
                                                     </Box>
                                                 </Grid>
                                                 <Grid item sx={8}>
-                                                    <Typography variant="h6" component="h6" color="primary">{to} to {from}</Typography>
+                                                    <Typography variant="h6" component="h6" color="primary">{selectedRetFlight.depCountry} to {selectedRetFlight.destCountry}</Typography>
                                                     <Timeline position="left" style={{ marginLeft: '-200px' }}>
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
                                                                 {selectedRetFlight.departureDate} - {selectedRetFlight.departureTime}<br />
-                                                                {from}, {selectedRetFlight.destinationAirport} <br />
+                                                                {selectedRetFlight.destCountry}, {selectedRetFlight.destinationAirport} <br />
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
@@ -1154,7 +1248,7 @@ function BookFlight() {
                                                         <TimelineItem>
                                                             <TimelineOppositeContent color="text.secondary" width="500px">
                                                                 {selectedRetFlight.arrivalDate} - {selectedRetFlight.arrivalTime}<br />
-                                                                {to},{selectedRetFlight.departureAirport} <br />
+                                                                {selectedRetFlight.depCountry},{selectedRetFlight.departureAirport} <br />
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
