@@ -61,6 +61,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import CloseIcon from "@mui/icons-material/Close";
+import Search from '../../Views/User/Logic/Search'
 
 // ___________COMPONENTS____________
 import UserNavBar from "../../Components/User/UserNavBar";
@@ -111,6 +112,7 @@ var economySplicedRet = [];
 
 export default function UserInfo() {
     const history = useHistory();
+    const { handleEditDepFlight } = Search();
     // user context
     const { loggedUser, setLoggedUser } = useContext(UserContext);
     const [openSnack, setOpenSnack] = useState(false)
@@ -133,19 +135,19 @@ export default function UserInfo() {
     const [openDepSeats, setOpenDepSeats] = useState(false);
     const [openRetSeats, setOpenRetSeats] = useState(false);
     const [email, setEmail] = useState(loggedUser.email);
-    const [emailVal, setEmailVal] = useState({error: false, label: "Email"})
+    const [emailVal, setEmailVal] = useState({ error: false, label: "Email" })
     const [fName, setFName] = useState(loggedUser.firstName);
-    const [fNameVal, setFNameVal] = useState({error: false, label: "First Name"})
+    const [fNameVal, setFNameVal] = useState({ error: false, label: "First Name" })
     const [lName, setLName] = useState(loggedUser.lastName);
-    const [lNameVal, setLNameVal] = useState({error: false, label: "Last Name"})
+    const [lNameVal, setLNameVal] = useState({ error: false, label: "Last Name" })
     const [cc1, setCc1] = useState(loggedUser.countryCode[0]);
-    const [cc1Val, setCc1Val] = useState({error: false, label: "Area Code 1"})
-    
-    const [phone1Val, setPhone1Val] = useState({error: false, label: "Phone 1"})
-    
-    const [passportVal, setPassportVal] = useState({error: false, label: "Passport"})
-    const [countryVal, setCountryVal] = useState({error: false, label: "Country/Region"})
-    const [cityVal, setCityVal] = useState({error: false, label: "City"})
+    const [cc1Val, setCc1Val] = useState({ error: false, label: "Area Code 1" })
+
+    const [phone1Val, setPhone1Val] = useState({ error: false, label: "Phone 1" })
+
+    const [passportVal, setPassportVal] = useState({ error: false, label: "Passport" })
+    const [countryVal, setCountryVal] = useState({ error: false, label: "Country/Region" })
+    const [cityVal, setCityVal] = useState({ error: false, label: "City" })
     const [cc2, setCc2] = useState(() => {
         if (loggedUser.countryCode.length > 1) return loggedUser.countryCode[1];
         else return "";
@@ -211,7 +213,7 @@ export default function UserInfo() {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                let res = await axios.post("/Users/getUserInfo" , {userId: loggedUser._id});
+                let res = await axios.post("/Users/getUserInfo", { userId: loggedUser._id });
                 let data = await res.data;
                 setLoggedUser(data)
             } catch (error) {
@@ -292,55 +294,55 @@ export default function UserInfo() {
             reservations: loggedUser.reservations,
         };
         var isError = false;
-        if(email === "" ){
-            setEmailVal({error:true, label:"This field is required"})
+        if (email === "") {
+            setEmailVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setEmailVal({error:false, label:"Email"})
+        } else {
+            setEmailVal({ error: false, label: "Email" })
         }
-        if(fName === "" ){
-            setFNameVal({error:true, label:"This field is required"})
+        if (fName === "") {
+            setFNameVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setFNameVal({error:false, label:"First Name"})
+        } else {
+            setFNameVal({ error: false, label: "First Name" })
         }
-        if(lName === "" ){
-            setLNameVal({error:true, label:"This field is required"})
+        if (lName === "") {
+            setLNameVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setLNameVal({error:false, label:"Last Name"})
+        } else {
+            setLNameVal({ error: false, label: "Last Name" })
         }
-        if(phone1 === "" ){
-            setPhone1Val({error:true, label:"This field is required"})
+        if (phone1 === "") {
+            setPhone1Val({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setPhone1Val({error:false, label:"Phone"})
+        } else {
+            setPhone1Val({ error: false, label: "Phone" })
         }
-        if(cc1 === "" ){
-            setCc1Val({error:true, label:"This field is required"})
+        if (cc1 === "") {
+            setCc1Val({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setCc1Val({error:false, label:"Area Code"})
+        } else {
+            setCc1Val({ error: false, label: "Area Code" })
         }
-        if(passport === "" ){
-            setPassportVal({error:true, label:"This field is required"})
+        if (passport === "") {
+            setPassportVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setPhone1Val({error:false, label:"First Name"})
+        } else {
+            setPhone1Val({ error: false, label: "First Name" })
         }
-        if(country === "" ){
-            setCountryVal({error:true, label:"This field is required"})
+        if (country === "") {
+            setCountryVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setCountryVal({error:false, label:"Country/Region"})
+        } else {
+            setCountryVal({ error: false, label: "Country/Region" })
         }
-        if(city === "" ){
-            setCityVal({error:true, label:"This field is required"})
+        if (city === "") {
+            setCityVal({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setCityVal({error:false, label:"City"})
+        } else {
+            setCityVal({ error: false, label: "City" })
         }
-        if(isError){
+        if (isError) {
             setEditing(false)
             return
         }
@@ -969,7 +971,7 @@ export default function UserInfo() {
                                                                     onChange={fnameChange}
                                                                     type="text"
                                                                     required
-                                                                    
+
                                                                 />
                                                             </Grid>
                                                             <Grid item sm={6}>
@@ -1447,6 +1449,14 @@ export default function UserInfo() {
                                                                                                     .departurePrice *
                                                                                                     reservation.reservation.seats}
                                                                                             </Alert>
+                                                                                            <br />
+                                                                                            <Button 
+                                                                                            color="warning" 
+                                                                                            variant="outlined"
+                                                                                            onClick={handleEditDepFlight}
+                                                                                            >
+                                                                                                Change Flight
+                                                                                            </Button>
                                                                                         </Box>
                                                                                     </Grid>
                                                                                     <Grid item sm={3}>
@@ -1500,6 +1510,8 @@ export default function UserInfo() {
                                                                                                     .returnPrice *
                                                                                                     reservation.reservation.seats}
                                                                                             </Alert>
+                                                                                            <br />
+                                                                                            <Button color="warning" variant="outlined">Change Flight</Button>
                                                                                         </Box>
                                                                                     </Grid>
                                                                                     <Grid item sm={9}></Grid>

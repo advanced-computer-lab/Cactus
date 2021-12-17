@@ -15,15 +15,15 @@ var economySplicedRet = []
 const Search = () => {
     const [value, setValue] = useState(0);
     const [date, setDate] = useState(["", ""]);
-    const [depDateValidation ,setDepDateValidation] = useState({ error: false, label: 'Departure Date' })
-    const [retDateValidation ,setRetDateValidation] = useState({ error: false, label: 'Return Date' })
+    const [depDateValidation, setDepDateValidation] = useState({ error: false, label: 'DEPARTURE DATE' })
+    const [retDateValidation, setRetDateValidation] = useState({ error: false, label: 'RETURN DATE' })
     const [open, setOpen] = useState(false);
     const [counter, setCounter] = useState(1);
     const [search, setSearch] = useState(false)
     const [from, setFrom] = useState("")
-    const [fromValidation, setFromValidation] = useState({ error: false, label: 'From' })
+    const [fromValidation, setFromValidation] = useState({ error: false, label: 'FROM' })
     const [to, setTo] = useState("")
-    const [toValidation, setToValidation] = useState({ error: false, label: 'To' })
+    const [toValidation, setToValidation] = useState({ error: false, label: 'TO' })
     const [seats, setSeats] = useState(1)
     const [cabin, setCabin] = useState('economy')
     const [counterChild, setCounterChild] = useState(0);
@@ -53,16 +53,17 @@ const Search = () => {
     const [allDepSeatsSelected, setAllDepSeatsSelected] = useState(false)
     const [allRetSeatsSelected, setAllRetSeatsSelected] = useState(false)
     const [getFlights, setGetFlights] = useState(false)
+    const [change, setChange] = useState(false)
 
     // Splicing economy seats
     useEffect(() => {
         // Departure Seats
-        economySplicedDep =[]
+        economySplicedDep = []
         //setEconomyDepSeats([])
         let temp1 = []
         let temp2 = []
         let temp3 = []
-        console.log("depMap: ",economyDepSeats)
+        console.log("depMap: ", economyDepSeats)
         for (let i = 0; i < economyDepSeats.length; i += 10) {
             temp1 = []
             temp2 = []
@@ -80,11 +81,11 @@ const Search = () => {
             economySplicedDep.push(temp2)
             economySplicedDep.push(temp3)
         }
-        console.log("spliced1:  ",economySplicedDep)
+        console.log("spliced1:  ", economySplicedDep)
         let temp4 = []
         let temp5 = []
         let temp6 = []
-        economySplicedRet =[]
+        economySplicedRet = []
         for (let i = 0; i < economyRetSeats.length; i += 10) {
             temp4 = []
             temp5 = []
@@ -207,28 +208,28 @@ const Search = () => {
         if (from === "") {
             setFromValidation({ error: true, label: "This field is required" })
             isError = true
-        }else{
+        } else {
             setFromValidation({ error: false, label: "From" })
         }
-        if (to === ""){
-            setToValidation({ error: true, label: "This field is required" })             
+        if (to === "") {
+            setToValidation({ error: true, label: "This field is required" })
             isError = true
-        }else{
+        } else {
             setToValidation({ error: false, label: "To" })
         }
-        if(date[0] === ""){
-            setDepDateValidation({error:true, label:"This field is required"})
+        if (date[0] === "") {
+            setDepDateValidation({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setDepDateValidation({error:false, label:"Departure Date"})
+        } else {
+            setDepDateValidation({ error: false, label: "Departure Date" })
         }
-        if(date[1] === "" ){
-            setRetDateValidation({error:true, label:"This field is required"})
+        if (date[1] === "") {
+            setRetDateValidation({ error: true, label: "This field is required" })
             isError = true
-        }else{
-            setRetDateValidation({error:false, label:"Return Date"})
+        } else {
+            setRetDateValidation({ error: false, label: "Return Date" })
         }
-        if(isError){
+        if (isError) {
             setFetching(false)
             return
         }
@@ -245,7 +246,7 @@ const Search = () => {
 
     const handleReturnFlight = (params, e) => {
         e.preventDefault()
-        if(changeDepSummary){
+        if (changeDepSummary) {
             console.log("entered")
             setSearch(false)
             setSelectedDep(params)
@@ -255,26 +256,26 @@ const Search = () => {
             setShowDepSeats(true)
             setGetFlights((prevState) => !prevState);
         }
-        else{
-        axios.post('/Users/getFlights', returnData)
-            .then((response) => {
-                setSearch(false)
-                setReturnFlights(response.data)
-                setSelectedDep(params)
-                console.log("b4: ",economyDepSeats)
-                console.log("b24: ",economySplicedDep)
-                economySplicedDep = []
-                setEconomyDepSeats(params.economyMap)
-                setBusinessDepSeats(params.businessMap)
-                setNumberOfSeats(seats)
-                setShowDepSeats(true)
-                setGetFlights((prevState) => !prevState);
-                console.log("a4: ",economyDepSeats)
-                console.log("a24: ",economySplicedDep)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+        else {
+            axios.post('/Users/getFlights', returnData)
+                .then((response) => {
+                    setSearch(false)
+                    setReturnFlights(response.data)
+                    setSelectedDep(params)
+                    console.log("b4: ", economyDepSeats)
+                    console.log("b24: ", economySplicedDep)
+                    economySplicedDep = []
+                    setEconomyDepSeats(params.economyMap)
+                    setBusinessDepSeats(params.businessMap)
+                    setNumberOfSeats(seats)
+                    setShowDepSeats(true)
+                    setGetFlights((prevState) => !prevState);
+                    console.log("a4: ", economyDepSeats)
+                    console.log("a24: ", economySplicedDep)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
         }
     }
     var depSeats = []
@@ -554,6 +555,11 @@ const Search = () => {
         setShowRetSeats(false)
         setDepSelected(true)
     }
+    const handleEditDepFlight = (e) => {
+        e.preventDefault()
+        setChange(true);
+        history.push("/BookFlight")
+    }
 
     return {
         handleReturnFlight, handleChange, handleClickOpen, handleClose, handleFindFlight,
@@ -568,8 +574,9 @@ const Search = () => {
         showDepSeats, showRetSeats, handleDepSeatsSelected, handleRetSeatsSelected, economyDepSeats, economyRetSeats,
         businessDepSeats, businessRetSeats, handleSelectedDepSeat, handleResetDepSeats, economySplicedDep, economySplicedRet,
         handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps,
-        handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep, 
-        handleCancelSeatsRet, fromValidation, toValidation, depDateValidation, retDateValidation
+        handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep,
+        handleCancelSeatsRet, fromValidation, toValidation, depDateValidation, retDateValidation, change, setChange,
+        handleEditDepFlight
     }
 }
 export default Search;

@@ -9,35 +9,35 @@ import { Link } from '@mui/material';
 import { useContext } from 'react';
 import { UserContext } from '../../Context/UserContext';
 import { useHistory } from 'react-router';
-// import logo from '../../logo5.png'
+import logo from '../../Images/logo5.png'
 
 
 export default function MenuAppBar() {
   const { loggedUser, setLoggedUser } = useContext(UserContext)
   const history = useHistory()
-  
-  const handleClick = (e) =>{
+
+  const handleClick = (e) => {
     e.preventDefault()
     history.push("/UserProfile")
   }
   return (
     <Box >
-      <AppBar 
-      position="static" 
-      style={{ boxShadow: "0px 0px 0px 0px" }} color="secondary">
+      <AppBar
+        position="static"
+        style={{ boxShadow: "0px 0px 0px 0px" }} color="white">
         <Toolbar>
-          {/* <Box 
+          <Box
             component="img"
+            style={{ marginTop: '-20px' }}
             sx={{
               height: 64,
             }}
             alt="logo"
             src={logo}
-            /> */}
-          
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} color="inherit">
-            Cactus Airlines
-          </Typography>
+          />
+            <Typography variant="h6" style={{ fontWeight: 'bold' }} component="div" sx={{ flexGrow: 1 }} color="secondary">
+              Cactus Airlines
+            </Typography>
           <div>
             {loggedUser ?
               <>
@@ -46,14 +46,14 @@ export default function MenuAppBar() {
                   aria-label="account of current user"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
-                  color="inherit"
+                  color="secondary"
                   startIcon={<AccountCircle />}
                   onClick={handleClick}
-                  style={{marginRight: '10px'}}
+                  style={{ marginRight: '10px' }}
                 >
                   Hello {loggedUser.firstName}
                 </Button>
-                <Button variant="contained" color="error" onClick={()=>{setLoggedUser(null)}}>Logout</Button>
+                <Button variant="contained" color="error" onClick={() => { setLoggedUser(null) }}>Logout</Button>
               </>
               :
               <>
@@ -63,7 +63,7 @@ export default function MenuAppBar() {
                     aria-label="account of current user"
                     aria-controls="menu-appbar"
                     aria-haspopup="true"
-                    color="inherit"
+                    color="secondary"
                     variant="outlined"
                     startIcon={<AccountCircle />}
                   >

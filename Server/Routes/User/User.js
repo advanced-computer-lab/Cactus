@@ -90,9 +90,9 @@ UserRouter.post('/getFlights', (req, res) => {
                 var Flag = true
                 if (result[i].departureDate !== req.body.departureDate)
                     Flag = false
-                if (result[i].departureAirport !== req.body.departureAirport)
+                if (result[i].depCountry !== req.body.departureAirport)
                     Flag = false
-                if (result[i].destinationAirport !== req.body.destinationAirport)
+                if (result[i].destCountry !== req.body.destinationAirport)
                     Flag = false
                 if (req.body.cabin === 'business' && result[i].availableBusiness < req.body.seats)
                     Flag = false
