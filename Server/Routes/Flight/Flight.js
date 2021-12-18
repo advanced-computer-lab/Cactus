@@ -135,6 +135,22 @@ FlightRouter.delete('/deleteFlight/:id',(req,res) =>{
 
 // ________Edit a Flight________
 FlightRouter.put('/updateFlight/:id',(req,res) =>{
+    const economyMap = []
+    for( i=0;i<req.body.economySeats;i++){
+        const obj = {
+            number: (i+1),
+            reserved: false 
+        }
+        economyMap.push(obj)
+    }
+    const businessMap = []
+    for(i =0;i<req.body.businessSeats;i++){
+        const obj = {
+            number: (i+1),
+            reserved: false
+        }
+        businessMap.push(obj)
+    }
     Flight.findById(req.params.id)
     .then(flight => { 
             flight.flightNumber =  req.body.flightNumber
@@ -153,8 +169,8 @@ FlightRouter.put('/updateFlight/:id',(req,res) =>{
             flight.planeType = req.body.planeType
             flight.destCountry = req.body.destCountry
             flight.depCountry = req.body.depCountry
-            flight.businessMap = req.body.businessMap
-            flight.economyMap = req.body.economyMap
+            flight.businessMap = businessMap
+            flight.economyMap = economyMap
         flight.save().then(() => res.json({success: true}))})
     .catch(er => res.status(404).json({success: false}))
 })

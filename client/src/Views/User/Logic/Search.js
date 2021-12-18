@@ -634,6 +634,8 @@ const Search = () => {
         console.log("data: ",data)
         axios.post('/Users/getFlights', data)
             .then((response) => {
+                setCabin(cabin)
+                setSeats(seats)
                 if(dep){
                     setSearch(true)
                     setFetching(false)

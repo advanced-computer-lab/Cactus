@@ -186,6 +186,21 @@ function BookFlight() {
                 depFlightMap: depFlightMaps,
                 retFlightMap: retFlightMaps
             }
+            var changeData  ={}
+            if(change === true){
+                changeData.userId = loggedUser._id
+                changeData.reservationId = reservation._id
+                if(departure === true){
+                    changeData.newFlightId = selectedDepFlight._id
+                    changeData.newSeats = depSeat
+                }
+                else{
+                    changeData.newFlightId = selectedRetFlight._id
+                    changeData.newSeats = retSeat
+                }
+                console.log(changeData)
+            }
+                
             console.log('ReserveData(i): ', reserveData);
             if (!stripe || !elements) {
                 return;
@@ -197,16 +212,39 @@ function BookFlight() {
             }).then((res) => {
                 console.log(res)
                 console.log(reserveData)
-                axios.post('/Users/reserveFlight', reserveData)
-                    .then((response) => {
-                        console.log(response.data)
-                        setLoading(false)
-                        setSuccess(true)
-                        setConfirmDialog(true)
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    })
+                if(change===true){
+                    if(departure=== true){
+                        console.log("changeData: ",changeData)
+                        axios.put('/Users/changeDep',changeData)
+                        .then((response) => {
+                            console.log(response.data)
+                            setLoading(false)
+                            setSuccess(true)
+                            setConfirmDialog(true)
+                        })
+                    }
+                    else{
+                        axios.put('/Users/changeRet',changeData)
+                        .then((response) => {
+                            console.log(response.data)
+                            setLoading(false)
+                            setSuccess(true)
+                            setConfirmDialog(true)
+                        })
+                    }
+                }
+                else{
+                    axios.post('/Users/reserveFlight', reserveData)
+                        .then((response) => {
+                            console.log(response.data)
+                            setLoading(false)
+                            setSuccess(true)
+                            setConfirmDialog(true)
+                        })
+                        .catch((err) => {
+                            console.log(err)
+                        })
+                    }
             });
             if (backendError) {
                 console.log(`Error: ${backendError.message}`)

@@ -378,11 +378,11 @@ UserRouter.put('/changeDep', async (req,res)=>{
     const reserve = await Reservation.findById(req.body.reservationId) 
     const flight1 = await Flight.findById(reserve.departureId) 
     if(reserve.cabin === "business"){
-        fillMap(flight1.businessMap,reserve.depSeatNumbers)
+        editFlightMap(flight1.businessMap,reserve.depSeatNumbers)
         flight1.availableBusiness += reserve.seats
     }
     else{
-        fillMap(flight1.economyMap,reserve.depSeatNumbers)
+        editFlightMap(flight1.economyMap,reserve.depSeatNumbers)
         flight1.availableEconomy += reserve.seats
     }
     flight1.save()
@@ -392,35 +392,36 @@ UserRouter.put('/changeDep', async (req,res)=>{
     reserve.departureTime = flight2.departureTime
     if(reserve.cabin === "business"){
         reserve.departurePrice = flight2.businessPrice
-        editFlightMap(flight2.businessMap,req.body.newSeats)
+        fillMap(flight2.businessMap,req.body.newSeats)
         flight2.availableBusiness -= reserve.seats
     }
     else{
         reserve.departurePrice = flight2.economyPrice
-        editFlightMap(flight2.economyMap,req.body.newSeats)
+        fillMap(flight2.economyMap,req.body.newSeats)
         flight2.availableEconomy -= reserve.seats
     }
-    reserve.depSeatsNumbers = req.body.newSeats
+    reserve.depSeatNumbers = req.body.newSeats
     reserve.save()
     flight2.save()
-    const user = await User.findbyId(req.body.userId)
+    const user = await User.findById(req.body.userId)
     for (i = 0; i < user.reservations.length; i++) {
         if (reserve._id.equals(user.reservations[i]._id)) {
             user.reservations.splice(i, 1, reserve)
         }
     }
     user.save()
+    .then(() => {res.send(reserve)})
 })
 
 UserRouter.put('/changeRet', async (req,res)=>{
     const reserve = await Reservation.findById(req.body.reservationId) 
     const flight1 = await Flight.findById(reserve.returnId) 
     if(reserve.cabin === "business"){
-        fillMap(flight1.businessMap,reserve.retSeatNumbers)
+        editFlightMap(flight1.businessMap,reserve.retSeatNumbers)
         flight1.availableBusiness += reserve.seats
     }
     else{
-        fillMap(flight1.economyMap,reserve.retSeatNumbers)
+        editFlightMap(flight1.economyMap,reserve.retSeatNumbers)
         flight1.availableEconomy += reserve.seats
     }
     flight1.save()
@@ -430,31 +431,32 @@ UserRouter.put('/changeRet', async (req,res)=>{
     reserve.returnTime = flight2.departureTime
     if(reserve.cabin === "business"){
         reserve.returnPrice = flight2.businessPrice
-        editFlightMap(flight2.businessMap,req.body.newSeats)
+        fillMap(flight2.businessMap,req.body.newSeats)
         flight2.availableBusiness -= reserve.seats
     }
     else{
         reserve.returnPrice = flight2.economyPrice
-        editFlightMap(flight2.economyMap,req.body.newSeats)
+        fillMap(flight2.economyMap,req.body.newSeats)
         flight2.availableEconomy -= reserve.seats
     }
-    reserve.retSeatsNumbers = req.body.newSeats
+    reserve.retSeatNumbers = req.body.newSeats
     reserve.save()
     flight2.save()
-    const user = await User.findbyId(req.body.userId)
+    const user = await User.findById(req.body.userId)
     for (i = 0; i < user.reservations.length; i++) {
         if (reserve._id.equals(user.reservations[i]._id)) {
             user.reservations.splice(i, 1, reserve)
         }
     }
     user.save()
+    .then(() => {res.send(reserve)})
 })
 
-const fillMap = (arr,seats)=>{
-    for(let j=0;j<seats.length;j++){
-        for(let i=0;i<arr;i++){
-            if(arr[i].number === seats[j]){
-                arr[i].reserved = false
+const fillMap = (map, arr) => {
+    for (i = 0; i < arr.length; i++) {
+        for (j = 0; j < map.length; j++) {
+            if (map[j].number === arr[i]) {
+                map[j].reserved = true
                 break
             }
         }
