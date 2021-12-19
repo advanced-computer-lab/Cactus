@@ -36,7 +36,9 @@ AuthRouter.post("/Register", (req, res) => {
         password: req.body.password,
         passportNumber: req.body.passportNumber,
         gender: req.body.gender,
-        phoneNumber: req.body.phoneNumber,
+        telephones: req.body.phoneNumber,
+        countryCode: req.body.countryCode,
+        homeAddress: req.body.homeAddress,
         isAdmin: false,
         reservations: []
     });

@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 const Reservation = require('../Schemas/Reservation').schema
 
 const UserSchema = new Schema({
+    title:{
+        type:String
+    },
     firstName:{
         type:String,
         required: true,

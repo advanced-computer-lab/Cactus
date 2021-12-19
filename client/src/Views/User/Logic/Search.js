@@ -121,7 +121,7 @@ const Search = () => {
 
     const returnDate = new Date(date[1]);
     var returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
-    if ((depDate.getMonth() + 1) < 10) {
+    if ((returnDate.getMonth() + 1) < 10) {
         returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
         if ((returnDate.getDate()) < 10) {
             returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
@@ -262,16 +262,13 @@ const Search = () => {
                     setSearch(false)
                     setReturnFlights(response.data)
                     setSelectedDep(params)
-                    console.log("b4: ", economyDepSeats)
-                    console.log("b24: ", economySplicedDep)
                     economySplicedDep = []
                     setEconomyDepSeats(params.economyMap)
                     setBusinessDepSeats(params.businessMap)
                     setNumberOfSeats(seats)
                     setShowDepSeats(true)
                     setGetFlights((prevState) => !prevState);
-                    console.log("a4: ", economyDepSeats)
-                    console.log("a24: ", economySplicedDep)
+
                 })
                 .catch((err) => {
                     console.log(err)
@@ -281,6 +278,7 @@ const Search = () => {
     var depSeats = []
     var depFlightMap = []
     const handleDepSeatsSelected = () => {
+        depSeats = []
         if (!changeDepSummary) {
             setDepSelected(true)
         }
@@ -502,6 +500,7 @@ const Search = () => {
     var retSeats = []
     var retFlightMap = []
     const handleRetSeatsSelected = () => {
+        retSeats = []
         setReturnSelected(true)
         setShowRetSeats(false)
 
@@ -559,6 +558,7 @@ const Search = () => {
     const handleEditDepFlight = (e, reserve,depFlight,retFlight) => {
         e.preventDefault()
         setSelectedRet(retFlight)
+        setDepSeat([])
         history.push(
             {
                 pathname: "/BookFlight",
@@ -576,6 +576,7 @@ const Search = () => {
     const handleEditRetFlight = (e, reserve,depFlight,retFlight) => {
         e.preventDefault()
         setSelectedDep(depFlight)
+        setRetSeat([])
         history.push(
             {
                 pathname: "/BookFlight",
@@ -605,7 +606,7 @@ const Search = () => {
         }
         const returnDate = new Date(retEditDate);
         var returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
-        if ((depDate.getMonth() + 1) < 10) {
+        if ((returnDate.getMonth() + 1) < 10) {
             returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-" + (returnDate.getDate())
             if ((returnDate.getDate()) < 10) {
                 returnDateFormat = (returnDate.getFullYear()) + '-0' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())

@@ -88,6 +88,10 @@ function BookFlight() {
     var departure = false
     var reservation = null
     var flight = null
+    var flight2 = {
+        economyPrice :0,
+        businessPrice :0
+    }
     var other = null
     const checker = () =>{
         if(location.state){
@@ -95,6 +99,7 @@ function BookFlight() {
             reservation = location.state.reservation;
             departure = location.state.departure;
             flight = location.state.flight
+            flight2 = location.state.flight
             other = location.state.other
         }
     }
@@ -277,28 +282,42 @@ function BookFlight() {
                         <Grid item sm={6}>
                             <img src={suitCase} alt="suitcase" />
                         </Grid>
-                        <Grid item sm={6} style={{ marginLeft: '-100px' }}>
+                        <Grid item sm={6} style={{
+                                    marginLef: '-100px',
+                                }}>
                             {change? 
                             <>
-                            <Paper elevation={1}>
+                            <Paper elevation={1} style={{padding: '50px',
+                                    borderRadius: '1rem',
+                                    borderColor: '#004080',
+                                    backgroundImage: 'linear-gradient(to bottom right, rgba(0, 64, 128, 1),rgba(128, 0, 128, 1))'}}>
                                 <Grid container spacing={3}>
                                     <Grid item sm={6}>
-                                        <TextField 
-                                            label="From"
-                                            disabled={true}
-                                            value={flight.depCountry}
+                                    <TextField 
+                                        label="From"
+                                        color='white'
+                                        focused
+                                        sx={{ input: { color: '#fff' } }}
+                                        disabled={true}
+                                        value={flight.depCountry}
                                         />
                                     </Grid>
                                     <Grid item sm={6}>
                                     <TextField 
-                                            label="To"
-                                            disabled={true}
-                                            value={flight.destCountry}
+                                        label="To"
+                                        color='white'
+                                        focused
+                                        sx={{ input: { color: '#fff' } }}
+                                        disabled={true}
+                                        value={flight.destCountry}
                                         />
                                     </Grid>
                                     <Grid item sm={6}>
                                     <TextField 
                                         label="Cabin"
+                                        color='white'
+                                        focused
+                                        sx={{ input: { color: '#fff' } }}
                                         disabled={true}
                                         value={reservation.cabin}
                                         />
@@ -306,6 +325,9 @@ function BookFlight() {
                                     <Grid item sm={6}>
                                     <TextField 
                                         label="Seats"
+                                        color='white'
+                                        focused
+                                        sx={{ input: { color: '#fff' } }}
                                         disabled={true}
                                         value={reservation.seats}
                                         />
@@ -314,8 +336,11 @@ function BookFlight() {
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                     <DatePicker
                                         label="Departure Date"
+                                        color='white'
+                                        focused
+                                        sx={{ input: { color: '#fff' } }}
                                         value={depEditDate}
-                                        defaultValue={reservation.departureDate}
+                                        defaultValue={new Date(reservation.departureDate)}
                                         inputFormat="yyyy/MM/dd"
                                         disabled={!departure}
                                         readOnly={!departure}
@@ -324,17 +349,22 @@ function BookFlight() {
                                         onChange={(newValue) => {
                                         setDepEditDate(newValue);
                                         }}
-                                        renderInput={(params) => <TextField {...params} />}
+                                        renderInput={(params) => 
+                                        <TextField {...params} 
+                                            color='white'
+                                            focused
+                                            sx={{ input: { color: '#fff' } }}
+                                        />}
                                     />
                                     </LocalizationProvider>
                                     </Grid>
                                     <Grid item sm={6}>
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                     <DatePicker
-                                        label="Departure Date"
+                                        label="Return Date"
                                         value={retEditDate}
                                         minDate={new Date(reservation.departureDate)}
-                                        defaultValue={reservation.rerturnDate}
+                                        defaultValue={new Date(reservation.rerturnDate)}
                                         formatDate="yyyy/MM/dd"
                                         disabled={departure}
                                         readOnly={departure}
@@ -342,7 +372,12 @@ function BookFlight() {
                                         onChange={(newValue) => {
                                         setRetEditDate(newValue);
                                         }}
-                                        renderInput={(params) => <TextField {...params} />}
+                                        renderInput={(params) => 
+                                            <TextField {...params} 
+                                                color='white'
+                                                focused
+                                                sx={{ input: { color: '#fff' } }}
+                                        />}
                                     />
                                     </LocalizationProvider>
                                     </Grid>
@@ -676,7 +711,7 @@ function BookFlight() {
                                                                             className="flightBtn"
                                                                         >
                                                                             From {<br />}
-                                                                            EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                                            EGP {cabin === "economy" ? flight.economyPrice - flight2.economyPrice : flight.businessPrice - flight2.businessPrice}
                                                                         </Button>
                                                                     </Grid>
                                                                     <Grid item sx={2}></Grid>
@@ -995,7 +1030,7 @@ function BookFlight() {
                                                                         className="flightBtn"
                                                                     >
                                                                         From {<br />}
-                                                                        EGP {cabin === "economy" ? flight.economyPrice : flight.businessPrice}
+                                                                        EGP {cabin === "economy" ? flight.economyPrice - flight2.economyPrice : flight.businessPrice - flight2.businessPrice}
                                                                     </Button>
                                                                 </Grid>
                                                                 <Grid item sx={2}></Grid>
@@ -1263,7 +1298,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)} EGP</Typography>
+                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
                                                         <Button variant="outlined" onClick={handleChangeDepFlight}>
                                                             Change this flight
                                                         </Button>
@@ -1298,7 +1333,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
+                                                        <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
                                                         <Button variant="outlined" onClick={handleChangeRetFlight}>
                                                             Change this flight
                                                         </Button>
@@ -1311,7 +1346,7 @@ function BookFlight() {
                                         <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
                                             <Box style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Typography variant="h4" component="h4" color="secondary">
-                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats))} EGP
+                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.returnPrice) * (seats))} EGP
                                                 </Typography>
                                                 <br />
                                                 <Divider variant="middle" />
@@ -1433,7 +1468,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sm={9}></Grid>
                                                 <Grid item sm={3}>
-                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)}</Typography>
+                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
                                                 </Grid>
                                                 <Grid item sm={12}>
                                                     <Alert icon={<ScheduleIcon />} severity="info">
@@ -1502,7 +1537,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sm={9}></Grid>
                                                 <Grid item sm={3}>
-                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
+                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
                                                 </Grid>
                                                 <Grid item sm={12}>
                                                     <Alert icon={<ScheduleIcon />} severity="info">
