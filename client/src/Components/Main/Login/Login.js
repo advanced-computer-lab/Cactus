@@ -62,7 +62,7 @@ export default function SignInSide() {
     setFetching(true)
     axios.post('/Authentication/Login', user)
       .then((res) => {
-        if(res.data.username === undefined || res.data.password === undefined){
+        if(res.data.username === undefined || res.data.password === undefined || res.data === null){
           setFetching(false)
           setOpen(true)
         }

@@ -8,6 +8,9 @@ import PasswordIcon from "@mui/icons-material/Password";
 import PersonIcon from "@mui/icons-material/Person";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { UserContext } from '../../Context/UserContext';
+import axios from 'axios'
+const crypto=require('crypto')
 
 function ChangePassword() {
     const history = useHistory();
@@ -17,7 +20,14 @@ function ChangePassword() {
         retypePassword: '',
         showRetypePassword: false
     });
+    const {loggedUser, setLoggedUser} = React.useContext(UserContext)
+    const decipher = crypto.createDecipher('aes192','a password');
 
+    var encrypted = loggedUser.password;//Write Here Encrypted password to be Decrypted
+
+    var decrypted = decipher.update(encrypted,'hex','utf8');
+    decrypted = decrypted + decipher.final('utf8');
+    const oldPass = decrypted
     const handlePasswordChange = (prop) => (event) => {
         setPassword({ ...password, [prop]: event.target.value });
     };
@@ -41,6 +51,12 @@ function ChangePassword() {
     }
     const handleMouseDownRetypePassword = (event) => {
         event.preventDefault();
+    }
+    const handleChangePassword = () => {
+        const data = {"password": password.password, "id":loggedUser._id}
+        console.log(data)
+        axios.post('/Authentication/changePassword',data)
+        .then((res) => {if(res.data === "good")console.log("good")} )
     }
 
     return (
@@ -107,7 +123,7 @@ function ChangePassword() {
                             <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <TextField
                                     variant="outlined"
-                                    value={"myoldpassword"}
+                                    value={oldPass}
                                     label="Old Password"
                                     fullWidth
                                 />
@@ -165,7 +181,9 @@ function ChangePassword() {
                         </Grid>
                         <Grid item lg={6}></Grid>
                         <Grid item lg={6}>
-                            <Button variant="outlined" color="success" fullWidth>Confirm</Button>
+                            <Button variant="outlined" color="success" 
+                            onClick={handleChangePassword}
+                            fullWidth>Confirm</Button>
                         </Grid>
                     </Grid>
                 </Paper>

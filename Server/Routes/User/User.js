@@ -119,10 +119,29 @@ UserRouter.post('/reserveFlight', (req, res) => {
     var returnDate = ""
     var departureTime = ""
     var returnTime = ""
-    console.log(req.body.depSeats)
-    console.log(req.body.retSeats)
-    console.log(req.body.depFlightMap)
-    console.log(req.body.retFlightMap)
+    console.log("Sending Mail Here");
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'Cactusairlinesguc@gmail.com',
+            pass: 'w0BNWlUcVIqx'
+        }
+    });
+
+    var mailOptions = {
+        from: 'Cactusairlinesguc@gmail.com',
+        to: req.body.email,//Insert User Email Here
+        subject: 'Booking Confirmation',
+        text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + '. \r\n Cactus Airlines Team.'
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
     Flight.findById(req.body.departureId)
         .then((flight) => {
             if (req.body.cabin === 'business') {

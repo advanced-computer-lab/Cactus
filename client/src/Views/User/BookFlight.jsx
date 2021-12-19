@@ -189,7 +189,10 @@ function BookFlight() {
                 depSeats: depSeat,
                 retSeats: retSeat,
                 depFlightMap: depFlightMaps,
-                retFlightMap: retFlightMaps
+                retFlightMap: retFlightMaps,
+                email: loggedUser.email,
+                firstName: loggedUser.firstName,
+                title: loggedUser.title
             }
             var changeData  ={}
             if(change === true){
