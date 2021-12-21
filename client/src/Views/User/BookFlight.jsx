@@ -1,19 +1,16 @@
 // ____________MIDDLEWARE_________________
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { UserContext } from '../../Context/UserContext';
 import axios from 'axios'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useHistory } from "react-router";
 import { useLocation } from 'react-router-dom'
 
-// ____________CUSTOM COMPONENTS_________________
-import Schedule from '../../Components/User/flightSchedule/Schedule';
 
 
 // ____________MATERIAL UI COMPONENTS_________________
 import {
-    Tabs, Tab, Box, Radio, RadioGroup, Dialog, DialogActions,
+    Box, Radio, RadioGroup, Dialog, DialogActions,
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
     List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton, DialogTitle, Tooltip, Accordion,
@@ -81,7 +78,8 @@ function BookFlight() {
     const [alertOpen, setAlertOpen] = React.useState(false)
     const [depEditDate, setDepEditDate] = React.useState()
     const [retEditDate, setRetEditDate] = React.useState()
-    const {loggedUser, setLoggedUser} = React.useContext(UserContext)
+    const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+    const [disablePayment, setDisablePayment] = React.useState(true)
     const history = useHistory();
     const location = useLocation();
     var change = false
@@ -89,12 +87,12 @@ function BookFlight() {
     var reservation = null
     var flight = null
     var flight2 = {
-        economyPrice :0,
-        businessPrice :0
+        economyPrice: 0,
+        businessPrice: 0
     }
     var other = null
-    const checker = () =>{
-        if(location.state){
+    const checker = () => {
+        if (location.state) {
             change = location.state.change;
             reservation = location.state.reservation;
             departure = location.state.departure;
@@ -104,9 +102,9 @@ function BookFlight() {
         }
     }
     checker()
-    
-    const elements = useElements()
+
     const stripe = useStripe()
+    const elements = useElements()
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -168,7 +166,7 @@ function BookFlight() {
             setLoginOpen(true)
         }
         else {
-            setShowCheckout(true)
+            setShowCheckout(!showCheckout)
         }
     }
 
@@ -208,8 +206,7 @@ function BookFlight() {
                 }
                 console.log(changeData)
             }
-                
-            console.log('ReserveData(i): ', reserveData);
+
             if (!stripe || !elements) {
                 return;
             }
@@ -275,6 +272,35 @@ function BookFlight() {
         }
 
     }
+    // const handleSubmit = async (event) => {
+    //     // We don't want to let default form submission happen here,
+    //     // which would refresh the page.
+    //     event.preventDefault();
+
+    //     if (!stripe || !elements) {
+    //         // Stripe.js has not yet loaded.
+    //         // Make sure to disable form submission until Stripe.js has loaded.
+    //         return;
+    //     }
+
+    //     const result = await stripe.confirmPayment({
+    //         //`Elements` instance that was used to create the Payment Element
+    //         elements,
+    //         confirmParams: {
+    //             return_url: "https://my-site.com/order/123/complete",
+    //         },
+    //     });
+
+
+    //     if (result.error) {
+    //         // Show error to your customer (e.g., payment details incomplete)
+    //         console.log(result.error.message);
+    //     } else {
+    //         // Your customer will be redirected to your `return_url`. For some payment
+    //         // methods like iDEAL, your customer will be redirected to an intermediate
+    //         // site first to authorize the payment, then redirected to the `return_url`.
+    //     }
+    // };
 
     return (
         <>
@@ -286,341 +312,344 @@ function BookFlight() {
                             <img src={suitCase} alt="suitcase" />
                         </Grid>
                         <Grid item sm={6} style={{
-                                    marginLef: '-100px',
-                                }}>
-                            {change? 
-                            <>
-                            <Paper elevation={1} style={{padding: '50px',
-                                    borderRadius: '1rem',
-                                    borderColor: '#004080',
-                                    backgroundImage: 'linear-gradient(to bottom right, rgba(0, 64, 128, 1),rgba(128, 0, 128, 1))'}}>
-                                <Grid container spacing={3}>
-                                    <Grid item sm={6}>
-                                    <TextField 
-                                        label="From"
-                                        color='white'
-                                        focused
-                                        sx={{ input: { color: '#fff' } }}
-                                        disabled={true}
-                                        value={flight.depCountry}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                    <TextField 
-                                        label="To"
-                                        color='white'
-                                        focused
-                                        sx={{ input: { color: '#fff' } }}
-                                        disabled={true}
-                                        value={flight.destCountry}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                    <TextField 
-                                        label="Cabin"
-                                        color='white'
-                                        focused
-                                        sx={{ input: { color: '#fff' } }}
-                                        disabled={true}
-                                        value={reservation.cabin}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                    <TextField 
-                                        label="Seats"
-                                        color='white'
-                                        focused
-                                        sx={{ input: { color: '#fff' } }}
-                                        disabled={true}
-                                        value={reservation.seats}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DatePicker
-                                        label="Departure Date"
-                                        color='white'
-                                        focused
-                                        sx={{ input: { color: '#fff' } }}
-                                        value={depEditDate}
-                                        defaultValue={new Date(reservation.departureDate)}
-                                        inputFormat="yyyy/MM/dd"
-                                        disabled={!departure}
-                                        readOnly={!departure}
-                                        maxDate={new Date(reservation.rerturnDate)}
-                                        disablePast
-                                        onChange={(newValue) => {
-                                        setDepEditDate(newValue);
-                                        }}
-                                        renderInput={(params) => 
-                                        <TextField {...params} 
-                                            color='white'
-                                            focused
-                                            sx={{ input: { color: '#fff' } }}
-                                        />}
-                                    />
-                                    </LocalizationProvider>
-                                    </Grid>
-                                    <Grid item sm={6}>
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DatePicker
-                                        label="Return Date"
-                                        value={retEditDate}
-                                        minDate={new Date(reservation.departureDate)}
-                                        defaultValue={new Date(reservation.rerturnDate)}
-                                        formatDate="yyyy/MM/dd"
-                                        disabled={departure}
-                                        readOnly={departure}
-                                        disablePast={departure}
-                                        onChange={(newValue) => {
-                                        setRetEditDate(newValue);
-                                        }}
-                                        renderInput={(params) => 
-                                            <TextField {...params} 
-                                                color='white'
-                                                focused
-                                                sx={{ input: { color: '#fff' } }}
-                                        />}
-                                    />
-                                    </LocalizationProvider>
-                                    </Grid>
-                                    <Grid item sm={12}>
-                                        <Button 
-                                        variant="contained" 
-                                        color="secondary" 
-                                        fullWidth
-                                        onClick={(e)=>{
-                                            handleEditSearch(
-                                                e,flight.depCountry,
-                                                flight.destCountry,
-                                                reservation.cabin,
-                                                reservation.seats,
-                                                depEditDate, retEditDate,
-                                                departure,other)}}
-                                        >
-                                            Search
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </Paper>
+                            marginLef: '-100px',
+                        }}>
+                            {change ?
+                                <>
+                                    <Paper elevation={1} style={{
+                                        padding: '50px',
+                                        borderRadius: '1rem',
+                                        borderColor: '#004080',
+                                        backgroundImage: 'linear-gradient(to bottom right, rgba(0, 64, 128, 1),rgba(128, 0, 128, 1))'
+                                    }}>
+                                        <Grid container spacing={3}>
+                                            <Grid item sm={6}>
+                                                <TextField
+                                                    label="From"
+                                                    color='white'
+                                                    focused
+                                                    sx={{ input: { color: '#fff' } }}
+                                                    disabled={true}
+                                                    value={flight.depCountry}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <TextField
+                                                    label="To"
+                                                    color='white'
+                                                    focused
+                                                    sx={{ input: { color: '#fff' } }}
+                                                    disabled={true}
+                                                    value={flight.destCountry}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <TextField
+                                                    label="Cabin"
+                                                    color='white'
+                                                    focused
+                                                    sx={{ input: { color: '#fff' } }}
+                                                    disabled={true}
+                                                    value={reservation.cabin}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <TextField
+                                                    label="Seats"
+                                                    color='white'
+                                                    focused
+                                                    sx={{ input: { color: '#fff' } }}
+                                                    disabled={true}
+                                                    value={reservation.seats}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DatePicker
+                                                        label="Departure Date"
+                                                        color='white'
+                                                        focused
+                                                        sx={{ input: { color: '#fff' } }}
+                                                        value={depEditDate}
+                                                        defaultValue={new Date(reservation.departureDate)}
+                                                        inputFormat="yyyy/MM/dd"
+                                                        disabled={!departure}
+                                                        readOnly={!departure}
+                                                        maxDate={new Date(reservation.rerturnDate)}
+                                                        disablePast
+                                                        onChange={(newValue) => {
+                                                            setDepEditDate(newValue);
+                                                        }}
+                                                        renderInput={(params) =>
+                                                            <TextField {...params}
+                                                                color='white'
+                                                                focused
+                                                                sx={{ input: { color: '#fff' } }}
+                                                            />}
+                                                    />
+                                                </LocalizationProvider>
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DatePicker
+                                                        label="Return Date"
+                                                        value={retEditDate}
+                                                        minDate={new Date(reservation.departureDate)}
+                                                        defaultValue={new Date(reservation.rerturnDate)}
+                                                        formatDate="yyyy/MM/dd"
+                                                        disabled={departure}
+                                                        readOnly={departure}
+                                                        disablePast={departure}
+                                                        onChange={(newValue) => {
+                                                            setRetEditDate(newValue);
+                                                        }}
+                                                        renderInput={(params) =>
+                                                            <TextField {...params}
+                                                                color='white'
+                                                                focused
+                                                                sx={{ input: { color: '#fff' } }}
+                                                            />}
+                                                    />
+                                                </LocalizationProvider>
+                                            </Grid>
+                                            <Grid item sm={12}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="secondary"
+                                                    fullWidth
+                                                    onClick={(e) => {
+                                                        handleEditSearch(
+                                                            e, flight.depCountry,
+                                                            flight.destCountry,
+                                                            reservation.cabin,
+                                                            reservation.seats,
+                                                            depEditDate, retEditDate,
+                                                            departure, other)
+                                                    }}
+                                                >
+                                                    Search
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
 
-                            </> 
-                            : 
-                            <>
-                            <Paper elevation={1}
-                                style={{
-                                    padding: '50px',
-                                    borderRadius: '1rem',
-                                    borderColor: '#004080',
-                                    backgroundImage: 'linear-gradient(to bottom right, rgba(0, 64, 128, 1),rgba(128, 0, 128, 1))'
-                                }}
-                            >
-                                <Grid container spacing={3}>
-                                    {/* From */}
-                                    <Grid item lg={6}>
-                                        <Autocomplete
-                                            id="country-select-demo"
-                                            options={countries}
-                                            autoHighlight
-                                            getOptionLabel={(option) => option.label}
-                                            color="white"
-                                            renderOption={(props, option) => (
-                                                <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                                    <img
-                                                        loading="lazy"
-                                                        width="20"
-                                                        src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                        srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                        alt=""
-                                                    />
-                                                    {option.label} ({option.code})
-                                                </Box>
-                                            )}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    color='white'
-                                                    focused
-                                                    placeholder={fromValidation.label}
-                                                    label="FROM"
-                                                    error={fromValidation.error}
-                                                    fullWidth
-                                                    sx={{ input: { color: '#fff' } }}
-                                                    required
-                                                    onChange={handleFromChange}
-                                                    inputProps={{
-                                                        ...params.inputProps,
-                                                        autoComplete: 'off', // disable autocomplete and autofill
-                                                    }}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    {/* To */}
-                                    <Grid item lg={6}>
-                                        <Autocomplete
-                                            id="country-select-demo"
-                                            options={countries}
-                                            autoHighlight
-                                            getOptionLabel={(option) => option.label}
-                                            renderOption={(props, option) => (
-                                                <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                                    <img
-                                                        loading="lazy"
-                                                        width="20"
-                                                        src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                        srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                        alt=""
-                                                    />
-                                                    {option.label} ({option.code})
-                                                </Box>
-                                            )}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    color='white'
-                                                    focused
-                                                    sx={{ input: { color: '#fff' } }}
-                                                    placeholder={toValidation.label}
-                                                    label="TO"
-                                                    error={toValidation.error}
-                                                    fullWidth
-                                                    required
-                                                    onChange={handleToChange}
-                                                    inputProps={{
-                                                        ...params.inputProps,
-                                                        autoComplete: 'off', // disable autocomplete and autofill
-                                                    }}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    {/* Dates */}
-                                    <Grid item lg={12}>
-                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                            <DateRangePicker
-                                                disablePast
-                                                startText="DEPARTURE DATE"
-                                                endText="RETURN DATE"
-                                                allowSameDateSelection={false}
-                                                value={date}
-                                                onChange={(newDate) => {
-                                                    setDate(newDate);
-                                                }}
-                                                renderInput={(startProps, endProps) => (
-                                                    <React.Fragment>
-                                                        <TextField {...startProps}
+                                </>
+                                :
+                                <>
+                                    <Paper elevation={1}
+                                        style={{
+                                            padding: '50px',
+                                            borderRadius: '1rem',
+                                            borderColor: '#004080',
+                                            backgroundImage: 'linear-gradient(to bottom right, rgba(0, 64, 128, 1),rgba(128, 0, 128, 1))'
+                                        }}
+                                    >
+                                        <Grid container spacing={3}>
+                                            {/* From */}
+                                            <Grid item lg={6}>
+                                                <Autocomplete
+                                                    id="country-select-demo"
+                                                    options={countries}
+                                                    autoHighlight
+                                                    getOptionLabel={(option) => option.label}
+                                                    color="white"
+                                                    renderOption={(props, option) => (
+                                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                            <img
+                                                                loading="lazy"
+                                                                width="20"
+                                                                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                                alt=""
+                                                            />
+                                                            {option.label} ({option.code})
+                                                        </Box>
+                                                    )}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
                                                             color='white'
                                                             focused
+                                                            placeholder={fromValidation.label}
+                                                            label="FROM"
+                                                            error={fromValidation.error}
+                                                            fullWidth
                                                             sx={{ input: { color: '#fff' } }}
                                                             required
-                                                            fullWidth
-                                                            error={depDateValidation.error}
-                                                            placeholder={depDateValidation.label}
+                                                            onChange={handleFromChange}
+                                                            inputProps={{
+                                                                ...params.inputProps,
+                                                                autoComplete: 'off', // disable autocomplete and autofill
+                                                            }}
                                                             InputLabelProps={{
                                                                 shrink: true,
                                                             }}
                                                         />
-                                                        <Box sx={{ mx: 1 }}> to </Box>
-                                                        <TextField {...endProps}
-                                                            required
+                                                    )}
+                                                />
+                                            </Grid>
+                                            {/* To */}
+                                            <Grid item lg={6}>
+                                                <Autocomplete
+                                                    id="country-select-demo"
+                                                    options={countries}
+                                                    autoHighlight
+                                                    getOptionLabel={(option) => option.label}
+                                                    renderOption={(props, option) => (
+                                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                            <img
+                                                                loading="lazy"
+                                                                width="20"
+                                                                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                                alt=""
+                                                            />
+                                                            {option.label} ({option.code})
+                                                        </Box>
+                                                    )}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
                                                             color='white'
-                                                            sx={{ input: { color: '#fff' } }}
                                                             focused
+                                                            sx={{ input: { color: '#fff' } }}
+                                                            placeholder={toValidation.label}
+                                                            label="TO"
+                                                            error={toValidation.error}
                                                             fullWidth
-                                                            error={retDateValidation.error}
-                                                            placeholder={retDateValidation.label}
+                                                            required
+                                                            onChange={handleToChange}
+                                                            inputProps={{
+                                                                ...params.inputProps,
+                                                                autoComplete: 'off', // disable autocomplete and autofill
+                                                            }}
                                                             InputLabelProps={{
                                                                 shrink: true,
                                                             }}
                                                         />
-                                                    </React.Fragment>
-                                                )}
-                                            />
-                                        </LocalizationProvider>
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                    </Grid>
-                                    {/* Cabin and Seats */}
-                                    <Grid item lg={6}>
-                                        <Button variant="outlined" color="white" onClick={handleClickOpen} style={{ height: '50px' }} fullWidth>
-                                            Passenger | Cabin
-                                        </Button>
-                                        <Dialog open={open} onClose={handleClose}>
-                                            <DialogContent>
-                                                <Typography component="legend">Passengers</Typography>
-                                                <br />
-                                                <Grid container spacing={2}>
-                                                    <Grid item sx={2}>
-                                                        <Typography variant="h6" component="h6">Adults (12+ years)</Typography>
-                                                    </Grid>
-                                                    <Grid item sx={6}>
-                                                        <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '13px' }}>
-                                                            <Button onClick={handleDecrement}>-</Button>
-                                                            <Button >{counter}</Button>
-                                                            <Button onClick={handleIncrement}>+</Button>
+                                                    )}
+                                                />
+                                            </Grid>
+                                            {/* Dates */}
+                                            <Grid item lg={12}>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                    <DateRangePicker
+                                                        disablePast
+                                                        startText="DEPARTURE DATE"
+                                                        endText="RETURN DATE"
+                                                        allowSameDateSelection={false}
+                                                        value={date}
+                                                        onChange={(newDate) => {
+                                                            setDate(newDate);
+                                                        }}
+                                                        renderInput={(startProps, endProps) => (
+                                                            <React.Fragment>
+                                                                <TextField {...startProps}
+                                                                    color='white'
+                                                                    focused
+                                                                    sx={{ input: { color: '#fff' } }}
+                                                                    required
+                                                                    fullWidth
+                                                                    error={depDateValidation.error}
+                                                                    placeholder={depDateValidation.label}
+                                                                    InputLabelProps={{
+                                                                        shrink: true,
+                                                                    }}
+                                                                />
+                                                                <Box sx={{ mx: 1 }}> to </Box>
+                                                                <TextField {...endProps}
+                                                                    required
+                                                                    color='white'
+                                                                    sx={{ input: { color: '#fff' } }}
+                                                                    focused
+                                                                    fullWidth
+                                                                    error={retDateValidation.error}
+                                                                    placeholder={retDateValidation.label}
+                                                                    InputLabelProps={{
+                                                                        shrink: true,
+                                                                    }}
+                                                                />
+                                                            </React.Fragment>
+                                                        )}
+                                                    />
+                                                </LocalizationProvider>
+                                            </Grid>
+                                            <Grid item lg={6}>
+                                            </Grid>
+                                            {/* Cabin and Seats */}
+                                            <Grid item lg={6}>
+                                                <Button variant="outlined" color="white" onClick={handleClickOpen} style={{ height: '50px' }} fullWidth>
+                                                    Passenger | Cabin
+                                                </Button>
+                                                <Dialog open={open} onClose={handleClose}>
+                                                    <DialogContent>
+                                                        <Typography component="legend">Passengers</Typography>
+                                                        <br />
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sx={2}>
+                                                                <Typography variant="h6" component="h6">Adults (12+ years)</Typography>
+                                                            </Grid>
+                                                            <Grid item sx={6}>
+                                                                <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '13px' }}>
+                                                                    <Button onClick={handleDecrement}>-</Button>
+                                                                    <Button >{counter}</Button>
+                                                                    <Button onClick={handleIncrement}>+</Button>
 
-                                                        </ButtonGroup>
-                                                    </Grid>
-                                                </Grid>
-                                                <Grid container spacing={2}>
-                                                    <Grid item sx={2}>
-                                                        <Typography variant="h6" component="h6">Child (0-11 years)</Typography>
-                                                    </Grid>
-                                                    <Grid item sx={6}>
-                                                        <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '20px' }}>
-                                                            <Button onClick={handleDecrementChild}>-</Button>
-                                                            <Button >{counterChild}</Button>
-                                                            <Button onClick={handleIncrementChild}>+</Button>
+                                                                </ButtonGroup>
+                                                            </Grid>
+                                                        </Grid>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item sx={2}>
+                                                                <Typography variant="h6" component="h6">Child (0-11 years)</Typography>
+                                                            </Grid>
+                                                            <Grid item sx={6}>
+                                                                <ButtonGroup size="small" aria-label="small outlined button group" style={{ marginLeft: '20px' }}>
+                                                                    <Button onClick={handleDecrementChild}>-</Button>
+                                                                    <Button >{counterChild}</Button>
+                                                                    <Button onClick={handleIncrementChild}>+</Button>
 
-                                                        </ButtonGroup>
-                                                    </Grid>
-                                                </Grid>
-                                                <br />
-                                                <Divider variant="middle" />
-                                                <br />
-                                                <FormControl component="fieldset">
-                                                    <Typography component="legend">Cabin</Typography>
-                                                    <br />
-                                                    <RadioGroup
-                                                        aria-label="economy"
-                                                        defaultValue='economy'
-                                                        value={cabin}
-                                                        name="radio-buttons-group"
-                                                        onChange={(e) => setCabin(e.target.value)}
-                                                    >
-                                                        <FormControlLabel value="economy" control={<Radio />} label="Economy" />
-                                                        <FormControlLabel value="business" control={<Radio />} label="Business" />
-                                                    </RadioGroup>
-                                                </FormControl>
-                                            </DialogContent>
-                                            <DialogActions>
-                                                <Button onClick={handleClose} color="success">Confirm</Button>
-                                            </DialogActions>
-                                        </Dialog>
-                                    </Grid>
-                                    {/* Search Button */}
-                                    <Grid item lg={12}>
-                                        <Button
-                                            variant="contained"
-                                            endIcon={<FlightTakeoffIcon />}
-                                            style={{ height: '50px' }}
-                                            fullWidth
-                                            color="secondary"
-                                            onClick={handleFindFlight}
-                                        >
-                                            {isFetching ? <CircularProgress color="primary" /> : "Show Flights "}
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </Paper></>}
-                            
+                                                                </ButtonGroup>
+                                                            </Grid>
+                                                        </Grid>
+                                                        <br />
+                                                        <Divider variant="middle" />
+                                                        <br />
+                                                        <FormControl component="fieldset">
+                                                            <Typography component="legend">Cabin</Typography>
+                                                            <br />
+                                                            <RadioGroup
+                                                                aria-label="economy"
+                                                                defaultValue='economy'
+                                                                value={cabin}
+                                                                name="radio-buttons-group"
+                                                                onChange={(e) => setCabin(e.target.value)}
+                                                            >
+                                                                <FormControlLabel value="economy" control={<Radio />} label="Economy" />
+                                                                <FormControlLabel value="business" control={<Radio />} label="Business" />
+                                                            </RadioGroup>
+                                                        </FormControl>
+                                                    </DialogContent>
+                                                    <DialogActions>
+                                                        <Button onClick={handleClose} color="success">Confirm</Button>
+                                                    </DialogActions>
+                                                </Dialog>
+                                            </Grid>
+                                            {/* Search Button */}
+                                            <Grid item lg={12}>
+                                                <Button
+                                                    variant="contained"
+                                                    endIcon={<FlightTakeoffIcon />}
+                                                    style={{ height: '50px' }}
+                                                    fullWidth
+                                                    color="secondary"
+                                                    onClick={handleFindFlight}
+                                                >
+                                                    {isFetching ? <CircularProgress color="primary" /> : "Show Flights "}
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper></>}
+
                         </Grid>
                     </Grid>
                     <Box sx={{ width: '100%' }}>
@@ -1293,7 +1322,6 @@ function BookFlight() {
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
-                                                                <TimelineConnector />
                                                             </TimelineSeparator>
                                                             <TimelineContent>Arrival</TimelineContent>
                                                         </TimelineItem>
@@ -1328,7 +1356,6 @@ function BookFlight() {
                                                             </TimelineOppositeContent>
                                                             <TimelineSeparator>
                                                                 <TimelineDot />
-                                                                <TimelineConnector />
                                                             </TimelineSeparator>
                                                             <TimelineContent>Arrival</TimelineContent>
                                                         </TimelineItem>
@@ -1373,9 +1400,10 @@ function BookFlight() {
                                                                         variant="outlined"
                                                                         type="submit"
                                                                         fullWidth
+                                                                        disabled={!stripe}
                                                                         sx={{
-                                                                            width: 150,
-                                                                            marginTop: 20
+                                                                            width: 410,
+                                                                            marginTop: 10,
                                                                         }}
                                                                     >
                                                                         {loading ? <CircularProgress color="inherit" aria-busy="true" /> : "Pay"}
@@ -1491,7 +1519,7 @@ function BookFlight() {
                                                                 <TimelineDot variant="outlined" color="secondary" />
                                                                 <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                             </TimelineSeparator>
-                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.desCountry}, {from} <br /> Terminal 6A</TimelineContent>
+                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.destCountry}, {from} <br /> Terminal 6A</TimelineContent>
                                                         </TimelineItem>
                                                         <TimelineItem>
                                                             <TimelineSeparator>

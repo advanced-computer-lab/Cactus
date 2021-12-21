@@ -54,6 +54,7 @@ const Search = () => {
     const [allRetSeatsSelected, setAllRetSeatsSelected] = useState(false)
     const [getFlights, setGetFlights] = useState(false)
     const [change, setChange] = useState(false)
+    const [items, setItems] = useState({totalPrice: 0, reservationId: ""})
 
     // Splicing economy seats
     useEffect(() => {
@@ -673,7 +674,7 @@ const Search = () => {
         handleSelectedRetSeat, handleResetRetSeats, depSeat, depFlightMaps, retSeat, retFlightMaps,
         handleChangeDepFlight, handleChangeRetFlight, allDepSeatsSelected, allRetSeatsSelected, handleCancelSeatsDep,
         handleCancelSeatsRet, fromValidation, toValidation, depDateValidation, retDateValidation, change, setChange,
-        handleEditDepFlight,handleEditSearch, handleEditRetFlight
+        handleEditDepFlight,handleEditSearch, handleEditRetFlight, items, setItems
     }
 }
 export default Search;

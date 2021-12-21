@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Button, Grid, Paper, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import MasksIcon from '@mui/icons-material/Masks';
@@ -7,9 +7,20 @@ import WifiIcon from '@mui/icons-material/Wifi';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import { useHistory } from 'react-router';
 import suitcase from '../../Images/whiteSuitcase.png'
+import { UserContext } from '../../Context/UserContext';
 
 function UserHomepage() {
     const history = useHistory()
+    const {loggedUser } = useContext(UserContext)
+
+    const handleRegisterProfile = (e) =>{
+        if(loggedUser){
+            history.push("/UserProfile")
+        }
+        else{
+            history.push("/Register")
+        }
+    }
     return (
         <div>
             <Paper elevation={4} style={{
@@ -50,11 +61,9 @@ function UserHomepage() {
                                 variant="outlined"
                                 color="white"
                                 style={{ height: '60px', width: '150px', marginLeft: '30px' }}
-                                onClick={() => {
-                                    history.push("/Register")
-                                }}
+                                onClick={handleRegisterProfile}
                             >
-                                Sign Up
+                                {loggedUser ? "My Profile" : "Sign Up"}
                             </Button>
                         </Box>
                     </Grid>

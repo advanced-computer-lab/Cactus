@@ -4,8 +4,8 @@ const AuthRouter = express.Router()
 AuthRouter.use(express.json())
 require("dotenv").config()
 const crypto=require('crypto')
-const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_SECRET_TEST);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_TEST);
+
 
 //___________Schema___________
 const User = require('../Schemas/Users')
@@ -18,9 +18,7 @@ AuthRouter.post("/Login", async (req, res) => {
     User.findOne(user).exec()
         .then((result) => {
             const decipher = crypto.createDecipher('aes192','a password');
-
             var encrypted = result.password;//Write Here Encrypted password to be Decrypted
-
             var decrypted = decipher.update(encrypted,'hex','utf8');
             decrypted = decrypted + decipher.final('utf8');
             console.log(decrypted)
