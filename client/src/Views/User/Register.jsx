@@ -9,11 +9,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField';
-import {
-    Radio, RadioGroup, FormControlLabel,
-    FormControl, FormLabel, Alert,
-    Avatar, Autocomplete, AlertTitle, Backdrop, CircularProgress
-} from '@mui/material'
+import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Avatar, Autocomplete, FormHelperText } from '@mui/material'
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -26,41 +22,82 @@ import CountryBox from '../../Components/User/CountryBox'
 import AreaCodeBox from '../../Components/User/AreaCodeBox'
 import UserNavBar from '../../Components/User/UserNavBar'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useHistory } from 'react-router';
 import axios from 'axios'
 
 
 let index = 0;
 
 function Register() {
-    const history = useHistory();
     const [activeStep, setActiveStep] = React.useState(0);
     const [title, setTitle] = React.useState('');
+    const [titleVal, setTitleVal] = React.useState({error: false, message: ""})
     const [firstName, setFName] = React.useState();
+    const [firstNVal, setFirstNVal] = React.useState({error: false, message: ""})
     const [lastName, setLName] = React.useState();
+    const [lastNVal, setLastNVal] = React.useState({error: false, message: ""})
     const [dateOfBirth, setDoB] = React.useState();
+    const [dobVal, setDobVal] = React.useState({error: false, message: ""})
     const [username, setUsername] = React.useState();
+    const [usernameVal, setUsernameVal] = React.useState({error: false, message: ""});
     const [email, setEmail] = React.useState();
+    const [emailVal, setEmailVal] = React.useState({error: false, message: ""});
     const [gender, setGender] = React.useState();
+    const [genderVal, setGenderVal] = React.useState({error: false, message: ""})
     const [passportNumber, setPassportNumber] = React.useState();
+    const [passportVal, setPassportVal] = React.useState({error: false, message: ""});
     const [phoneNumber, setPhoneNumber] = React.useState();
+    const [phoneVal, setPhoneVal] = React.useState({error: false, message: ""})
     const [cc1, setCc1] = React.useState()
+    const [ccVal, setCcVal] = React.useState({error: false, message: ""})
     const [country, setCountry] = React.useState()
+    const [countryVal, setCountryVal] = React.useState({error: false, message: ""})
     const [city, setCity] = React.useState()
+    const [cityVal, setCityVal] = React.useState({error: false, message: ""})
     const [password, setPassword] = React.useState({
         password: '',
         showPassword: false,
         retypePassword: '',
         showRetypePassword: false
     });
-    const [registered, setRegistered] = React.useState(false);
-    const [open, setOpen] = React.useState(false);
+    const [passwordVal, setPasswordVal] = React.useState({error: false, message: ""})
+    const [rePasswordVal, setRePasswordVal] = React.useState({error: false, message: ""})
+    const [Error, setError] = React.useState(false)
 
     const handlePasswordChange = (prop) => (event) => {
         setPassword({ ...password, [prop]: event.target.value });
+        if((event.target.value).length < 6 && (event.target.value).length !== 0){
+            setPasswordVal({error: true, message: 'Password must be minimum 6 characters'})
+            setError(true)
+        }
+        if((event.target.value).length > 16){
+            setPasswordVal({error: true, message: 'Password must be maximum 16 characters'})
+            setError(true)
+        }
+        if((event.target.value).length === 0){
+            setPasswordVal({error: true, message: 'This Field is Required'})
+            setError(true)
+        }
+        else{
+            setPasswordVal({error: false, message: ''})
+        }
     };
     const handleRetypePasswordChange = (prop) => (event) => {
         setPassword({ ...password, [prop]: event.target.value });
+        if((event.target.value).length < 6 && (event.target.value).length !== 0){
+            setRePasswordVal({error: true, message: 'Password must be minimum 6 characters'})
+            setError(true)
+        }
+        if((event.target.value).length > 16){
+            setRePasswordVal({error: true, message: 'Password must be maximum 16 characters'})
+            setError(true)
+        }
+        if((event.target.value).length === 0){
+            setRePasswordVal({error: true, message: 'This Field is Required'})
+            setError(true)
+        }
+        else{
+            setPasswordVal({error: false, message: ''})
+        }
     };
 
     const handleClickShowPassword = () => {
@@ -86,14 +123,14 @@ function Register() {
     const handleChange = (event) => {
         setTitle(event.target.value);
     };
-
+    
     const handleNext = () => {
         index++;
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         if (index === 2) {
             const phone = [phoneNumber]
             const cc = [cc1]
-            const home = { country: country, city: city }
+            const home = {country:country,city:city}
             const newUser = {
                 title: title,
                 firstName: firstName,
@@ -107,12 +144,9 @@ function Register() {
                 phoneNumber: phone,
                 countryCode: cc,
                 homeAddress: home
-            };
-            setOpen(true)
+        };
             axios.post('/Authentication/Register', newUser)
                 .then((res) => {
-                    setRegistered(true)
-                    setOpen(false)
                     console.log(res.data)
                 })
                 .catch((error) => {
@@ -132,381 +166,453 @@ function Register() {
         setActiveStep(0);
     };
 
+    const handleUsernameChange = (e) =>{
+        e.preventDefault();
+        setUsername(e.target.value)
+    }  
+
+    const handleCcChange = (e) =>{
+        e.preventDefault()
+        setCc1(e.target.value)
+        if((e.target.value).length === 0){
+            setCcVal({error: true, message: 'This Field is Required'})
+            setError(true)
+        }
+        else{
+            setCcVal({error: false, message: ""})
+        }
+    }
+    const handlefirstNChange = (e) => {
+        e.preventDefault()
+        setFName(e.target.value)
+        if((e.target.value).length === 0){
+            setFirstNVal({error: true, message: 'This Field is Required'})
+            setError(true)
+        }
+        else{
+            setFirstNVal({error:false, message: ""})
+        }
+    }
+    const handlelastNChange = (e) => {
+        e.preventDefault()
+        setLName(e.target.value)
+        if((e.target.value).length === 0){
+            setLastNVal({error: true, message: 'This Field is Required'})
+            setError(true)
+        }
+        else{setLastNVal({error:false, message: ""})}
+    }
+       
+    const checkUsername = (e) => {
+        axios.post('/Authentication/checkUsername',{username: e.target.value})
+        .then((res) => {
+            if(res.data === "good"){
+                setUsernameVal({error: false, message: ""})
+            }
+            else{
+                setUsernameVal({error: true, message: "Username already exists"})
+            }
+            
+        })
+    }
+    const checkEmail = (e) => {
+        axios.post('/Authentication/checkEmail',{email: e.target.value})
+        .then((res) => {
+            if(res.data === "good"){
+                setEmailVal({error: false, message: ""})
+            }
+            else{
+                setEmailVal({error: true, message: "Email already exists"})
+            }
+        })
+    }
+    const checkPassport = (e) => {
+        axios.post('/Authentication/checkPassport',{passport: e.target.value})
+        .then((res) => {
+            if(res.data === "good"){
+                setPassportVal({error: false, message: ""})
+            }
+            else{
+                setPassportVal({error: true, message: "Passport Number already exists"})
+            }
+        })
+    }
+
     return (
         <div style={{ background: 'linear-gradient(-160deg, #004080,#004080 60%, white 60%, white)' }}>
             <div>
                 <UserNavBar />
                 <div style={{ display: "flex", justifyContent: "center", marginTop: '30px' }}>
-                    {
-                        registered
-                            ?
-                            <>
-                                <Alert severity="success">
-                                    <AlertTitle>Welcome Aboard</AlertTitle>
-                                    You have been registered successfully — <Button onClick={() => {
-                                        history.push("/Login")
-                                    }}>Login</Button>
-                                </Alert>
-                            </>
-                            :
-                            <>
-                                <Paper elevation={3}
-                                    variant="outlined"
-                                    square
-                                    style={{ borderRadius: '1rem', width: '1000px', padding: '30px' }}
-                                >
-                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                                            <LockOutlinedIcon />
-                                        </Avatar>
-                                        <Typography component="h1" variant="h5">
-                                            Sign up
-                                        </Typography>
-                                    </Box>
-                                    <Box sx={{ maxWidth: 800 }} style={{ marginLeft: '70px' }}>
-                                        <Stepper activeStep={activeStep} orientation="vertical">
-                                            <Step key="credentials">
-                                                <StepLabel>
-                                                    <Typography variant="caption">Your Credentials</Typography>
-                                                </StepLabel>
-                                                {/* credentials */}
-                                                <StepContent>
-                                                    <Grid container spacing={2}>
-                                                        <Grid item lg={6}>
-                                                            <TextField
-                                                                required
-                                                                id="username"
-                                                                label="Username"
-                                                                placeholder="Username"
-                                                                type="text"
-                                                                fullWidth
-                                                                onChange={(e) => {
-                                                                    setUsername(e.target.value)
-                                                                }}
-                                                            />
-                                                        </Grid>
-                                                        <Grid item lg={6}></Grid>
-                                                        <Grid item lg={12}>
-                                                            <TextField
-                                                                required
-                                                                id="email"
-                                                                label="Email Address"
-                                                                placeholder="user@email.com"
-                                                                type="email"
-                                                                fullWidth
-                                                                onChange={(e) => {
-                                                                    setEmail(e.target.value)
-                                                                }}
-                                                            />
-                                                        </Grid>
-                                                        <Grid item lg={6}>
-                                                            <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
-                                                                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                                                                <OutlinedInput
-                                                                    id="outlined-adornment-password"
-                                                                    type={password.showPassword ? 'text' : 'password'}
-                                                                    fullWidth
-                                                                    value={password.password}
-                                                                    onChange={handlePasswordChange('password')}
-                                                                    endAdornment={
-                                                                        <InputAdornment position="end">
-                                                                            <IconButton
-                                                                                aria-label="toggle password visibility"
-                                                                                onClick={handleClickShowPassword}
-                                                                                onMouseDown={handleMouseDownPassword}
-                                                                                edge="end"
-                                                                            >
-                                                                                {password.showPassword ? <VisibilityOff /> : <Visibility />}
-                                                                            </IconButton>
-                                                                        </InputAdornment>
-                                                                    }
-                                                                    label="Password"
-                                                                />
-                                                            </FormControl>
-                                                        </Grid>
-                                                        <Grid item lg={6}>
-                                                            <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
-                                                                <InputLabel htmlFor="outlined-adornment-password">Retype Password</InputLabel>
-                                                                <OutlinedInput
-                                                                    id="outlined-adornment-password"
-                                                                    type={password.showRetypePassword ? 'text' : 'password'}
-                                                                    fullWidth
-                                                                    value={password.retypePassword}
-                                                                    onChange={handleRetypePasswordChange('retypePassword')}
-                                                                    endAdornment={
-                                                                        <InputAdornment position="end">
-                                                                            <IconButton
-                                                                                aria-label="toggle password visibility"
-                                                                                onClick={handleClickShowRetypePassword}
-                                                                                onMouseDown={handleMouseDownRetypePassword}
-                                                                                edge="end"
-                                                                            >
-                                                                                {password.showRetypePassword ? <VisibilityOff /> : <Visibility />}
-                                                                            </IconButton>
-                                                                        </InputAdornment>
-                                                                    }
-                                                                    label="Retype Password"
-                                                                />
-                                                            </FormControl>
-                                                        </Grid>
-                                                        <Grid item lg={4}>
-                                                            <Autocomplete
-                                                                id="country-select-demo"
-                                                                options={countries}
-                                                                autoHighlight
-                                                                getOptionLabel={(option) => option.phone}
-                                                                renderOption={(props, option) => (
-                                                                    <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                                                        <img
-                                                                            loading="lazy"
-                                                                            width="20"
-                                                                            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                                            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                                            alt=""
-                                                                        />
-                                                                        {option.label} ({option.code}) +{option.phone}
-                                                                    </Box>
-                                                                )}
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        label="Area Code"
-                                                                        fullWidth
-                                                                        onChange={(e) => {
-                                                                            setCc1(e.target.value)
-                                                                        }}
-                                                                        inputProps={{
-                                                                            ...params.inputProps,
-                                                                            autoComplete: 'new-password', // disable autocomplete and autofill
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </Grid>
-                                                        <Grid item lg={8}>
-                                                            <TextField
-                                                                required
-                                                                id="phoneNumber"
-                                                                label="Phone Number"
-                                                                placeholder="XXXXXXXX"
-                                                                type="tel"
-                                                                fullWidth
-                                                                onChange={(e) => {
-                                                                    setPhoneNumber(e.target.value)
-                                                                }}
-                                                            />
-                                                        </Grid>
 
-                                                    </Grid>
-                                                    <Box sx={{ mb: 2 }}>
-                                                        <div>
-                                                            <Button
-                                                                variant="contained"
-                                                                onClick={handleNext}
-                                                                sx={{ mt: 1, mr: 1 }}
-                                                            >
-                                                                {index === 2 ? 'Finish' : 'Continue'}
-                                                            </Button>
-                                                            <Button
-                                                                disabled={index === 0}
-                                                                onClick={handleBack}
-                                                                sx={{ mt: 1, mr: 1 }}
-                                                            >
-                                                                Back
-                                                            </Button>
-                                                        </div>
-                                                    </Box>
-                                                </StepContent>
-                                            </Step>
-                                            <Step key="personalDetails">
-                                                <StepLabel>
-                                                    <Typography variant="caption">Your Personal Information</Typography>
-                                                </StepLabel>
-                                                {/* Personal Info */}
-                                                <StepContent>
-                                                    <Box>
-                                                        <Grid container spacing={2}>
-                                                            <Grid item lg={2}>
-                                                                <FormControl sm={{ m: 1 }} fullWidth>
-                                                                    <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
-                                                                    <Select
-                                                                        labelId="demo-simple-select-helper-label"
-                                                                        id="demo-simple-select-helper"
-                                                                        value={title}
-                                                                        label="Title"
-                                                                        onChange={handleChange}
-                                                                    >
-                                                                        <MenuItem value="">
-                                                                            <em>None</em>
-                                                                        </MenuItem>
-                                                                        <MenuItem value="MR">MR</MenuItem>
-                                                                        <MenuItem value="MISS">MISS</MenuItem>
-                                                                        <MenuItem value="MRS">MRS</MenuItem>
-                                                                    </Select>
-                                                                </FormControl>
-                                                            </Grid>
-                                                            <Grid item lg={5}>
-                                                                <TextField
-                                                                    required
-                                                                    id="firstName"
-                                                                    label="First Name"
-                                                                    placeholder="First Name (as per passport)"
-                                                                    type="text"
-                                                                    fullWidth
-                                                                    onChange={(e) => {
-                                                                        setFName(e.target.value)
-                                                                    }}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={5}>
-                                                                <TextField
-                                                                    required
-                                                                    id="lastName"
-                                                                    label="Last Name"
-                                                                    placeholder="Last Name (as per passport)"
-                                                                    type="text"
-                                                                    fullWidth
-                                                                    onChange={(e) => {
-                                                                        setLName(e.target.value)
-                                                                    }}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={12}>
-                                                                <TextField
-                                                                    id="outlined-textarea"
-                                                                    label="Passport Number"
-                                                                    fullWidth
-                                                                    type="text"
-                                                                    required
-                                                                    onChange={(e) => {
-                                                                        setPassportNumber(e.target.value)
-                                                                    }}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={6}>
-                                                                <Autocomplete
-                                                                    id="country-select-demo"
-                                                                    options={countries}
-                                                                    autoHighlight
-                                                                    getOptionLabel={(option) => option.label}
-                                                                    renderOption={(props, option) => (
-                                                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                                                                            <img
-                                                                                loading="lazy"
-                                                                                width="20"
-                                                                                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                                                                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                                                                                alt=""
-                                                                            />
-                                                                            {option.label} ({option.code})
-                                                                        </Box>
-                                                                    )}
-                                                                    renderInput={(params) => (
-                                                                        <TextField
-                                                                            {...params}
-                                                                            label="Country/Region"
-                                                                            fullWidth
-                                                                            inputProps={{
-                                                                                ...params.inputProps,
-                                                                                autoComplete: 'new-password', // disable autocomplete and autofill
-                                                                            }}
-                                                                            onChange={(e) => {
-                                                                                setCountry(e.target.value)
-                                                                                console.log(country)
-                                                                            }}
-                                                                        />
-                                                                    )}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={6}>
-                                                                <TextField
-                                                                    id="outlined-textarea"
-                                                                    label="City"
-                                                                    fullWidth
-                                                                    type="text"
-                                                                    required
-                                                                    onChange={(e) => {
-                                                                        setCity(e.target.value)
-                                                                    }}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={7}>
-                                                                <TextField
-                                                                    id="outlined-textarea"
-                                                                    label="Date of Birth"
-                                                                    fullWidth
-                                                                    type="date"
-                                                                    InputLabelProps={{
-                                                                        shrink: true,
-                                                                    }}
-                                                                    required
-                                                                    onChange={(e) => {
-                                                                        setDoB(e.target.value)
-                                                                    }}
-                                                                />
-                                                            </Grid>
-                                                            <Grid item lg={4}>
-                                                                <FormControl component="fieldset">
-                                                                    <FormLabel component="legend" style={{ textAlign: 'start' }}>Gender</FormLabel>
-                                                                    <RadioGroup
-                                                                        row-aria-label="gender"
-                                                                        name="row-radio-button-group"
-                                                                        row
-                                                                        onChange={(e) => {
-                                                                            setGender(e.target.value)
-                                                                        }}
-                                                                    >
-                                                                        <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                                                                        <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                                                                    </RadioGroup>
-                                                                </FormControl>
-                                                            </Grid>
-                                                        </Grid>
-                                                    </Box>
-                                                    <Box sx={{ mb: 2 }}>
-                                                        <div>
-                                                            <Button
-                                                                variant="contained"
-                                                                onClick={handleNext}
-                                                                sx={{ mt: 1, mr: 1 }}
-                                                            >
-                                                                {index === 1 ? 'Finish' : 'Continue'}
-                                                            </Button>
-                                                            <Button
-                                                                disabled={index === 0}
-                                                                onClick={handleBack}
-                                                                sx={{ mt: 1, mr: 1 }}
-                                                            >
-                                                                Back
-                                                            </Button>
-                                                        </div>
-                                                    </Box>
-                                                </StepContent>
-                                            </Step>
-                                        </Stepper>
-                                        {activeStep === 1 && (
-                                            <Paper square elevation={0} lg={{ p: 3 }}>
-                                                <Button
-                                                    onClick={handleReset}
-                                                    color="error"
-                                                    variant="contained" sx={{ mt: 1, mr: 1 }}
-                                                    style={{ marginLeft: '800px' }}
-                                                >
-                                                    Reset
-                                                </Button>
-                                            </Paper>
-                                        )}
-                                    </Box>
-                                </Paper>
-                            </>
-                    }
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={open}
+                    <Paper elevation={3}
+                        variant="outlined"
+                        square
+                        style={{ borderRadius: '1rem', width: '1000px', padding: '30px' }}
                     >
-                        <CircularProgress color="inherit" />
-                    </Backdrop>
+                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                                <LockOutlinedIcon />
+                            </Avatar>
+                            <Typography component="h1" variant="h5">
+                                Sign up
+                            </Typography>
+                        </Box>
+                        <Box sx={{ maxWidth: 800 }} style={{ marginLeft: '70px' }}>
+                            <Stepper activeStep={activeStep} orientation="vertical">
+                                <Step key="credentials">
+                                    <StepLabel>
+                                        <Typography variant="caption">Your Credentials</Typography>
+                                    </StepLabel>
+                                    {/* credentials */}
+                                    <StepContent>
+                                        <Grid container spacing={2}>
+                                            <Grid item lg={6}>
+                                                <TextField
+                                                    required
+                                                    id="username"
+                                                    label="Username"
+                                                    placeholder="Username"
+                                                    type="text"
+                                                    fullWidth
+                                                    onChange={handleUsernameChange}
+                                                    onInputCapture={checkUsername}
+                                                    helperText={usernameVal.message}
+                                                    error={usernameVal.error}
+                                                />
+                                            </Grid>
+                                            <Grid item lg={6}></Grid>
+                                            <Grid item lg={12}>
+                                                <TextField
+                                                    required
+                                                    id="email"
+                                                    label="Email Address"
+                                                    placeholder="user@email.com"
+                                                    type="email"
+                                                    fullWidth
+                                                    onChange={(e) => {
+                                                        setEmail(e.target.value)
+                                                    }}
+                                                    onInputCapture={checkEmail}
+                                                    helperText={emailVal.message}
+                                                    error={emailVal.error}
+                                                />
+                                            </Grid>
+                                            <Grid item lg={6}>
+                                                <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                                                    <OutlinedInput
+                                                        id="outlined-adornment-password"
+                                                        type={password.showPassword ? 'text' : 'password'}
+                                                        fullWidth
+                                                        value={password.password}
+                                                        onChange={handlePasswordChange('password')}
+                                                        endAdornment={
+                                                            <InputAdornment position="end">
+                                                                <IconButton
+                                                                    aria-label="toggle password visibility"
+                                                                    onClick={handleClickShowPassword}
+                                                                    onMouseDown={handleMouseDownPassword}
+                                                                    edge="end"
+                                                                >
+                                                                    {password.showPassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        }
+                                                        label="Password"
+                                                        helperText={passwordVal.message}
+                                                        error={passwordVal.error}
+                                                    />
+                                                </FormControl>
+                                            </Grid>
+                                            <Grid item lg={6}>
+                                                <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                    <InputLabel htmlFor="outlined-adornment-password">Retype Password</InputLabel>
+                                                    <OutlinedInput
+                                                        id="outlined-adornment-password"
+                                                        type={password.showRetypePassword ? 'text' : 'password'}
+                                                        fullWidth
+                                                        value={password.retypePassword}
+                                                        onChange={handleRetypePasswordChange('retypePassword')}
+                                                        endAdornment={
+                                                            <InputAdornment position="end">
+                                                                <IconButton
+                                                                    aria-label="toggle password visibility"
+                                                                    onClick={handleClickShowRetypePassword}
+                                                                    onMouseDown={handleMouseDownRetypePassword}
+                                                                    edge="end"
+                                                                >
+                                                                    {password.showRetypePassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        }
+                                                        label="Retype Password"
+                                                        helperText={rePasswordVal.message}
+                                                        error={rePasswordVal.error}
+                                                    />
+                                                </FormControl>
+                                            </Grid>
+                                            <Grid item lg={4}>
+                                            <Autocomplete
+                                                id="country-select-demo"
+                                                options={countries}
+                                                autoHighlight
+                                                getOptionLabel={(option) => option.phone}
+                                                renderOption={(props, option) => (
+                                                    <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                    <img
+                                                        loading="lazy"
+                                                        width="20"
+                                                        src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                        srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                        alt=""
+                                                    />
+                                                    {option.label} ({option.code}) +{option.phone}
+                                                    </Box>
+                                                )}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                    {...params}
+                                                    label="Area Code"
+                                                    fullWidth
+                                                    onChange={handleCcChange}
+                                                    helperText={ccVal.message}
+                                                    error={ccVal.error}
+                                                    inputProps={{
+                                                        ...params.inputProps,
+                                                        autoComplete: 'new-password', // disable autocomplete and autofill
+                                                    }}
+                                                    />
+                                                )}
+                                                />
+                                            </Grid>
+                                            <Grid item lg={8}>
+                                                <TextField
+                                                    required
+                                                    id="phoneNumber"
+                                                    label="Phone Number"
+                                                    placeholder="XXXXXXXX"
+                                                    type="tel"
+                                                    fullWidth
+                                                    helperText={phoneVal.message}
+                                                    error={phoneVal.error}
+                                                    onChange={(e) => {
+                                                        setPhoneNumber(e.target.value)
+                                                    }}
+                                                />
+                                            </Grid>
 
+                                        </Grid>
+                                        <Box sx={{ mb: 2 }}>
+                                            <div>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleNext}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    {index === 2 ? 'Finish' : 'Continue'}
+                                                </Button>
+                                                <Button
+                                                    disabled={index === 0}
+                                                    onClick={handleBack}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </StepContent>
+                                </Step>
+                                <Step key="personalDetails">
+                                    <StepLabel>
+                                        <Typography variant="caption">Your Personal Information</Typography>
+                                    </StepLabel>
+                                    {/* Personal Info */}
+                                    <StepContent>
+                                        <Box>
+                                            <Grid container spacing={2}>
+                                                <Grid item lg={2}>
+                                                    <FormControl sm={{ m: 1 }} fullWidth>
+                                                        <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-helper-label"
+                                                            id="demo-simple-select-helper"
+                                                            value={title}
+                                                            label="Title"
+                                                            helperText={titleVal.message}
+                                                            error={titleVal.error}
+                                                            onChange={handleChange}
+                                                        >
+                                                            <MenuItem value="">
+                                                                <em>None</em>
+                                                            </MenuItem>
+                                                            <MenuItem value="MR">MR</MenuItem>
+                                                            <MenuItem value="MISS">MISS</MenuItem>
+                                                            <MenuItem value="MRS">MRS</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid item lg={5}>
+                                                    <TextField
+                                                        required
+                                                        id="firstName"
+                                                        label="First Name"
+                                                        placeholder="First Name (as per passport)"
+                                                        type="text"
+                                                        fullWidth
+                                                        helperText={firstNVal.message}
+                                                        error={firstNVal.error}
+                                                        onChange={handlefirstNChange}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={5}>
+                                                    <TextField
+                                                        required
+                                                        id="lastName"
+                                                        label="Last Name"
+                                                        placeholder="Last Name (as per passport)"
+                                                        type="text"
+                                                        fullWidth
+                                                        helperText={lastNVal.message}
+                                                        error={lastNVal.error}
+                                                        onChange={handlelastNChange}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={12}>
+                                                    <TextField
+                                                        id="outlined-textarea"
+                                                        label="Passport Number"
+                                                        fullWidth
+                                                        type="text"
+                                                        required
+                                                        onChange={(e) => {
+                                                            setPassportNumber(e.target.value)
+                                                        }}
+                                                        onInputCapture={checkPassport}
+                                                        error={passportVal.error}
+                                                        helperText={passportVal.message}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={6}>
+                                                <Autocomplete
+                                                    id="country-select-demo"
+                                                    options={countries}
+                                                    autoHighlight
+                                                    getOptionLabel={(option) => option.label}
+                                                    renderOption={(props, option) => (
+                                                        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                                        <img
+                                                            loading="lazy"
+                                                            width="20"
+                                                            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                                                            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                                                            alt=""
+                                                        />
+                                                        {option.label} ({option.code})
+                                                        </Box>
+                                                    )}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                        {...params}
+                                                        label="Country/Region"
+                                                        fullWidth
+                                                        helperText={countryVal.message}
+                                                        error={countryVal.error}
+                                                        inputProps={{
+                                                            ...params.inputProps,
+                                                            autoComplete: 'new-password', // disable autocomplete and autofill
+                                                        }}
+                                                        onChange={(e)=>{
+                                                            setCountry(e.target.value)
+                                                        }}
+                                                        />
+                                                    )}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={6}>
+                                                <TextField
+                                                        id="outlined-textarea"
+                                                        label="City"
+                                                        fullWidth
+                                                        type="text"
+                                                        required
+                                                        helperText={cityVal.message}
+                                                        error={cityVal.error}
+                                                        onChange={(e) => {
+                                                            setCity(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={7}>
+                                                    <TextField
+                                                        id="outlined-textarea"
+                                                        label="Date of Birth"
+                                                        fullWidth
+                                                        type="date"
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                        required
+                                                        helperText={dobVal.message}
+                                                        error={dobVal.error}
+                                                        onChange={(e) => {
+                                                            setDoB(e.target.value)
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={4}>
+                                                    <FormControl component="fieldset" error={genderVal.error}>
+                                                        <FormLabel component="legend" style={{ textAlign: 'start' }}>Gender</FormLabel>
+                                                        <RadioGroup
+                                                            row-aria-label="gender"
+                                                            name="row-radio-button-group"
+                                                            row
+                                                            onChange={(e) => {
+                                                                setGender(e.target.value)
+                                                            }}
+                                                        >
+                                                            <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                                                            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                                                        </RadioGroup>
+                                                        <FormHelperText>{genderVal.message}</FormHelperText>
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                        <Box sx={{ mb: 2 }}>
+                                            <div>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleNext}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    {index === 1 ? 'Finish' : 'Continue'}
+                                                </Button>
+                                                <Button
+                                                    disabled={index === 0}
+                                                    onClick={handleBack}
+                                                    sx={{ mt: 1, mr: 1 }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </StepContent>
+                                </Step>
+                            </Stepper>
+                            {activeStep === 1 && (
+                                <Paper square elevation={0} lg={{ p: 3 }}>
+                                    <Button 
+                                    onClick={handleReset} 
+                                    color="error" 
+                                    variant="contained" sx={{ mt: 1, mr: 1 }}
+                                    style={{marginLeft: '800px'}}
+                                    >
+                                        Reset
+                                    </Button>
+                                </Paper>
+                            )}
+                        </Box>
+                    </Paper>
                 </div>
             </div>
         </div>
@@ -515,15 +621,15 @@ function Register() {
 const countries = [
     { code: 'AD', label: 'Andorra', phone: '376' },
     {
-        code: 'AE',
-        label: 'United Arab Emirates',
-        phone: '971',
+      code: 'AE',
+      label: 'United Arab Emirates',
+      phone: '971',
     },
     { code: 'AF', label: 'Afghanistan', phone: '93' },
     {
-        code: 'AG',
-        label: 'Antigua and Barbuda',
-        phone: '1-268',
+      code: 'AG',
+      label: 'Antigua and Barbuda',
+      phone: '1-268',
     },
     { code: 'AI', label: 'Anguilla', phone: '1-264' },
     { code: 'AL', label: 'Albania', phone: '355' },
@@ -534,18 +640,18 @@ const countries = [
     { code: 'AS', label: 'American Samoa', phone: '1-684' },
     { code: 'AT', label: 'Austria', phone: '43' },
     {
-        code: 'AU',
-        label: 'Australia',
-        phone: '61',
-        suggested: true,
+      code: 'AU',
+      label: 'Australia',
+      phone: '61',
+      suggested: true,
     },
     { code: 'AW', label: 'Aruba', phone: '297' },
     { code: 'AX', label: 'Alland Islands', phone: '358' },
     { code: 'AZ', label: 'Azerbaijan', phone: '994' },
     {
-        code: 'BA',
-        label: 'Bosnia and Herzegovina',
-        phone: '387',
+      code: 'BA',
+      label: 'Bosnia and Herzegovina',
+      phone: '387',
     },
     { code: 'BB', label: 'Barbados', phone: '1-246' },
     { code: 'BD', label: 'Bangladesh', phone: '880' },
@@ -567,30 +673,30 @@ const countries = [
     { code: 'BY', label: 'Belarus', phone: '375' },
     { code: 'BZ', label: 'Belize', phone: '501' },
     {
-        code: 'CA',
-        label: 'Canada',
-        phone: '1',
-        suggested: true,
+      code: 'CA',
+      label: 'Canada',
+      phone: '1',
+      suggested: true,
     },
     {
-        code: 'CC',
-        label: 'Cocos (Keeling) Islands',
-        phone: '61',
+      code: 'CC',
+      label: 'Cocos (Keeling) Islands',
+      phone: '61',
     },
     {
-        code: 'CD',
-        label: 'Congo, Democratic Republic of the',
-        phone: '243',
+      code: 'CD',
+      label: 'Congo, Democratic Republic of the',
+      phone: '243',
     },
     {
-        code: 'CF',
-        label: 'Central African Republic',
-        phone: '236',
+      code: 'CF',
+      label: 'Central African Republic',
+      phone: '236',
     },
     {
-        code: 'CG',
-        label: 'Congo, Republic of the',
-        phone: '242',
+      code: 'CG',
+      label: 'Congo, Republic of the',
+      phone: '242',
     },
     { code: 'CH', label: 'Switzerland', phone: '41' },
     { code: 'CI', label: "Cote d'Ivoire", phone: '225' },
@@ -607,18 +713,18 @@ const countries = [
     { code: 'CY', label: 'Cyprus', phone: '357' },
     { code: 'CZ', label: 'Czech Republic', phone: '420' },
     {
-        code: 'DE',
-        label: 'Germany',
-        phone: '49',
-        suggested: true,
+      code: 'DE',
+      label: 'Germany',
+      phone: '49',
+      suggested: true,
     },
     { code: 'DJ', label: 'Djibouti', phone: '253' },
     { code: 'DK', label: 'Denmark', phone: '45' },
     { code: 'DM', label: 'Dominica', phone: '1-767' },
     {
-        code: 'DO',
-        label: 'Dominican Republic',
-        phone: '1-809',
+      code: 'DO',
+      label: 'Dominican Republic',
+      phone: '1-809',
     },
     { code: 'DZ', label: 'Algeria', phone: '213' },
     { code: 'EC', label: 'Ecuador', phone: '593' },
@@ -631,21 +737,21 @@ const countries = [
     { code: 'FI', label: 'Finland', phone: '358' },
     { code: 'FJ', label: 'Fiji', phone: '679' },
     {
-        code: 'FK',
-        label: 'Falkland Islands (Malvinas)',
-        phone: '500',
+      code: 'FK',
+      label: 'Falkland Islands (Malvinas)',
+      phone: '500',
     },
     {
-        code: 'FM',
-        label: 'Micronesia, Federated States of',
-        phone: '691',
+      code: 'FM',
+      label: 'Micronesia, Federated States of',
+      phone: '691',
     },
     { code: 'FO', label: 'Faroe Islands', phone: '298' },
     {
-        code: 'FR',
-        label: 'France',
-        phone: '33',
-        suggested: true,
+      code: 'FR',
+      label: 'France',
+      phone: '33',
+      suggested: true,
     },
     { code: 'GA', label: 'Gabon', phone: '241' },
     { code: 'GB', label: 'United Kingdom', phone: '44' },
@@ -662,9 +768,9 @@ const countries = [
     { code: 'GQ', label: 'Equatorial Guinea', phone: '240' },
     { code: 'GR', label: 'Greece', phone: '30' },
     {
-        code: 'GS',
-        label: 'South Georgia and the South Sandwich Islands',
-        phone: '500',
+      code: 'GS',
+      label: 'South Georgia and the South Sandwich Islands',
+      phone: '500',
     },
     { code: 'GT', label: 'Guatemala', phone: '502' },
     { code: 'GU', label: 'Guam', phone: '1-671' },
@@ -672,9 +778,9 @@ const countries = [
     { code: 'GY', label: 'Guyana', phone: '592' },
     { code: 'HK', label: 'Hong Kong', phone: '852' },
     {
-        code: 'HM',
-        label: 'Heard Island and McDonald Islands',
-        phone: '672',
+      code: 'HM',
+      label: 'Heard Island and McDonald Islands',
+      phone: '672',
     },
     { code: 'HN', label: 'Honduras', phone: '504' },
     { code: 'HR', label: 'Croatia', phone: '385' },
@@ -686,15 +792,15 @@ const countries = [
     { code: 'IM', label: 'Isle of Man', phone: '44' },
     { code: 'IN', label: 'India', phone: '91' },
     {
-        code: 'IO',
-        label: 'British Indian Ocean Territory',
-        phone: '246',
+      code: 'IO',
+      label: 'British Indian Ocean Territory',
+      phone: '246',
     },
     { code: 'IQ', label: 'Iraq', phone: '964' },
     {
-        code: 'IR',
-        label: 'Iran, Islamic Republic of',
-        phone: '98',
+      code: 'IR',
+      label: 'Iran, Islamic Republic of',
+      phone: '98',
     },
     { code: 'IS', label: 'Iceland', phone: '354' },
     { code: 'IT', label: 'Italy', phone: '39' },
@@ -702,10 +808,10 @@ const countries = [
     { code: 'JM', label: 'Jamaica', phone: '1-876' },
     { code: 'JO', label: 'Jordan', phone: '962' },
     {
-        code: 'JP',
-        label: 'Japan',
-        phone: '81',
-        suggested: true,
+      code: 'JP',
+      label: 'Japan',
+      phone: '81',
+      suggested: true,
     },
     { code: 'KE', label: 'Kenya', phone: '254' },
     { code: 'KG', label: 'Kyrgyzstan', phone: '996' },
@@ -713,23 +819,23 @@ const countries = [
     { code: 'KI', label: 'Kiribati', phone: '686' },
     { code: 'KM', label: 'Comoros', phone: '269' },
     {
-        code: 'KN',
-        label: 'Saint Kitts and Nevis',
-        phone: '1-869',
+      code: 'KN',
+      label: 'Saint Kitts and Nevis',
+      phone: '1-869',
     },
     {
-        code: 'KP',
-        label: "Korea, Democratic People's Republic of",
-        phone: '850',
+      code: 'KP',
+      label: "Korea, Democratic People's Republic of",
+      phone: '850',
     },
     { code: 'KR', label: 'Korea, Republic of', phone: '82' },
     { code: 'KW', label: 'Kuwait', phone: '965' },
     { code: 'KY', label: 'Cayman Islands', phone: '1-345' },
     { code: 'KZ', label: 'Kazakhstan', phone: '7' },
     {
-        code: 'LA',
-        label: "Lao People's Democratic Republic",
-        phone: '856',
+      code: 'LA',
+      label: "Lao People's Democratic Republic",
+      phone: '856',
     },
     { code: 'LB', label: 'Lebanon', phone: '961' },
     { code: 'LC', label: 'Saint Lucia', phone: '1-758' },
@@ -744,31 +850,31 @@ const countries = [
     { code: 'MA', label: 'Morocco', phone: '212' },
     { code: 'MC', label: 'Monaco', phone: '377' },
     {
-        code: 'MD',
-        label: 'Moldova, Republic of',
-        phone: '373',
+      code: 'MD',
+      label: 'Moldova, Republic of',
+      phone: '373',
     },
     { code: 'ME', label: 'Montenegro', phone: '382' },
     {
-        code: 'MF',
-        label: 'Saint Martin (French part)',
-        phone: '590',
+      code: 'MF',
+      label: 'Saint Martin (French part)',
+      phone: '590',
     },
     { code: 'MG', label: 'Madagascar', phone: '261' },
     { code: 'MH', label: 'Marshall Islands', phone: '692' },
     {
-        code: 'MK',
-        label: 'Macedonia, the Former Yugoslav Republic of',
-        phone: '389',
+      code: 'MK',
+      label: 'Macedonia, the Former Yugoslav Republic of',
+      phone: '389',
     },
     { code: 'ML', label: 'Mali', phone: '223' },
     { code: 'MM', label: 'Myanmar', phone: '95' },
     { code: 'MN', label: 'Mongolia', phone: '976' },
     { code: 'MO', label: 'Macao', phone: '853' },
     {
-        code: 'MP',
-        label: 'Northern Mariana Islands',
-        phone: '1-670',
+      code: 'MP',
+      label: 'Northern Mariana Islands',
+      phone: '1-670',
     },
     { code: 'MQ', label: 'Martinique', phone: '596' },
     { code: 'MR', label: 'Mauritania', phone: '222' },
@@ -801,16 +907,16 @@ const countries = [
     { code: 'PK', label: 'Pakistan', phone: '92' },
     { code: 'PL', label: 'Poland', phone: '48' },
     {
-        code: 'PM',
-        label: 'Saint Pierre and Miquelon',
-        phone: '508',
+      code: 'PM',
+      label: 'Saint Pierre and Miquelon',
+      phone: '508',
     },
     { code: 'PN', label: 'Pitcairn', phone: '870' },
     { code: 'PR', label: 'Puerto Rico', phone: '1' },
     {
-        code: 'PS',
-        label: 'Palestine, State of',
-        phone: '970',
+      code: 'PS',
+      label: 'Palestine, State of',
+      phone: '970',
     },
     { code: 'PT', label: 'Portugal', phone: '351' },
     { code: 'PW', label: 'Palau', phone: '680' },
@@ -830,9 +936,9 @@ const countries = [
     { code: 'SH', label: 'Saint Helena', phone: '290' },
     { code: 'SI', label: 'Slovenia', phone: '386' },
     {
-        code: 'SJ',
-        label: 'Svalbard and Jan Mayen',
-        phone: '47',
+      code: 'SJ',
+      label: 'Svalbard and Jan Mayen',
+      phone: '47',
     },
     { code: 'SK', label: 'Slovakia', phone: '421' },
     { code: 'SL', label: 'Sierra Leone', phone: '232' },
@@ -842,32 +948,32 @@ const countries = [
     { code: 'SR', label: 'Suriname', phone: '597' },
     { code: 'SS', label: 'South Sudan', phone: '211' },
     {
-        code: 'ST',
-        label: 'Sao Tome and Principe',
-        phone: '239',
+      code: 'ST',
+      label: 'Sao Tome and Principe',
+      phone: '239',
     },
     { code: 'SV', label: 'El Salvador', phone: '503' },
     {
-        code: 'SX',
-        label: 'Sint Maarten (Dutch part)',
-        phone: '1-721',
+      code: 'SX',
+      label: 'Sint Maarten (Dutch part)',
+      phone: '1-721',
     },
     {
-        code: 'SY',
-        label: 'Syrian Arab Republic',
-        phone: '963',
+      code: 'SY',
+      label: 'Syrian Arab Republic',
+      phone: '963',
     },
     { code: 'SZ', label: 'Swaziland', phone: '268' },
     {
-        code: 'TC',
-        label: 'Turks and Caicos Islands',
-        phone: '1-649',
+      code: 'TC',
+      label: 'Turks and Caicos Islands',
+      phone: '1-649',
     },
     { code: 'TD', label: 'Chad', phone: '235' },
     {
-        code: 'TF',
-        label: 'French Southern Territories',
-        phone: '262',
+      code: 'TF',
+      label: 'French Southern Territories',
+      phone: '262',
     },
     { code: 'TG', label: 'Togo', phone: '228' },
     { code: 'TH', label: 'Thailand', phone: '66' },
@@ -879,51 +985,51 @@ const countries = [
     { code: 'TO', label: 'Tonga', phone: '676' },
     { code: 'TR', label: 'Turkey', phone: '90' },
     {
-        code: 'TT',
-        label: 'Trinidad and Tobago',
-        phone: '1-868',
+      code: 'TT',
+      label: 'Trinidad and Tobago',
+      phone: '1-868',
     },
     { code: 'TV', label: 'Tuvalu', phone: '688' },
     {
-        code: 'TW',
-        label: 'Taiwan, Province of China',
-        phone: '886',
+      code: 'TW',
+      label: 'Taiwan, Province of China',
+      phone: '886',
     },
     {
-        code: 'TZ',
-        label: 'United Republic of Tanzania',
-        phone: '255',
+      code: 'TZ',
+      label: 'United Republic of Tanzania',
+      phone: '255',
     },
     { code: 'UA', label: 'Ukraine', phone: '380' },
     { code: 'UG', label: 'Uganda', phone: '256' },
     {
-        code: 'US',
-        label: 'United States',
-        phone: '1',
-        suggested: true,
+      code: 'US',
+      label: 'United States',
+      phone: '1',
+      suggested: true,
     },
     { code: 'UY', label: 'Uruguay', phone: '598' },
     { code: 'UZ', label: 'Uzbekistan', phone: '998' },
     {
-        code: 'VA',
-        label: 'Holy See (Vatican City State)',
-        phone: '379',
+      code: 'VA',
+      label: 'Holy See (Vatican City State)',
+      phone: '379',
     },
     {
-        code: 'VC',
-        label: 'Saint Vincent and the Grenadines',
-        phone: '1-784',
+      code: 'VC',
+      label: 'Saint Vincent and the Grenadines',
+      phone: '1-784',
     },
     { code: 'VE', label: 'Venezuela', phone: '58' },
     {
-        code: 'VG',
-        label: 'British Virgin Islands',
-        phone: '1-284',
+      code: 'VG',
+      label: 'British Virgin Islands',
+      phone: '1-284',
     },
     {
-        code: 'VI',
-        label: 'US Virgin Islands',
-        phone: '1-340',
+      code: 'VI',
+      label: 'US Virgin Islands',
+      phone: '1-340',
     },
     { code: 'VN', label: 'Vietnam', phone: '84' },
     { code: 'VU', label: 'Vanuatu', phone: '678' },
@@ -935,7 +1041,7 @@ const countries = [
     { code: 'ZA', label: 'South Africa', phone: '27' },
     { code: 'ZM', label: 'Zambia', phone: '260' },
     { code: 'ZW', label: 'Zimbabwe', phone: '263' },
-];
-
+  ];
+  
 
 export default Register

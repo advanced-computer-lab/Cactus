@@ -63,6 +63,7 @@ AuthRouter.post("/Register", (req, res) => {
         })
         .catch((error)=>{
             console.log(error)
+            console.log(error.message)
         })
     
 })
@@ -83,10 +84,44 @@ AuthRouter.get('/users', (req, res) => {
         .then((result) => {
             res.send(result)
         })
-        .catch((err) => {
+        .catch((err) => {s
             console.log(err)
         })
 })
+AuthRouter.post('/checkUsername',(req,res) => {
+    User.findOne({username: req.body.username})
+    .then((users) => {
+        if (users === null){
+            res.send("good")
+        }
+        else{
+            res.send("This Username is already Taken")
+        }
+    })
+})
+AuthRouter.post('/checkEmail',(req,res) => {
+    User.findOne({email: req.body.email})
+    .then((users) => {
+        if (users === null){
+            res.send("good")
+        }
+        else{
+            res.send("This Email is already Taken")
+        }
+    })
+})
+AuthRouter.post('/checkPassport',(req,res) => {
+    User.findOne({passportNumber: req.body.passport})
+    .then((users) => {
+        if (users === null){
+            res.send("good")
+        }
+        else{
+            res.send("This Passport Number is already Taken")
+        }
+    })
+})
+
 AuthRouter.post('/create-payment-intent', async (req, res) => {
     const {paymentMethodType, currency} = req.body;
     try {

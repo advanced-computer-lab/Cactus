@@ -222,6 +222,8 @@ export default function UserInfo() {
         }
         fetchUserInfo();
     }, [updateUser])
+    useEffect(() => {
+    }, [openDepSeats])
     const [openDialog, setOpenDialog] = useState(false);
 
     const emailChange = (e) => {
@@ -399,10 +401,11 @@ export default function UserInfo() {
         setReservationID(reserve)
         setDepartureFlight(depFlight)
         setReturnFlight(retFlight)
-        setOpenDepSeats(true);
         let tempEconomy = depFlight.economyMap;
         let tempBusiness = depFlight.businessMap;
         setNumberOfSeats(reserve.seats);
+        setOpenDepSeats(true)
+        setOpenDepSeats(false)
         setSeats(reserve.seats);
         setCabin(reserve.cabin);
         if (reserve.cabin === "economy") {
@@ -452,8 +455,11 @@ export default function UserInfo() {
             setBusinessDepSeats(tempBusiness);
             recentlyReservedDepB = [];
         }
-
+        openDep()
     };
+    const openDep = () =>{
+        setOpenDepSeats(true)
+    }
     const handleCancelDialog = (e, reservation) => {
         setOpenDialog(true)
         setReservationID(reservation)
