@@ -2,8 +2,13 @@
 import './App.css';
 
 //___________Middleware___________
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { UserContext } from './Context/UserContext';
+import axios from 'axios'
+import { getLocalStorage } from './Authentication/LocalStorage'
+import { getCookie } from './Authentication/Cookies'
+
 
 
 //___________Views___________
@@ -16,12 +21,12 @@ import FindFlight from './Views/Admin/Flight/FindFlight'
 import Login from './Components/Main/Login/Login'
 import Register from './Views/User/Register'
 import UserProfile from './Views/User/UserProfile'
-
+import ChangePassword from './Views/User/ChangePassword';
+import Unauthorized from './Views/Error/Unauthorized'
 
 //___________Theme__________
 import { createTheme, ThemeProvider } from '@mui/material';
-import { useState } from 'react';
-import ChangePassword from './Views/User/ChangePassword';
+
 
 
 
@@ -50,8 +55,19 @@ const theme = createTheme({
 });
 
 function App() {
-  const [loggedUser, setLoggedUser] = useState()
-  const [reservation, setReservation] = useState()
+  const [loggedUser, setLoggedUser] = useState({user: "", token: ""})
+
+  useEffect(() => {
+    if(getCookie('token')){
+      const token = getCookie('token')
+      const user = getLocalStorage('user')
+      setLoggedUser({user: user, token: token})
+    }
+    else{
+      setLoggedUser({user: "", token: ""})
+    }
+  })
+
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
@@ -69,17 +85,17 @@ function App() {
             <Route path="/findFlight">
               <FindFlight />
             </Route>
-            <UserContext.Provider value={{ loggedUser, setLoggedUser, reservation, setReservation }}>
+            <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
               <Route exact path="/" component={LandingPage} />
               <Route path={"/BookFlight"} component={UserHome} />
               <Route path="/Register">
                 <Register />
               </Route>
               <Route path="/login">
-                <Login />
+               {loggedUser.user ? <UserHome /> : <Login />}
               </Route>
               <Route path="/UserProfile">
-                <UserProfile />
+                {loggedUser.user ? <UserProfile /> : <Unauthorized />}
               </Route>
               <Route path={"/ChangePassword"} component={ChangePassword} />
             </UserContext.Provider>

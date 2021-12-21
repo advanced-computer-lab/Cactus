@@ -118,8 +118,8 @@ export default function UserInfo() {
     const [openSnack, setOpenSnack] = useState(false)
     var maleDisabled = false;
     var femaleDisabled = true;
-    if (loggedUser) {
-        if (loggedUser.gender === "Male") {
+    if (loggedUser.user) {
+        if (loggedUser.user.gender === "Male") {
             maleDisabled = false;
             femaleDisabled = true;
         } else {
@@ -134,13 +134,13 @@ export default function UserInfo() {
     const [isFetching, setFetching] = useState(false);
     const [openDepSeats, setOpenDepSeats] = useState(false);
     const [openRetSeats, setOpenRetSeats] = useState(false);
-    const [email, setEmail] = useState(loggedUser.email);
+    const [email, setEmail] = useState(loggedUser.user.email);
     const [emailVal, setEmailVal] = useState({ error: false, label: "Email" })
-    const [fName, setFName] = useState(loggedUser.firstName);
+    const [fName, setFName] = useState(loggedUser.user.firstName);
     const [fNameVal, setFNameVal] = useState({ error: false, label: "First Name" })
-    const [lName, setLName] = useState(loggedUser.lastName);
+    const [lName, setLName] = useState(loggedUser.user.lastName);
     const [lNameVal, setLNameVal] = useState({ error: false, label: "Last Name" })
-    const [cc1, setCc1] = useState(loggedUser.countryCode[0]);
+    const [cc1, setCc1] = useState(loggedUser.user.countryCode[0]);
     const [cc1Val, setCc1Val] = useState({ error: false, label: "Area Code 1" })
 
     const [phone1Val, setPhone1Val] = useState({ error: false, label: "Phone 1" })
@@ -149,25 +149,25 @@ export default function UserInfo() {
     const [countryVal, setCountryVal] = useState({ error: false, label: "Country/Region" })
     const [cityVal, setCityVal] = useState({ error: false, label: "City" })
     const [cc2, setCc2] = useState(() => {
-        if (loggedUser.countryCode.length > 1) return loggedUser.countryCode[1];
+        if (loggedUser.user.countryCode.length > 1) return loggedUser.user.countryCode[1];
         else return "";
     });
     const [cc3, setCc3] = useState(() => {
-        if (loggedUser.countryCode.length > 2) return loggedUser.countryCode[2];
+        if (loggedUser.user.countryCode.length > 2) return loggedUser.user.countryCode[2];
         else return "";
     });
-    const [phone1, setPhone1] = useState(loggedUser.telephones[0]);
+    const [phone1, setPhone1] = useState(loggedUser.user.telephones[0]);
     const [phone2, setPhone2] = useState(() => {
-        if (loggedUser.telephones.length > 1) return loggedUser.telephones[1];
+        if (loggedUser.user.telephones.length > 1) return loggedUser.user.telephones[1];
         else return "";
     });
     const [phone3, setPhone3] = useState(() => {
-        if (loggedUser.telephones.length > 2) return loggedUser.telephones[2];
+        if (loggedUser.user.telephones.length > 2) return loggedUser.user.telephones[2];
         else return "";
     });
-    const [passport, setPassport] = useState(loggedUser.passportNumber);
-    const [country, setCountry] = useState(loggedUser.homeAddress.country);
-    const [city, setCity] = useState(loggedUser.homeAddress.city);
+    const [passport, setPassport] = useState(loggedUser.user.passportNumber);
+    const [country, setCountry] = useState(loggedUser.user.homeAddress.country);
+    const [city, setCity] = useState(loggedUser.user.homeAddress.city);
     const open = Boolean(anchorEl);
     const [departureFlight, setDepartureFlight] = useState()
     const [returnFlight, setReturnFlight] = useState()
@@ -197,7 +197,7 @@ export default function UserInfo() {
         const fetchReservations = async () => {
             try {
                 let res = await axios.post("/Users/getAllReservations", {
-                    username: loggedUser.username,
+                    username: loggedUser.user.username,
                 });
                 let data = await res.data;
                 setReservations(data);
@@ -213,9 +213,9 @@ export default function UserInfo() {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                let res = await axios.post("/Users/getUserInfo", { userId: loggedUser._id });
+                let res = await axios.post("/Users/getUserInfo", { userId: loggedUser.user._id });
                 let data = await res.data;
-                setLoggedUser(data)
+                setLoggedUser({user: data, token: loggedUser.token})
             } catch (error) {
                 console.log(error)
             }
@@ -291,9 +291,9 @@ export default function UserInfo() {
             countryCode: codes,
             country: country,
             city: city,
-            password: loggedUser.password,
-            _id: loggedUser._id,
-            reservations: loggedUser.reservations,
+            password: loggedUser.user.password,
+            _id: loggedUser.user._id,
+            reservations: loggedUser.user.reservations,
         };
         var isError = false;
         if (email === "") {
@@ -368,13 +368,13 @@ export default function UserInfo() {
         e.preventDefault();
         console.log("id: ", reservationID._id)
         const data = {
-            username: loggedUser.username,
+            username: loggedUser.user.username,
             reservationId: reservationID._id,
-            title: loggedUser.title,
+            title: loggedUser.user.title,
             refundedAmount:
                 (reservationID.departurePrice + reservationID.returnPrice) * reservationID.seats,
-            email: loggedUser.email,
-            firstName: loggedUser.firstName,
+            email: loggedUser.user.email,
+            firstName: loggedUser.user.firstName,
         };
         console.log(data);
         setOpenDialog(false)
@@ -472,7 +472,7 @@ export default function UserInfo() {
         }
         var data = {}
 
-        data.username = loggedUser.username
+        data.username = loggedUser.user.username
         data.depSeats = tmp
         data.retSeats = reservationID.retSeatNumbers
         data.reservationId = reservationID._id
@@ -700,7 +700,7 @@ export default function UserInfo() {
         }
         var data = {}
 
-        data.username = loggedUser.username
+        data.username = loggedUser.user.username
         data.depSeats = reservationID.depSeatNumbers
         data.retSeats = tmp
         data.reservationId = reservationID._id
@@ -786,7 +786,7 @@ export default function UserInfo() {
         <>
             <UserNavBar />
             {
-                loggedUser
+                loggedUser.user
                     ?
                     <>
                         <div style={{ background: 'linear-gradient(160deg, #004080,#004080 60%, white 60%, white)' }}>
@@ -797,7 +797,7 @@ export default function UserInfo() {
                                     justifyContent: "center",
                                 }}
                             >
-                                {loggedUser ? (
+                                {loggedUser.user ? (
                                     <>
                                         <div>
                                             <Paper
@@ -854,8 +854,8 @@ export default function UserInfo() {
                                                         {/* Navigation */}
                                                         <Grid item sx={5}>
                                                             <Typography variant="h4" component="h4" style={{ marginLeft: '20px' }}>
-                                                                {loggedUser.title} {loggedUser.firstName}{" "}
-                                                                {loggedUser.lastName}
+                                                                {loggedUser.user.title} {loggedUser.user.firstName}{" "}
+                                                                {loggedUser.user.lastName}
                                                             </Typography>
                                                             <ButtonGroup
                                                                 color="secondary"
@@ -936,7 +936,7 @@ export default function UserInfo() {
                                                                                     fullWidth
                                                                                     variant="outlined"
                                                                                     disabled
-                                                                                    value={loggedUser.username}
+                                                                                    value={loggedUser.user.username}
                                                                                     label="Username"
                                                                                 />
                                                                             </Grid>
@@ -945,7 +945,7 @@ export default function UserInfo() {
                                                                                     fullWidth
                                                                                     variant="outlined"
                                                                                     disabled
-                                                                                    value={loggedUser.dateOfBirth}
+                                                                                    value={loggedUser.user.dateOfBirth}
                                                                                     label="Date of Birth"
                                                                                 />
                                                                             </Grid>

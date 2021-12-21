@@ -14,7 +14,7 @@ function UserHomepage() {
     const {loggedUser } = useContext(UserContext)
 
     const handleRegisterProfile = (e) =>{
-        if(loggedUser){
+        if(loggedUser.user){
             history.push("/UserProfile")
         }
         else{
@@ -63,7 +63,7 @@ function UserHomepage() {
                                 style={{ height: '60px', width: '150px', marginLeft: '30px' }}
                                 onClick={handleRegisterProfile}
                             >
-                                {loggedUser ? "My Profile" : "Sign Up"}
+                                {loggedUser.user ? "My Profile" : "Sign Up"}
                             </Button>
                         </Box>
                     </Grid>

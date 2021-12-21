@@ -3,8 +3,9 @@ const express = require('express')
 const AuthRouter = express.Router()
 AuthRouter.use(express.json())
 require("dotenv").config()
-const crypto=require('crypto')
+const crypto = require('crypto')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_TEST);
+const jwt = require('jsonwebtoken')
 
 
 //___________Schema___________
@@ -17,16 +18,27 @@ AuthRouter.post("/Login", async (req, res) => {
     }
     User.findOne(user).exec()
         .then((result) => {
-            const decipher = crypto.createDecipher('aes192','a password');
+            const decipher = crypto.createDecipher('aes192', 'a password');
             var encrypted = result.password;//Write Here Encrypted password to be Decrypted
-            var decrypted = decipher.update(encrypted,'hex','utf8');
+            var decrypted = decipher.update(encrypted, 'hex', 'utf8');
             decrypted = decrypted + decipher.final('utf8');
-            console.log(decrypted)
-            if(decrypted === req.body.password)
-                res.send(result)
+            if (decrypted === req.body.password) {
+                const secret = process.env.ACCESS_TOKEN_SECRET
+                jwt.sign(
+                        { id: result._id },
+                        secret,
+                        { expiresIn: 3600 },
+                        (err, token) => {
+                            if(err) throw err;
+                            res.json({
+                                token,
+                                user: result
+                            });
+                        }
+                )
+            }
             else
                 res.send(null)
-            console.log(result)
         })
         .catch((err) => {
             console.log(err)
@@ -36,8 +48,8 @@ AuthRouter.post("/Login", async (req, res) => {
 // Register
 AuthRouter.post("/Register", (req, res) => {
     //Encryption Code
-    const cipher = crypto.createCipher('aes192','a password');
-    var encrypted = cipher.update(req.body.password+"",'utf8','hex');//Password to be Encrypted
+    const cipher = crypto.createCipher('aes192', 'a password');
+    var encrypted = cipher.update(req.body.password + "", 'utf8', 'hex');//Password to be Encrypted
     encrypted = encrypted + cipher.final('hex');
     console.log(encrypted);
     const newUser = new User({
@@ -57,79 +69,84 @@ AuthRouter.post("/Register", (req, res) => {
         reservations: []
     });
     newUser.save()
-        .then((response)=>{
+        .then((response) => {
             res.send(response)
             console.log(response)
         })
-        .catch((error)=>{
+        .catch((error) => {
             console.log(error)
             console.log(error.message)
         })
-    
+
 })
-AuthRouter.post('/changePassword', (req,res) => {
+AuthRouter.post('/changePassword', (req, res) => {
     User.findById(req.body.id)
-    .then((user) => {
-        const cipher = crypto.createCipher('aes192','a password');
-        var encrypted = cipher.update(req.body.password+"",'utf8','hex');//Password to be Encrypted
-        encrypted = encrypted + cipher.final('hex');
-        user.password = encrypted
-        user.save()
-        .then(()=>res.send("good"))
-    })
+        .then((user) => {
+            const cipher = crypto.createCipher('aes192', 'a password');
+            var encrypted = cipher.update(req.body.password + "", 'utf8', 'hex');//Password to be Encrypted
+            encrypted = encrypted + cipher.final('hex');
+            user.password = encrypted
+            user.save()
+                .then(() => res.send("good"))
+        })
 })
-// Get Users
+// Get User
 AuthRouter.get('/users', (req, res) => {
     User.find()
         .then((result) => {
             res.send(result)
         })
-        .catch((err) => {s
+        .catch((err) => {
+            s
             console.log(err)
         })
 })
-AuthRouter.post('/checkUsername',(req,res) => {
-    User.findOne({username: req.body.username})
-    .then((users) => {
-        if (users === null){
-            res.send("good")
-        }
-        else{
-            res.send("This Username is already Taken")
-        }
-    })
-})
-AuthRouter.post('/checkEmail',(req,res) => {
-    User.findOne({email: req.body.email})
-    .then((users) => {
-        if (users === null){
-            res.send("good")
-        }
-        else{
-            res.send("This Email is already Taken")
-        }
-    })
-})
-AuthRouter.post('/checkPassport',(req,res) => {
-    User.findOne({passportNumber: req.body.passport})
-    .then((users) => {
-        if (users === null){
-            res.send("good")
-        }
-        else{
-            res.send("This Passport Number is already Taken")
-        }
-    })
-})
 
+// Check if user exists
+AuthRouter.post('/checkUsername', (req, res) => {
+    User.findOne({ username: req.body.username })
+        .then((users) => {
+            if (users === null) {
+                res.send("good")
+            }
+            else {
+                res.send("This Username is already Taken")
+            }
+        })
+})
+// Check if this email exists
+AuthRouter.post('/checkEmail', (req, res) => {
+    User.findOne({ email: req.body.email })
+        .then((users) => {
+            if (users === null) {
+                res.send("good")
+            }
+            else {
+                res.send("This Email is already Taken")
+            }
+        })
+})
+// Check if passport exists
+AuthRouter.post('/checkPassport', (req, res) => {
+    User.findOne({ passportNumber: req.body.passport })
+        .then((users) => {
+            if (users === null) {
+                res.send("good")
+            }
+            else {
+                res.send("This Passport Number is already Taken")
+            }
+        })
+})
+// Stripe
 AuthRouter.post('/create-payment-intent', async (req, res) => {
-    const {paymentMethodType, currency} = req.body;
+    const { paymentMethodType, currency } = req.body;
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: 10000,
             currency: currency,
             description: 'Cactus Airlines',
-            payment_method_types:[paymentMethodType],
+            payment_method_types: [paymentMethodType],
         });
         res.json({
             clientSecret: paymentIntent.client_secret,
@@ -137,7 +154,7 @@ AuthRouter.post('/create-payment-intent', async (req, res) => {
             message: "Payment successful"
         });
     } catch (error) {
-        res.status(400).json({error: {message: error.message}});
+        res.status(400).json({ error: { message: error.message } });
         res.json({
             message: "Payment Failed",
             success: false

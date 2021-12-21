@@ -10,6 +10,8 @@ import { useContext } from 'react';
 import { UserContext } from '../../Context/UserContext';
 import { useHistory } from 'react-router';
 import logo from '../../Images/logo5.png'
+import { deleteLoacalStorage } from '../../Authentication/LocalStorage'
+import { deleteCookie } from '../../Authentication/Cookies'
 
 
 export default function MenuAppBar() {
@@ -39,7 +41,7 @@ export default function MenuAppBar() {
               Cactus Airlines
             </Typography>
           <div>
-            {loggedUser ?
+            {loggedUser.user ?
               <>
                 <Button
                   size="large"
@@ -51,10 +53,12 @@ export default function MenuAppBar() {
                   onClick={handleClick}
                   style={{ marginRight: '10px' }}
                 >
-                  Hello {loggedUser.firstName}
+                  Hello {loggedUser.user.firstName}
                 </Button>
                 <Button variant="contained" color="error" onClick={() => { 
                   setLoggedUser(null) 
+                  deleteLoacalStorage('user')
+                  deleteCookie('token')
                   history.push("/")
                   }}>Logout</Button>
               </>

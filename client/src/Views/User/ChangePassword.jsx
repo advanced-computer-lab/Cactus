@@ -26,9 +26,9 @@ function ChangePassword() {
     });
     const { loggedUser } = React.useContext(UserContext)
     var decrypted = ""
-    if (loggedUser) {
+    if (loggedUser.user) {
         const decipher = crypto.createDecipher('aes192', 'a password');
-        var encrypted = loggedUser.password;//Write Here Encrypted password to be Decrypted
+        var encrypted = loggedUser.user.password;//Write Here Encrypted password to be Decrypted
         decrypted = decipher.update(encrypted, 'hex', 'utf8');
         decrypted = decrypted + decipher.final('utf8');
     }
@@ -61,7 +61,7 @@ function ChangePassword() {
         event.preventDefault();
     }
     const handleChangePassword = () => {
-        const data = { "password": password.password, "id": loggedUser._id }
+        const data = { "password": password.password, "id": loggedUser.user._id }
         var error = false
         setLoading(true)
         if (!(password.password === password.retypePassword)) {
@@ -105,7 +105,7 @@ function ChangePassword() {
         <div>
             <UserNavBar />
             {
-                loggedUser
+                loggedUser.user
                     ?
                     <>
                         <div style={{ background: 'linear-gradient(160deg, #004080,#004080 60%, white 60%, white)' }}>

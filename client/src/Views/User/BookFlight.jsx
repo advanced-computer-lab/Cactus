@@ -142,12 +142,11 @@ function BookFlight() {
         setFetchingUser(true)
         axios.post('/Authentication/Login', user)
             .then((res) => {
-                if (res.data.username === undefined || res.data.password === undefined) {
+                if (res.data.user.username === undefined || res.data.user.password === undefined) {
                     setFetchingUser(false)
                     setAlertOpen(true)
                 } else {
-                    setLoggedUser(res.data)
-                    console.log(res.data)
+                    setLoggedUser({user: res.data.user, token: res.data.token})
                     setLoginOpen(false)
                     setFetchingUser(false)
                 }
@@ -161,7 +160,7 @@ function BookFlight() {
     }
     const handleShowCheckout = (e) => {
         e.preventDefault()
-        if (loggedUser === undefined) {
+        if (loggedUser.user === undefined) {
             setShowCheckout(false)
             setLoginOpen(true)
         }
@@ -173,7 +172,7 @@ function BookFlight() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true)
-        if (loggedUser === null || loggedUser === undefined) {
+        if (loggedUser.user === null || loggedUser.user === undefined) {
             setLoading(false);
             setLoginOpen(true);
         }
@@ -183,18 +182,18 @@ function BookFlight() {
                 cabin: cabin,
                 departureId: selectedDepFlight._id,
                 returnId: selectedRetFlight._id,
-                username: loggedUser.username,
+                username: loggedUser.user.username,
                 depSeats: depSeat,
                 retSeats: retSeat,
                 depFlightMap: depFlightMaps,
                 retFlightMap: retFlightMaps,
-                email: loggedUser.email,
-                firstName: loggedUser.firstName,
-                title: loggedUser.title
+                email: loggedUser.user.email,
+                firstName: loggedUser.user.firstName,
+                title: loggedUser.user.title
             }
             var changeData  ={}
             if(change === true){
-                changeData.userId = loggedUser._id
+                changeData.userId = loggedUser.user._id
                 changeData.reservationId = reservation._id
                 if(departure === true){
                     changeData.newFlightId = selectedDepFlight._id
@@ -272,35 +271,6 @@ function BookFlight() {
         }
 
     }
-    // const handleSubmit = async (event) => {
-    //     // We don't want to let default form submission happen here,
-    //     // which would refresh the page.
-    //     event.preventDefault();
-
-    //     if (!stripe || !elements) {
-    //         // Stripe.js has not yet loaded.
-    //         // Make sure to disable form submission until Stripe.js has loaded.
-    //         return;
-    //     }
-
-    //     const result = await stripe.confirmPayment({
-    //         //`Elements` instance that was used to create the Payment Element
-    //         elements,
-    //         confirmParams: {
-    //             return_url: "https://my-site.com/order/123/complete",
-    //         },
-    //     });
-
-
-    //     if (result.error) {
-    //         // Show error to your customer (e.g., payment details incomplete)
-    //         console.log(result.error.message);
-    //     } else {
-    //         // Your customer will be redirected to your `return_url`. For some payment
-    //         // methods like iDEAL, your customer will be redirected to an intermediate
-    //         // site first to authorize the payment, then redirected to the `return_url`.
-    //     }
-    // };
 
     return (
         <>

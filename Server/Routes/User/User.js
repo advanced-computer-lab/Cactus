@@ -80,8 +80,6 @@ UserRouter.post('/addUser', (req, res) => {
 });
 
 
-///USER FLIGHTS////
-
 UserRouter.post('/getFlights', (req, res) => {
     var flights = []
     Flight.find()
@@ -248,7 +246,6 @@ UserRouter.post('/cancelReservation', (req, res) => {
                     }
                     reserve.remove()
                     //Mail Cancelation
-                    //////////////////////////
                     console.log("Sending Mail Here");
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -306,7 +303,7 @@ UserRouter.post('/cancelReservation', (req, res) => {
         })
 })
 
-UserRouter.post('/updateReservation', (req, res) => {
+UserRouter.post('/updateReservation',  (req, res) => {
     Reservation.findById(req.body.reservationId)
         .then((reserve) => {
             reserve.depSeatNumbers = req.body.depSeats
@@ -393,7 +390,7 @@ UserRouter.post('/getUserInfo', (req,res)=>{
         })
 })
 
-UserRouter.put('/changeDep', async (req,res)=>{
+UserRouter.put('/changeDep',  async (req,res)=>{
     const reserve = await Reservation.findById(req.body.reservationId) 
     const flight1 = await Flight.findById(reserve.departureId) 
     if(reserve.cabin === "business"){
