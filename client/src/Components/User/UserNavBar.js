@@ -56,7 +56,7 @@ export default function MenuAppBar() {
                   Hello {loggedUser.user.firstName}
                 </Button>
                 <Button variant="contained" color="error" onClick={() => { 
-                  setLoggedUser(null) 
+                  setLoggedUser({user: "", token: ""}) 
                   deleteLoacalStorage('user')
                   deleteCookie('token')
                   history.push("/")

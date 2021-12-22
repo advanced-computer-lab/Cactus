@@ -15,15 +15,15 @@ var economySplicedRet = []
 const Search = () => {
     const [value, setValue] = useState(0);
     const [date, setDate] = useState(["", ""]);
-    const [depDateValidation, setDepDateValidation] = useState({ error: false, label: 'DEPARTURE DATE' })
-    const [retDateValidation, setRetDateValidation] = useState({ error: false, label: 'RETURN DATE' })
+    const [depDateValidation, setDepDateValidation] = useState({ error: false, label: '' })
+    const [retDateValidation, setRetDateValidation] = useState({ error: false, label: '' })
     const [open, setOpen] = useState(false);
     const [counter, setCounter] = useState(1);
     const [search, setSearch] = useState(false)
     const [from, setFrom] = useState("")
-    const [fromValidation, setFromValidation] = useState({ error: false, label: 'FROM' })
+    const [fromValidation, setFromValidation] = useState({ error: false, label: '' })
     const [to, setTo] = useState("")
-    const [toValidation, setToValidation] = useState({ error: false, label: 'TO' })
+    const [toValidation, setToValidation] = useState({ error: false, label: '' })
     const [seats, setSeats] = useState(1)
     const [cabin, setCabin] = useState('economy')
     const [counterChild, setCounterChild] = useState(0);
@@ -210,25 +210,25 @@ const Search = () => {
             setFromValidation({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setFromValidation({ error: false, label: "From" })
+            setFromValidation({ error: false, label: "" })
         }
         if (to === "") {
             setToValidation({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setToValidation({ error: false, label: "To" })
+            setToValidation({ error: false, label: "" })
         }
         if (date[0] === "") {
             setDepDateValidation({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setDepDateValidation({ error: false, label: "Departure Date" })
+            setDepDateValidation({ error: false, label: "" })
         }
         if (date[1] === "") {
             setRetDateValidation({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setRetDateValidation({ error: false, label: "Return Date" })
+            setRetDateValidation({ error: false, label: "" })
         }
         if (isError) {
             setFetching(false)
@@ -558,8 +558,6 @@ const Search = () => {
     } 
     const handleEditDepFlight = (e, reserve,depFlight,retFlight) => {
         e.preventDefault()
-        setSelectedRet(retFlight)
-        setDepSeat([])
         history.push(
             {
                 pathname: "/BookFlight",
@@ -576,8 +574,6 @@ const Search = () => {
     }
     const handleEditRetFlight = (e, reserve,depFlight,retFlight) => {
         e.preventDefault()
-        setSelectedDep(depFlight)
-        setRetSeat([])
         history.push(
             {
                 pathname: "/BookFlight",
@@ -592,7 +588,7 @@ const Search = () => {
             }
         )
     }
-    const handleEditSearch = (e,depCountry,destCountry,cabin,seats,depEditDate,retEditDate,dep,other) => {
+    const handleEditSearch = (e,depCountry,destCountry,cabin,seats,depEditDate,retEditDate,dep,other, reservation) => {
         const depDate = new Date(depEditDate);
         var depDateFormat = (depDate.getFullYear()) + "-" + (depDate.getMonth() + 1) + "-" + (depDate.getDate())
         if ((depDate.getMonth() + 1) < 10) {
@@ -617,6 +613,27 @@ const Search = () => {
                 returnDateFormat = (returnDate.getFullYear()) + '-' + (returnDate.getMonth() + 1) + "-0" + (returnDate.getDate())
             }
         }
+        let isError = false
+        if(depEditDate === "" && dep)
+        {
+            setDepDateValidation({error:true, label:"This field is required"})
+            isError= true
+        }
+        else{
+            setDepDateValidation({error:false, label:""})
+        }
+        if(retEditDate === "" && !dep)
+        {
+            setRetDateValidation({error:true, label:"This field is required"})
+            isError= true
+        }
+        else{
+            setRetDateValidation({error:false, label:""})
+        }
+        if(isError){
+            setFetching(false)
+            return
+        }
         e.preventDefault();
         var data = {}
         if(dep){
@@ -625,6 +642,10 @@ const Search = () => {
             data.departureAirport= depCountry
             data.cabin= cabin
             data.seats= seats
+            setSelectedRet(other)
+            setDepSeat([])
+            setRetSeat(reservation.retSeatNumbers)
+            console.log("return flight edit: ", selectedRetFlight)
             }
         else{
             data.departureDate= returnDateFormat
@@ -632,6 +653,9 @@ const Search = () => {
             data.departureAirport= depCountry
             data.cabin= cabin
             data.seats= seats
+            setDepSeat(reservation.depSeatNumbers)
+            setSelectedDep(other)
+            setRetSeat([])
         }
         console.log("data: ",data)
         axios.post('/Users/getFlights', data)

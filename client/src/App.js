@@ -62,11 +62,12 @@ function App() {
       const token = getCookie('token')
       const user = getLocalStorage('user')
       setLoggedUser({user: user, token: token})
+      console.log("cookie effect")
     }
     else{
       setLoggedUser({user: "", token: ""})
     }
-  })
+  },[])
 
   return (
     <div className="App">

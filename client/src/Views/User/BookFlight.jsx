@@ -14,7 +14,7 @@ import {
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
     List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton, DialogTitle, Tooltip, Accordion,
-    AccordionSummary, AccordionDetails
+    AccordionSummary, AccordionDetails, Link
 } from '@mui/material';
 
 
@@ -160,7 +160,7 @@ function BookFlight() {
     }
     const handleShowCheckout = (e) => {
         e.preventDefault()
-        if (loggedUser.user === undefined) {
+        if (loggedUser.user === "") {
             setShowCheckout(false)
             setLoginOpen(true)
         }
@@ -172,7 +172,7 @@ function BookFlight() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true)
-        if (loggedUser.user === null || loggedUser.user === undefined) {
+        if (loggedUser.user === "") {
             setLoading(false);
             setLoginOpen(true);
         }
@@ -203,7 +203,6 @@ function BookFlight() {
                     changeData.newFlightId = selectedRetFlight._id
                     changeData.newSeats = retSeat
                 }
-                console.log(changeData)
             }
 
             if (!stripe || !elements) {
@@ -214,14 +213,11 @@ function BookFlight() {
                 paymentMethodType: 'card',
                 currency: 'egp',
             }).then((res) => {
-                console.log(res)
-                console.log(reserveData)
                 if(change===true){
                     if(departure=== true){
                         console.log("changeData: ",changeData)
                         axios.put('/Users/changeDep',changeData)
                         .then((response) => {
-                            console.log(response.data)
                             setLoading(false)
                             setSuccess(true)
                             setConfirmDialog(true)
@@ -230,7 +226,6 @@ function BookFlight() {
                     else{
                         axios.put('/Users/changeRet',changeData)
                         .then((response) => {
-                            console.log(response.data)
                             setLoading(false)
                             setSuccess(true)
                             setConfirmDialog(true)
@@ -347,6 +342,8 @@ function BookFlight() {
                                                         readOnly={!departure}
                                                         maxDate={new Date(reservation.rerturnDate)}
                                                         disablePast
+                                                        error={depDateValidation.error}
+                                                        helperText={depDateValidation.label}
                                                         onChange={(newValue) => {
                                                             setDepEditDate(newValue);
                                                         }}
@@ -367,6 +364,8 @@ function BookFlight() {
                                                         minDate={new Date(reservation.departureDate)}
                                                         defaultValue={new Date(reservation.rerturnDate)}
                                                         formatDate="yyyy/MM/dd"
+                                                        error={retDateValidation.error}
+                                                        helperText={retDateValidation.label}
                                                         disabled={departure}
                                                         readOnly={departure}
                                                         disablePast={departure}
@@ -394,7 +393,7 @@ function BookFlight() {
                                                             reservation.cabin,
                                                             reservation.seats,
                                                             depEditDate, retEditDate,
-                                                            departure, other)
+                                                            departure, other,reservation)
                                                     }}
                                                 >
                                                     Search
@@ -440,11 +439,12 @@ function BookFlight() {
                                                             {...params}
                                                             color='white'
                                                             focused
-                                                            placeholder={fromValidation.label}
+                                                            placeholder="From"
                                                             label="FROM"
                                                             error={fromValidation.error}
                                                             fullWidth
                                                             sx={{ input: { color: '#fff' } }}
+                                                            helperText={fromValidation.label}
                                                             required
                                                             onChange={handleFromChange}
                                                             inputProps={{
@@ -483,9 +483,10 @@ function BookFlight() {
                                                             color='white'
                                                             focused
                                                             sx={{ input: { color: '#fff' } }}
-                                                            placeholder={toValidation.label}
+                                                            placeholder="To"
                                                             label="TO"
                                                             error={toValidation.error}
+                                                            helperText={toValidation.label}
                                                             fullWidth
                                                             required
                                                             onChange={handleToChange}
@@ -521,7 +522,8 @@ function BookFlight() {
                                                                     required
                                                                     fullWidth
                                                                     error={depDateValidation.error}
-                                                                    placeholder={depDateValidation.label}
+                                                                    placeholder="Departure Date"
+                                                                    helperText={depDateValidation.label}
                                                                     InputLabelProps={{
                                                                         shrink: true,
                                                                     }}
@@ -534,7 +536,8 @@ function BookFlight() {
                                                                     focused
                                                                     fullWidth
                                                                     error={retDateValidation.error}
-                                                                    placeholder={retDateValidation.label}
+                                                                    placeholder="Return Date"
+                                                                    helperText={retDateValidation.label}
                                                                     InputLabelProps={{
                                                                         shrink: true,
                                                                     }}
@@ -1298,12 +1301,28 @@ function BookFlight() {
                                                     </Timeline>
                                                 </Grid>
                                                 <Grid item sx={4}>
+                                                    {
+                                                    change ?
+                                                    departure
+                                                    ? 
+                                                    <>
                                                     <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                                         <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={handleChangeDepFlight}>
+                                                        <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
                                                             Change this flight
                                                         </Button>
                                                     </Box>
+                                                    </> 
+                                                    : 
+                                                    <></>
+                                                    :
+                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
+                                                    <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
+                                                        Change this flight
+                                                    </Button>
+                                                </Box>
+                                                    }
                                                 </Grid>
                                                 <Grid item sx={8}>
                                                     <Typography variant="h6" component="h6" color="primary">{selectedRetFlight.depCountry} to {selectedRetFlight.destCountry}</Typography>
@@ -1332,12 +1351,30 @@ function BookFlight() {
                                                     </Timeline>
                                                 </Grid>
                                                 <Grid item sx={4}>
-                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
-                                                        <Button variant="outlined" onClick={handleChangeRetFlight}>
-                                                            Change this flight
-                                                        </Button>
-                                                    </Box>
+                                                    {
+                                                        change ?
+                                                        departure 
+                                                        ? 
+                                                            <></> 
+                                                        : 
+                                                        <>
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                                <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
+                                                                    Change this flight
+                                                                </Button>
+                                                            </Box>
+                                                        </>
+                                                        :
+                                                        <>
+                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                                <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
+                                                                    Change this flight
+                                                                </Button>
+                                                            </Box>
+                                                        </>
+                                                        }
                                                 </Grid>
                                             </Grid>
                                         </Paper>
@@ -1346,7 +1383,10 @@ function BookFlight() {
                                         <Paper elevation={2} style={{ borderRadius: '1rem', marginTop: '30px', padding: '30px' }}>
                                             <Box style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Typography variant="h4" component="h4" color="secondary">
-                                                    Total Price: {((cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.returnPrice) * (seats))} EGP
+                                                    Total Price: {change ? departure ? ((cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.returnPrice) * (seats))
+                                                     : ((cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats))
+                                                    : ((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice  : selectedDepFlight.businessPrice) * (seats))
+                                                    } EGP
                                                 </Typography>
                                                 <br />
                                                 <Divider variant="middle" />
@@ -1420,13 +1460,13 @@ function BookFlight() {
                                                                 <TimelineDot variant="outlined" color="secondary" />
                                                                 <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                             </TimelineSeparator>
-                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} {selectedDepFlight.depCountry}, {from} <br /> Terminal 1</TimelineContent>
+                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.departureTime} {selectedDepFlight.depCountry}, {selectedDepFlight.departureAirport} <br /> Terminal 1</TimelineContent>
                                                         </TimelineItem>
                                                         <TimelineItem>
                                                             <TimelineSeparator>
                                                                 <TimelineDot variant="outlined" color="secondary" />
                                                             </TimelineSeparator>
-                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.arrivalTime} {selectedDepFlight.destCountry}, {to} <br /> Terminal 2</TimelineContent>
+                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedDepFlight.arrivalTime} {selectedDepFlight.destCountry}, {selectedDepFlight.destinationAirport} <br /> Terminal 2</TimelineContent>
                                                         </TimelineItem>
                                                     </Timeline>
                                                 </Grid>
@@ -1469,7 +1509,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sm={9}></Grid>
                                                 <Grid item sm={3}>
-                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats)}</Typography>
                                                 </Grid>
                                                 <Grid item sm={12}>
                                                     <Alert icon={<ScheduleIcon />} severity="info">
@@ -1489,13 +1529,13 @@ function BookFlight() {
                                                                 <TimelineDot variant="outlined" color="secondary" />
                                                                 <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
                                                             </TimelineSeparator>
-                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.destCountry}, {from} <br /> Terminal 6A</TimelineContent>
+                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.departureTime} {selectedRetFlight.depCountry}, {selectedRetFlight.departureAirport} <br /> Terminal 6A</TimelineContent>
                                                         </TimelineItem>
                                                         <TimelineItem>
                                                             <TimelineSeparator>
                                                                 <TimelineDot variant="outlined" color="secondary" />
                                                             </TimelineSeparator>
-                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.arrivalDate} {selectedRetFlight.depCountry}, {to} <br /> Terminal 2</TimelineContent>
+                                                            <TimelineContent style={{ fontWeight: 'bold' }} width="500px">{selectedRetFlight.arrivalTime} {selectedRetFlight.destCountry}, {selectedRetFlight.destinationAirport} <br /> Terminal 2</TimelineContent>
                                                         </TimelineItem>
                                                     </Timeline>
                                                 </Grid>
@@ -1538,7 +1578,7 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sm={9}></Grid>
                                                 <Grid item sm={3}>
-                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                    <Typography variant="h6">Total Price: EGP {(cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)}</Typography>
                                                 </Grid>
                                                 <Grid item sm={12}>
                                                     <Alert icon={<ScheduleIcon />} severity="info">
@@ -1631,6 +1671,10 @@ function BookFlight() {
                                             >
                                                 {isFetchingUser ? <CircularProgress color="primary" /> : "Login"}
                                             </Button>
+                                            <br />
+                                            <Link href="/Register" color="secondary">
+                                                <Typography variant="subtitle1">Don't Have an Account, Sign Up</Typography>
+                                            </Link>
                                         </Box>
                                     </Box>
                                 </Grid>

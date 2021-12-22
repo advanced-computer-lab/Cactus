@@ -44,7 +44,6 @@ const UserSchema = new Schema({
     isAdmin: {
         type: Boolean
     },
-
     passportNumber:{
         type:Number   
     },

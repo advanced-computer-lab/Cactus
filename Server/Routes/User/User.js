@@ -118,28 +118,6 @@ UserRouter.post('/reserveFlight', (req, res) => {
     var departureTime = ""
     var returnTime = ""
     console.log("Sending Mail Here");
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'Cactusairlinesguc@gmail.com',
-            pass: 'w0BNWlUcVIqx'
-        }
-    });
-
-    var mailOptions = {
-        from: 'Cactusairlinesguc@gmail.com',
-        to: req.body.email,//Insert User Email Here
-        subject: 'Booking Confirmation',
-        text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + '. \r\n Cactus Airlines Team.'
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
     Flight.findById(req.body.departureId)
         .then((flight) => {
             if (req.body.cabin === 'business') {
@@ -195,6 +173,28 @@ UserRouter.post('/reserveFlight', (req, res) => {
                         reserve.depSeatNumbers = req.body.depSeats
                         reserve.retSeatNumbers = req.body.retSeats
                         users[0].reservations.push(reserve)
+                        var transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'Cactusairlinesguc@gmail.com',
+                                pass: 'w0BNWlUcVIqx'
+                            }
+                        });
+                    
+                        var mailOptions = {
+                            from: 'Cactusairlinesguc@gmail.com',
+                            to: req.body.email,//Insert User Email Here
+                            subject: 'Booking Confirmation',
+                            text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + '\r\n' + JSON.stringify(reserve) +'. \r\n Cactus Airlines Team.'
+                        };
+                    
+                        transporter.sendMail(mailOptions, function (error, info) {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
                         reserve.save()
                         users[0].save().then(() => res.send(reserve))
                             .catch(er => console.log(er))
@@ -202,7 +202,6 @@ UserRouter.post('/reserveFlight', (req, res) => {
             })
                 .catch(er => console.log(er))
         })
-
 })
 
 

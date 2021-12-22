@@ -186,6 +186,8 @@ export default function UserInfo() {
     const [update, setUpdate] = useState(false);
     const [editing, setEditing] = useState(false)
     const [updateUser, setUpdateUser] = useState(false)
+    const [confirmDepBtn, setConfirmDepBtn] = useState(false)
+    const [confirmRetBtn, setConfirmRetBtn] = useState(false)
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -404,8 +406,6 @@ export default function UserInfo() {
         let tempEconomy = depFlight.economyMap;
         let tempBusiness = depFlight.businessMap;
         setNumberOfSeats(reserve.seats);
-        setOpenDepSeats(true)
-        setOpenDepSeats(false)
         setSeats(reserve.seats);
         setCabin(reserve.cabin);
         if (reserve.cabin === "economy") {
@@ -423,23 +423,24 @@ export default function UserInfo() {
             setEconomyDepSeats(tempEconomy);
             recentlyReservedDepE = [];
             economySplicedDep = [];
-            for (let i = 0; i < economyDepSeats.length; i += 10) {
+            for (let i = 0; i < tempEconomy.length; i += 10) {
                 let temp1 = [];
                 let temp2 = [];
                 let temp3 = [];
                 for (let j = i; j < i + 3; j++) {
-                    temp1.push(economyDepSeats[j]);
+                    temp1.push(tempEconomy[j]);
                 }
                 for (let k = i + 3; k < i + 3 + 4; k++) {
-                    temp2.push(economyDepSeats[k]);
+                    temp2.push(tempEconomy[k]);
                 }
                 for (let l = i + 7; l < i + 7 + 3; l++) {
-                    temp3.push(economyDepSeats[l]);
+                    temp3.push(tempEconomy[l]);
                 }
                 economySplicedDep.push(temp1);
                 economySplicedDep.push(temp2);
                 economySplicedDep.push(temp3);
             }
+            
         } else {
             const reservedSeats = [];
             for (let i = 0; i < reserve.depSeatNumbers.length; i++) {
@@ -455,11 +456,9 @@ export default function UserInfo() {
             setBusinessDepSeats(tempBusiness);
             recentlyReservedDepB = [];
         }
-        openDep()
-    };
-    const openDep = () =>{
         setOpenDepSeats(true)
-    }
+    };
+    
     const handleCancelDialog = (e, reservation) => {
         setOpenDialog(true)
         setReservationID(reservation)
@@ -496,6 +495,9 @@ export default function UserInfo() {
         e.preventDefault();
         if (!(numberOfSeats === 0)) {
             setNumberOfSeats(numberOfSeats - 1);
+            if(numberOfSeats === 1){
+                setConfirmDepBtn(true)
+            }
             if (cabin === "business") {
                 let seat = businessDepSeats.find((o, i) => {
                     if (o.number === params) {
@@ -553,6 +555,9 @@ export default function UserInfo() {
         e.preventDefault();
         if (!(numberOfSeats === 0)) {
             setNumberOfSeats(numberOfSeats - 1);
+            if(numberOfSeats === 1){
+                setConfirmRetBtn(true)
+            }
             if (cabin === "business") {
                 let seat = businessRetSeats.find((o, i) => {
                     if (o.number === params) {
@@ -608,6 +613,7 @@ export default function UserInfo() {
     };
     const handleResetRetSeats = (e) => {
         e.preventDefault();
+        setConfirmRetBtn(false)
         if (cabin === "business") {
             for (let index = 0; index < recentlyReservedRetB.length; index++) {
                 businessRetSeats[recentlyReservedRetB[index]].reserved = false;
@@ -652,6 +658,7 @@ export default function UserInfo() {
     };
     const handleResetDepSeats = (e) => {
         e.preventDefault();
+        setConfirmDepBtn(false)
         if (cabin === "business") {
             for (let index = 0; index < recentlyReservedDepB.length; index++) {
                 businessDepSeats[recentlyReservedDepB[index]].reserved = false;
@@ -749,18 +756,18 @@ export default function UserInfo() {
             setEconomyRetSeats(tempEconomy);
             recentlyReservedRetE = [];
             economySplicedRet = [];
-            for (let i = 0; i < economyRetSeats.length; i += 10) {
+            for (let i = 0; i < tempEconomy.length; i += 10) {
                 let temp1 = [];
                 let temp2 = [];
                 let temp3 = [];
                 for (let j = i; j < i + 3; j++) {
-                    temp1.push(economyRetSeats[j]);
+                    temp1.push(tempEconomy[j]);
                 }
                 for (let k = i + 3; k < i + 3 + 4; k++) {
-                    temp2.push(economyRetSeats[k]);
+                    temp2.push(tempEconomy[k]);
                 }
                 for (let l = i + 7; l < i + 7 + 3; l++) {
-                    temp3.push(economyRetSeats[l]);
+                    temp3.push(tempEconomy[l]);
                 }
                 economySplicedRet.push(temp1);
                 economySplicedRet.push(temp2);
@@ -1602,7 +1609,10 @@ export default function UserInfo() {
                                             {/* Ret Seats */}
                                             <Dialog
                                                 open={openRetSeats}
-                                                onClose={() => setOpenRetSeats(false)}
+                                                onClose={() => {
+                                                    setConfirmRetBtn(false)
+                                                    setOpenRetSeats(false)
+                                                }}
                                                 maxWidth="xl"
                                             >
                                                 <DialogTitle>
@@ -1644,15 +1654,9 @@ export default function UserInfo() {
                                                                     <Grid item sm={10}></Grid>
                                                                     <Grid item sm={2}>
                                                                         <Tooltip title="Reset Seats">
-                                                                            <IconButton
-                                                                                color="error"
-                                                                                onClick={
-                                                                                    handleResetRetSeats
-                                                                                }
-                                                                                aria-label="reset"
-                                                                            >
-                                                                                <RestoreIcon />
-                                                                            </IconButton>
+                                                                            <Button startIcon={<RestoreIcon />} color="error" onClick={handleResetRetSeats} aria-label="reset">
+                                                                                Reset Seats
+                                                                            </Button>
                                                                         </Tooltip>
                                                                     </Grid>
                                                                     <Grid item sm={3}>
@@ -1661,6 +1665,8 @@ export default function UserInfo() {
                                                                             endIcon={<ExitToAppIcon />}
                                                                             fullWidth
                                                                             color="error"
+                                                                            disabled color="error"
+                                                                            style={{ color: "white", backgroundColor: "red" }}
                                                                         >
                                                                             Exit
                                                                         </Button>
@@ -1916,6 +1922,8 @@ export default function UserInfo() {
                                                                             endIcon={<ExitToAppIcon />}
                                                                             fullWidth
                                                                             color="error"
+                                                                            disabled color="error"
+                                                                            style={{ color: "white", backgroundColor: "red" }}
                                                                         >
                                                                             Exit
                                                                         </Button>
@@ -1939,6 +1947,7 @@ export default function UserInfo() {
                                                         onClick={handleRetSeatsChanged}
                                                         variant="outlined"
                                                         color="success"
+                                                        disabled={!confirmRetBtn}
                                                     >
                                                         Confirm
                                                     </Button>
@@ -1947,8 +1956,11 @@ export default function UserInfo() {
                                             {/* dep seats */}
                                             <Dialog
                                                 open={openDepSeats}
-                                                onClose={() => setOpenDepSeats(false)}
-                                                maxWidth="lg"
+                                                onClose={() => {
+                                                    setConfirmDepBtn(false)
+                                                    setOpenDepSeats(false)}
+                                                }
+                                                maxWidth="xl"
                                             >
                                                 <DialogTitle>
                                                     Change Departure Flight Seats
@@ -1960,7 +1972,6 @@ export default function UserInfo() {
                                                             variant="outlined"
                                                             style={{
                                                                 borderRadius: "1rem",
-                                                                marginLeft: "150px",
                                                                 marginTop: "50px",
                                                                 padding: "30px",
                                                                 width: "1000px",
@@ -1990,15 +2001,9 @@ export default function UserInfo() {
                                                                     <Grid item sm={10}></Grid>
                                                                     <Grid item sm={2}>
                                                                         <Tooltip title="Reset Seats">
-                                                                            <IconButton
-                                                                                color="error"
-                                                                                onClick={
-                                                                                    handleResetDepSeats
-                                                                                }
-                                                                                aria-label="reset"
-                                                                            >
-                                                                                <RestoreIcon />
-                                                                            </IconButton>
+                                                                        <Button startIcon={<RestoreIcon />} color="error" onClick={handleResetDepSeats} aria-label="reset">
+                                                                            Reset Seats
+                                                                        </Button>
                                                                         </Tooltip>
                                                                     </Grid>
                                                                     <Grid item sm={3}>
@@ -2007,6 +2012,8 @@ export default function UserInfo() {
                                                                             endIcon={<ExitToAppIcon />}
                                                                             fullWidth
                                                                             color="error"
+                                                                            disabled color="error"
+                                                                            style={{ color: "white", backgroundColor: "red" }}
                                                                         >
                                                                             Exit
                                                                         </Button>
@@ -2261,7 +2268,8 @@ export default function UserInfo() {
                                                                             variant="contained"
                                                                             endIcon={<ExitToAppIcon />}
                                                                             fullWidth
-                                                                            color="error"
+                                                                            disabled color="error"
+                                                                            style={{ color: "white", backgroundColor: "red" }}
                                                                         >
                                                                             Exit
                                                                         </Button>
@@ -2285,6 +2293,7 @@ export default function UserInfo() {
                                                         onClick={handleDepSeatsChanged}
                                                         variant="outlined"
                                                         color="success"
+                                                        disabled={!confirmDepBtn}
                                                     >
                                                         Confirm
                                                     </Button>

@@ -85,7 +85,6 @@ export default function SignInSide() {
         setOpen(true)
         console.log(err)
       })
-    console.log(user)
   }
 
 
