@@ -75,16 +75,16 @@ function App() {
         <Router>
           <Switch>
             <Route path="/adminHome">
-              <AdminHome />
+              {loggedUser.user.isAdmin ? <AdminHome /> : <Unauthorized />}
             </Route>
             <Route path="/addFlight">
-              <AddFlight />
+            {loggedUser.user.isAdmin ? <AddFlight /> : <Unauthorized />}
             </Route>
             <Route path="/editFlight">
-              <EditFlight />
+            {loggedUser.user.isAdmin ? <EditFlight /> : <Unauthorized />}
             </Route>
             <Route path="/findFlight">
-              <FindFlight />
+            {loggedUser.user.isAdmin ? <FindFlight /> : <Unauthorized />}
             </Route>
             <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
               <Route exact path="/" component={LandingPage} />
