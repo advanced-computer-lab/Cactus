@@ -35,7 +35,7 @@ function Register() {
     const [firstNVal, setFirstNVal] = React.useState({ error: false, message: "" })
     const [lastName, setLName] = React.useState("");
     const [lastNVal, setLastNVal] = React.useState({ error: false, message: "" })
-    const [dateOfBirth, setDoB] = React.useState("");
+    const [dateOfBirth, setDoB] = React.useState();
     const [dobVal, setDobVal] = React.useState({ error: false, message: "" })
     const [username, setUsername] = React.useState("");
     const [usernameVal, setUsernameVal] = React.useState({ error: false, message: "" });
@@ -62,7 +62,7 @@ function Register() {
     const [passwordVal, setPasswordVal] = React.useState({ error: false, message: "" })
     const [rePasswordVal, setRePasswordVal] = React.useState({ error: false, message: "" })
     const [Error, setError] = React.useState(false)
-    const [personalInfoError, setPersonalInfoError] = React.useState(false)
+    const [register, setRegister] = React.useState(false)
 
     const handlePasswordChange = (prop) => (event) => {
         setPassword({ ...password, [prop]: event.target.value });
@@ -256,12 +256,12 @@ function Register() {
                 setActiveStep((prevActiveStep) => prevActiveStep + 1);
             }
         }
-        if (!(index === 1 && Error)) {
+        if (!(index === 2 && Error)) {
             const checkError = checkPersonalValidation(firstName,lastName,passportNumber,country,city)
             if (checkError) {
                 index = 1;
             } else {
-                index++;
+                index = 2;
             }
         }
         if (index === 2) {
@@ -285,6 +285,7 @@ function Register() {
             axios.post('/Authentication/Register', newUser)
                 .then((res) => {
                     console.log(res.data)
+                    setRegister(true)
                 })
                 .catch((error) => {
                     console.log(error.message)
@@ -397,6 +398,7 @@ function Register() {
         else { setLastNVal({ error: false, message: "" }) }
     }
     const handlePassportChange = (e) => {
+        setPassportNumber(e.target.value)
         if ((e.target.value).length === 0) {
             setPassportVal({ error: true, message: "This Field is Required" })
             setError(true)
@@ -440,7 +442,6 @@ function Register() {
             setCityVal({error: false, message: ""})
         }
     }
-    
 
 
     return (
@@ -760,6 +761,10 @@ function Register() {
                                                             shrink: true,
                                                         }}
                                                         required
+                                                        onChange={(e)=>{
+                                                            e.preventDefault();
+                                                            setDoB(e.target.value)
+                                                        }}
                                                         helperText={dobVal.message}
                                                         error={dobVal.error}
                                                     />

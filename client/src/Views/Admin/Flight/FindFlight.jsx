@@ -18,6 +18,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 function FindFlight() {
   const [flights, SetFlights] = useState([]);
+  const [openWarning, setOpenWarning] = useState(false)
   const [open, setOpen] = React.useState(false);
   const [id, setId] = useState([])
   const history = useHistory()
@@ -30,12 +31,11 @@ function FindFlight() {
     setOpen(false);
   };
   const handleDelete = () => {
-
-    axios.delete('Flight/deleteFlight/'+id)
-    .then(()=> { 
-      })
-    .catch((err) => console.log(err))
-    setOpen(false);
+      axios.delete('Flight/deleteFlight/'+id)
+      .then(()=> { 
+        })
+      .catch((err) => console.log(err))
+      setOpen(false);
   };
   useEffect(()=>{
     const fetchFlights = async () =>{
@@ -79,11 +79,17 @@ function FindFlight() {
             .forEach(
               (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
             );
-            history.push({
-              pathname: "/EditFlight",
-              search: '?query=abc',
-              state: {detail:  getFlight(thisRow.id)}
-            })
+            const flight = getFlight(thisRow.id)
+            if(flight.availableEconomy === flight.economySeats && flight.availableBusiness === flight.businessSeats){
+              history.push({
+                pathname: "/EditFlight",
+                search: '?query=abc',
+                state: {detail:  flight}
+              })
+          }
+          else{
+            setOpenWarning(true)
+          }
           console.log(thisRow.id);
         };
         return <Button color="secondary" variant="contained" onClick={onClick}>Edit</Button>;
@@ -94,7 +100,6 @@ function FindFlight() {
 
         const onClick = (e) => {
           e.stopPropagation(); // don't select this row after clicking
-          handleClickOpen();
           // const api: GridApi = params.api;
           // const thisRow: Record<string, GridCellValue> = {};
           const api = params.api;
@@ -105,15 +110,20 @@ function FindFlight() {
             .forEach(
               (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
             );
-            setId(thisRow.id);  
+            setId(thisRow.id); 
+            const flight = getFlight(thisRow.id)
+            if(flight.availableEconomy === flight.economySeats && flight.availableBusiness === flight.businessSeats){
+              handleClickOpen();    
+            }
+            else
+              setOpenWarning(true)
           console.log(thisRow.id);
         };
         return <Button color="error" variant="contained" onClick={onClick}>Delete</Button>;
       }
     },
   ];
-  // flights.departureDate = moment(flights.departureDate).format('MM DD YYYY')
-  // flights.arrivalDate = moment(flights.arrivalDate).format('MM DD YYYY')
+
   var rowsvalue = flights;
 
 
@@ -146,6 +156,27 @@ function FindFlight() {
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
             <Button onClick={handleDelete} color="error">Delete</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={openWarning}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={()=>{
+            setOpenWarning(false)
+          }}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle>{"Flight is Reserved"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+              This Flight is reserved so you are not allowed to Edit/Delete it.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={()=>{
+              setOpenWarning(false)
+            }}>OK</Button>
           </DialogActions>
         </Dialog>
       </div>

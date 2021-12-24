@@ -319,22 +319,18 @@ UserRouter.post('/updateReservation',  (req, res) => {
                         Flight.findById(reserve.departureId)
                             .then((flight) => {
                                 if (reserve.cabin === 'business') {
-                                    flight.availableBusiness += reserve.seats
                                     flight.businessMap = req.body.depFlightMap
                                 }
                                 else {
-                                    flight.availableEconomy += reserve.seats
                                     flight.economyMap = req.body.depFlightMap
                                 }
                                 flight.save().then(() => {
                                     Flight.findById(reserve.returnId)
                                         .then((flight2) => {
                                             if (reserve.cabin === 'business') {
-                                                flight2.availableBusiness += reserve.seats
                                                 flight2.businessMap = req.body.retFlightMap
                                             }
                                             else {
-                                                flight2.availableEconomy += reserve.seats
                                                 flight2.economyMap = req.body.retFlightMap
                                             }
                                             flight2.save().then(() => { res.send({ success: true }) })

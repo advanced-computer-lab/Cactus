@@ -62,7 +62,7 @@ function App() {
       const token = getCookie('token')
       const user = getLocalStorage('user')
       setLoggedUser({user: user, token: token})
-      console.log("cookie effect")
+      console.log("logged: ",user)
     }
     else{
       setLoggedUser({user: "", token: ""})
@@ -72,6 +72,7 @@ function App() {
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
+          <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
         <Router>
           <Switch>
             <Route path="/adminHome">
@@ -86,7 +87,6 @@ function App() {
             <Route path="/findFlight">
             {loggedUser.user.isAdmin ? <FindFlight /> : <Unauthorized />}
             </Route>
-            <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
               <Route exact path="/" component={LandingPage} />
               <Route path={"/BookFlight"} component={UserHome} />
               <Route path="/Register">
@@ -99,9 +99,9 @@ function App() {
                 {loggedUser.user ? <UserProfile /> : <Unauthorized />}
               </Route>
               <Route path={"/ChangePassword"} component={ChangePassword} />
-            </UserContext.Provider>
           </Switch>
         </Router>
+            </UserContext.Provider>
       </ThemeProvider>
     </div>
   );

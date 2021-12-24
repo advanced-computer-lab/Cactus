@@ -645,6 +645,7 @@ const Search = () => {
             setSelectedRet(other)
             setDepSeat([])
             setRetSeat(reservation.retSeatNumbers)
+            setNumberOfSeats(seats)
             console.log("return flight edit: ", selectedRetFlight)
             }
         else{
@@ -655,6 +656,7 @@ const Search = () => {
             data.seats= seats
             setDepSeat(reservation.depSeatNumbers)
             setSelectedDep(other)
+            setNumberOfSeats(seats)
             setRetSeat([])
         }
         console.log("data: ",data)

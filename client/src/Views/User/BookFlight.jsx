@@ -71,7 +71,6 @@ function BookFlight() {
     } = Search()
 
     const [progress, setProgress] = React.useState(0);
-    const [details, setDetails] = React.useState(false);
     const [username, setUsername] = React.useState('');
     const [userPass, setPassword] = React.useState('');
     const [isFetchingUser, setFetchingUser] = React.useState(false)
@@ -79,7 +78,6 @@ function BookFlight() {
     const [depEditDate, setDepEditDate] = React.useState()
     const [retEditDate, setRetEditDate] = React.useState()
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
-    const [disablePayment, setDisablePayment] = React.useState(true)
     const history = useHistory();
     const location = useLocation();
     var change = false
@@ -336,10 +334,11 @@ function BookFlight() {
                                                         focused
                                                         sx={{ input: { color: '#fff' } }}
                                                         value={depEditDate}
-                                                        defaultValue={new Date(reservation.departureDate)}
+                                                        // defaultValue={new Date(reservation.departureDate)}
                                                         inputFormat="yyyy/MM/dd"
                                                         disabled={!departure}
                                                         readOnly={!departure}
+                                                        minDate={new Date(reservation.departureDate)}
                                                         maxDate={new Date(reservation.rerturnDate)}
                                                         disablePast
                                                         error={depDateValidation.error}

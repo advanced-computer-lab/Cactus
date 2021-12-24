@@ -581,6 +581,7 @@ export default function UserInfo() {
                         recentlyReservedRetE.push(i);
                         setRetSeats(recentlyReservedRetE);
                         setRetFlightMap(economyRetSeats);
+                        console.log("recently: ", recentlyReservedRetE)
                         return true;
                     }
                 });
@@ -701,10 +702,13 @@ export default function UserInfo() {
 
     const handleRetSeatsChanged = (e) => {
         e.preventDefault()
+        console.log("retSeats: ",retSeats)
         var tmp = retSeats;
+        
         for (let i = 0; i < tmp.length; i++) {
             tmp[i] = tmp[i] + 1;
         }
+        console.log("temp: ", tmp)
         var data = {}
 
         data.username = loggedUser.user.username

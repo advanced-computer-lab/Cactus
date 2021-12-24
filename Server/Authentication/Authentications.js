@@ -18,27 +18,32 @@ AuthRouter.post("/Login", async (req, res) => {
     }
     User.findOne(user).exec()
         .then((result) => {
-            const decipher = crypto.createDecipher('aes192', 'a password');
-            var encrypted = result.password;//Write Here Encrypted password to be Decrypted
-            var decrypted = decipher.update(encrypted, 'hex', 'utf8');
-            decrypted = decrypted + decipher.final('utf8');
-            if (decrypted === req.body.password) {
-                const secret = process.env.ACCESS_TOKEN_SECRET
-                jwt.sign(
-                        { id: result._id },
-                        secret,
-                        { expiresIn: 3600 },
-                        (err, token) => {
-                            if(err) throw err;
-                            res.json({
-                                token,
-                                user: result
-                            });
-                        }
-                )
-            }
-            else
+            if(result === null){
                 res.send(null)
+            }
+            else{
+                const decipher = crypto.createDecipher('aes192', 'a password');
+                var encrypted = result.password;//Write Here Encrypted password to be Decrypted
+                var decrypted = decipher.update(encrypted, 'hex', 'utf8');
+                decrypted = decrypted + decipher.final('utf8');
+                if (decrypted === req.body.password) {
+                    const secret = process.env.ACCESS_TOKEN_SECRET
+                    jwt.sign(
+                            { id: result._id },
+                            secret,
+                            { expiresIn: 3600 },
+                            (err, token) => {
+                                if(err) throw err;
+                                res.json({
+                                    token,
+                                    user: result
+                                });
+                            }
+                    )
+                }
+                else
+                    res.send(null)
+        }
         })
         .catch((err) => {
             console.log(err)

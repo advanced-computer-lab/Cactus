@@ -64,13 +64,16 @@ export default function SignInSide() {
     setFetching(true)
     axios.post('/Authentication/Login', user)
       .then((res) => {
-        if(res.data.user.username === undefined || res.data.user.password === undefined || res.data.user === null){
+        console.log("User: ",res)
+        if(res.data === ""){
           setFetching(false)
           setOpen(true)
         }
         else
         {  if (res.data.user.isAdmin) {
             setFetching(false)
+            setAuthentication(res.data.token, res.data.user)
+            setLoggedUser({user: res.data.user, token: res.data.token})
             history.push("/adminHome")
           }
           else{
