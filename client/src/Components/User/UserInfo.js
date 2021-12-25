@@ -135,19 +135,19 @@ export default function UserInfo() {
     const [openDepSeats, setOpenDepSeats] = useState(false);
     const [openRetSeats, setOpenRetSeats] = useState(false);
     const [email, setEmail] = useState(loggedUser.user.email);
-    const [emailVal, setEmailVal] = useState({ error: false, label: "Email" })
+    const [emailVal, setEmailVal] = useState({ error: false, label: "" })
     const [fName, setFName] = useState(loggedUser.user.firstName);
-    const [fNameVal, setFNameVal] = useState({ error: false, label: "First Name" })
+    const [fNameVal, setFNameVal] = useState({ error: false, label: "" })
     const [lName, setLName] = useState(loggedUser.user.lastName);
-    const [lNameVal, setLNameVal] = useState({ error: false, label: "Last Name" })
-    const [cc1, setCc1] = useState(loggedUser.user.countryCode[0]);
-    const [cc1Val, setCc1Val] = useState({ error: false, label: "Area Code 1" })
+    const [lNameVal, setLNameVal] = useState({ error: false, label: "" })
+    const [cc1, setCc1] = useState(loggedUser.user.countryCode[0] ? loggedUser.user.countryCode[0]:"");
+    const [cc1Val, setCc1Val] = useState({ error: false, label: "" })
 
-    const [phone1Val, setPhone1Val] = useState({ error: false, label: "Phone 1" })
+    const [phone1Val, setPhone1Val] = useState({ error: false, label: "" })
 
-    const [passportVal, setPassportVal] = useState({ error: false, label: "Passport" })
-    const [countryVal, setCountryVal] = useState({ error: false, label: "Country/Region" })
-    const [cityVal, setCityVal] = useState({ error: false, label: "City" })
+    const [passportVal, setPassportVal] = useState({ error: false, label: "" })
+    const [countryVal, setCountryVal] = useState({ error: false, label: "" })
+    const [cityVal, setCityVal] = useState({ error: false, label: "" })
     const [cc2, setCc2] = useState(() => {
         if (loggedUser.user.countryCode.length > 1) return loggedUser.user.countryCode[1];
         else return "";
@@ -156,7 +156,7 @@ export default function UserInfo() {
         if (loggedUser.user.countryCode.length > 2) return loggedUser.user.countryCode[2];
         else return "";
     });
-    const [phone1, setPhone1] = useState(loggedUser.user.telephones[0]);
+    const [phone1, setPhone1] = useState(loggedUser.user.telephones[0] ? loggedUser.user.telephones[0]:"");
     const [phone2, setPhone2] = useState(() => {
         if (loggedUser.user.telephones.length > 1) return loggedUser.user.telephones[1];
         else return "";
@@ -166,8 +166,8 @@ export default function UserInfo() {
         else return "";
     });
     const [passport, setPassport] = useState(loggedUser.user.passportNumber);
-    const [country, setCountry] = useState(loggedUser.user.homeAddress.country);
-    const [city, setCity] = useState(loggedUser.user.homeAddress.city);
+    const [country, setCountry] = useState(loggedUser.user.homeAddress ? loggedUser.user.homeAddress.country : "");
+    const [city, setCity] = useState(loggedUser.user.homeAddress ? loggedUser.user.homeAddress.city: "");
     const open = Boolean(anchorEl);
     const [departureFlight, setDepartureFlight] = useState()
     const [returnFlight, setReturnFlight] = useState()
@@ -302,49 +302,49 @@ export default function UserInfo() {
             setEmailVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setEmailVal({ error: false, label: "Email" })
+            setEmailVal({ error: false, label: "" })
         }
         if (fName === "") {
             setFNameVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setFNameVal({ error: false, label: "First Name" })
+            setFNameVal({ error: false, label: "" })
         }
         if (lName === "") {
             setLNameVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setLNameVal({ error: false, label: "Last Name" })
+            setLNameVal({ error: false, label: "" })
         }
         if (phone1 === "") {
             setPhone1Val({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setPhone1Val({ error: false, label: "Phone" })
+            setPhone1Val({ error: false, label: "" })
         }
         if (cc1 === "") {
             setCc1Val({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setCc1Val({ error: false, label: "Area Code" })
+            setCc1Val({ error: false, label: "" })
         }
         if (passport === "") {
             setPassportVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setPhone1Val({ error: false, label: "First Name" })
+            setPassportVal({ error: false, label: "" })
         }
         if (country === "") {
             setCountryVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setCountryVal({ error: false, label: "Country/Region" })
+            setCountryVal({ error: false, label: "" })
         }
         if (city === "") {
             setCityVal({ error: true, label: "This field is required" })
             isError = true
         } else {
-            setCityVal({ error: false, label: "City" })
+            setCityVal({ error: false, label: "" })
         }
         if (isError) {
             setEditing(false)
@@ -985,7 +985,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={fNameVal.label}
+                                                                                    label="First Name"
+                                                                                    helperText={fNameVal.label}
                                                                                     error={fNameVal.error}
                                                                                     defaultValue={fName}
                                                                                     onChange={fnameChange}
@@ -998,7 +999,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={lNameVal.label}
+                                                                                    label="Last Name"
+                                                                                    helperText={lNameVal.label}
                                                                                     error={lNameVal.error}
                                                                                     defaultValue={lName}
                                                                                     onChange={lnameChange}
@@ -1010,7 +1012,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={emailVal.label}
+                                                                                    label="Email"
+                                                                                    helperText={emailVal.label}
                                                                                     error={emailVal.error}
                                                                                     defaultValue={email}
                                                                                     onChange={emailChange}
@@ -1022,7 +1025,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={cc1Val.label}
+                                                                                    label="Country Code 1"
+                                                                                    helperText={cc1Val.label}
                                                                                     error={cc1Val.error}
                                                                                     defaultValue={cc1}
                                                                                     onChange={cc1Change}
@@ -1033,11 +1037,12 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={phone1Val.label}
+                                                                                    helperText={phone1Val.label}
+                                                                                    label="Phone Number 1"
                                                                                     error={phone1Val.error}
                                                                                     defaultValue={phone1}
                                                                                     onChange={p1Change}
-                                                                                    type="tel"
+                                                                                    type="text"
                                                                                     required
                                                                                 />
                                                                             </Grid>
@@ -1085,7 +1090,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={countryVal.label}
+                                                                                    helperText={countryVal.label}
+                                                                                    label="Country"
                                                                                     error={countryVal.error}
                                                                                     defaultValue={country}
                                                                                     onChange={countryChange}
@@ -1097,8 +1103,9 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={cityVal.label}
+                                                                                    label="City"
                                                                                     error={cityVal.error}
+                                                                                    helperText={cityVal.label}
                                                                                     defaultValue={city}
                                                                                     onChange={cityChange}
                                                                                     type="text"
@@ -1109,7 +1116,8 @@ export default function UserInfo() {
                                                                                 <TextField
                                                                                     fullWidth
                                                                                     variant="outlined"
-                                                                                    label={passportVal.label}
+                                                                                    label="Passport Number"
+                                                                                    helperText={passportVal.label}
                                                                                     error={passportVal.error}
                                                                                     defaultValue={passport}
                                                                                     onChange={passportChange}
