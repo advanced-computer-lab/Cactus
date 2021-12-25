@@ -14,7 +14,7 @@ import {
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
     List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton, DialogTitle, Tooltip, Accordion,
-    AccordionSummary, AccordionDetails, Link
+    AccordionSummary, AccordionDetails, Link, InputLabel, Select, MenuItem, OutlinedInput, InputAdornment, FormHelperText
 } from '@mui/material';
 
 
@@ -54,6 +54,8 @@ import DatePicker from '@mui/lab/DatePicker';
 import './BookFlight.css';
 import Search from './Logic/Search'
 import suitCase from '../../Images/suitcase.png'
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Visibility from '@mui/icons-material/Visibility';
 
 
 function BookFlight() {
@@ -78,6 +80,18 @@ function BookFlight() {
     const [depEditDate, setDepEditDate] = React.useState()
     const [retEditDate, setRetEditDate] = React.useState()
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
+    const [title, setTitle] = React.useState()
+    const [signUpUsername, setSignUpUsername] = React.useState()
+    const [email, setEmail] = React.useState()
+    const [firstName, setFirstName] = React.useState()
+    const [lastName, setLastName] = React.useState()
+    const [signUpPassword, setSignUpPassword] = React.useState({
+        password: "",
+        showPassword: false,
+        retypePassword: "",
+        showRetypePassword: false
+    });
+
     const history = useHistory();
     const location = useLocation();
     var change = false
@@ -121,6 +135,89 @@ function BookFlight() {
     }, []);
 
 
+    const [passwordVal, setPasswordVal] = React.useState({ error: false, message: "" })
+    const [rePasswordVal, setRePasswordVal] = React.useState({ error: false, message: "" })
+    const [error, setError] = React.useState(false)
+
+    const handleSignUpPasswordChange = (prop) => (event) => {
+        setSignUpPassword({ ...signUpPassword, [prop]: event.target.value });
+        let passError = false
+        if ((event.target.value).length === 0) {
+            setPasswordVal({ error: true, message: 'This Field is Required' })
+            passError = true
+        }
+        else if ((event.target.value).length < 6) {
+            setPasswordVal({ error: true, message: 'Password must be minimum 6 characters' })
+            passError = true
+        }
+        else if ((event.target.value).length > 16) {
+            setPasswordVal({ error: true, message: 'Password must be maximum 16 characters' })
+            passError = true
+        }
+        else {
+            passError = false
+            setPasswordVal({ error: false, message: '' })
+        }
+        if (passError) {
+            setError(true)
+        }
+        else {
+            setError(false)
+        }
+    };
+    const handleRetypeSignUpPasswordChange = (prop) => (event) => {
+        setSignUpPassword({ ...signUpPassword, [prop]: event.target.value });
+        let rePassError = false
+        if ((event.target.value).length === 0) {
+            setRePasswordVal({ error: true, message: 'This Field is Required' })
+            rePassError = true
+        }
+        else if ((event.target.value).length < 6) {
+            setRePasswordVal({ error: true, message: 'Password must be minimum 6 characters' })
+            rePassError = true
+        }
+        else if ((event.target.value).length > 16) {
+            setRePasswordVal({ error: true, message: 'Password must be maximum 16 characters' })
+            rePassError = true
+        }
+        else {
+            rePassError = false
+            setRePasswordVal({ error: false, message: '' })
+        }
+        if (signUpPassword.password === event.target.value) {
+            setRePasswordVal({ error: false, message: "" })
+            rePassError = false
+        }
+        else {
+            setRePasswordVal({ error: true, message: "Passwords Don't Match" })
+            rePassError = true
+        }
+        if (rePassError) {
+            setError(true)
+        }
+        else {
+            setError(false)
+        }
+    };
+    const handleClickShowPassword = () => {
+        setSignUpPassword({
+            ...signUpPassword,
+            showPassword: !signUpPassword.showPassword,
+        });
+    };
+    const handleClickShowRetypePassword = () => {
+        setSignUpPassword({
+            ...signUpPassword,
+            showRetypePassword: !signUpPassword.showRetypePassword,
+        });
+    };
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    }
+    const handleMouseDownRetypePassword = (event) => {
+        event.preventDefault();
+    }
+
     const handleLoginClose = () => {
         setLoginOpen(false);
     };
@@ -144,7 +241,7 @@ function BookFlight() {
                     setFetchingUser(false)
                     setAlertOpen(true)
                 } else {
-                    setLoggedUser({user: res.data.user, token: res.data.token})
+                    setLoggedUser({ user: res.data.user, token: res.data.token })
                     setLoginOpen(false)
                     setFetchingUser(false)
                 }
@@ -189,15 +286,15 @@ function BookFlight() {
                 firstName: loggedUser.user.firstName,
                 title: loggedUser.user.title
             }
-            var changeData  ={}
-            if(change === true){
+            var changeData = {}
+            if (change === true) {
                 changeData.userId = loggedUser.user._id
                 changeData.reservationId = reservation._id
-                if(departure === true){
+                if (departure === true) {
                     changeData.newFlightId = selectedDepFlight._id
                     changeData.newSeats = depSeat
                 }
-                else{
+                else {
                     changeData.newFlightId = selectedRetFlight._id
                     changeData.newSeats = retSeat
                 }
@@ -211,26 +308,26 @@ function BookFlight() {
                 paymentMethodType: 'card',
                 currency: 'egp',
             }).then((res) => {
-                if(change===true){
-                    if(departure=== true){
-                        console.log("changeData: ",changeData)
-                        axios.put('/Users/changeDep',changeData)
-                        .then((response) => {
-                            setLoading(false)
-                            setSuccess(true)
-                            setConfirmDialog(true)
-                        })
+                if (change === true) {
+                    if (departure === true) {
+                        console.log("changeData: ", changeData)
+                        axios.put('/Users/changeDep', changeData)
+                            .then((response) => {
+                                setLoading(false)
+                                setSuccess(true)
+                                setConfirmDialog(true)
+                            })
                     }
-                    else{
-                        axios.put('/Users/changeRet',changeData)
-                        .then((response) => {
-                            setLoading(false)
-                            setSuccess(true)
-                            setConfirmDialog(true)
-                        })
+                    else {
+                        axios.put('/Users/changeRet', changeData)
+                            .then((response) => {
+                                setLoading(false)
+                                setSuccess(true)
+                                setConfirmDialog(true)
+                            })
                     }
                 }
-                else{
+                else {
                     axios.post('/Users/reserveFlight', reserveData)
                         .then((response) => {
                             console.log(response.data)
@@ -241,7 +338,7 @@ function BookFlight() {
                         .catch((err) => {
                             console.log(err)
                         })
-                    }
+                }
             });
             if (backendError) {
                 console.log(`Error: ${backendError.message}`)
@@ -263,6 +360,35 @@ function BookFlight() {
             }
         }
 
+    }
+    const handleTitleChange = (event) => {
+        setTitle(event.target.value);
+    };
+    const [signUpOpen, setSignUpOpen] = React.useState(true)
+    const handleSignUpClose = (e) => {
+        setSignUpOpen(false)
+    }
+    const emailChange = (e) => {
+        setEmail(e.target.value)
+    }
+    const firstNameChange = (e) => {
+        setFirstName(e.target.value)
+    }
+    const lastNameChange = (e) => {
+        setLastName(e.target.value)
+    }
+    const handleSignUp = (e) => {
+        e.preventDefault()
+        history.push(
+            {
+                pathname: "/",
+                search: '?query=abc',
+                state: {
+                    finished: true
+                }
+            }
+        )
+        setSignUpOpen(false)
     }
 
     return (
@@ -392,7 +518,7 @@ function BookFlight() {
                                                             reservation.cabin,
                                                             reservation.seats,
                                                             depEditDate, retEditDate,
-                                                            departure, other,reservation)
+                                                            departure, other, reservation)
                                                     }}
                                                 >
                                                     Search
@@ -1301,26 +1427,26 @@ function BookFlight() {
                                                 </Grid>
                                                 <Grid item sx={4}>
                                                     {
-                                                    change ?
-                                                    departure
-                                                    ? 
-                                                    <>
-                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
-                                                        <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
-                                                            Change this flight
-                                                        </Button>
-                                                    </Box>
-                                                    </> 
-                                                    : 
-                                                    <></>
-                                                    :
-                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
-                                                    <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
-                                                        Change this flight
-                                                    </Button>
-                                                </Box>
+                                                        change ?
+                                                            departure
+                                                                ?
+                                                                <>
+                                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                        <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
+                                                                        <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
+                                                                            Change this flight
+                                                                        </Button>
+                                                                    </Box>
+                                                                </>
+                                                                :
+                                                                <></>
+                                                            :
+                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <Typography variant="h6" component="h6" color="primary">{(cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.businessPrice) * (seats)} EGP</Typography>
+                                                                <Button variant="outlined" onClick={handleChangeDepFlight} disabled={change}>
+                                                                    Change this flight
+                                                                </Button>
+                                                            </Box>
                                                     }
                                                 </Grid>
                                                 <Grid item sx={8}>
@@ -1352,28 +1478,28 @@ function BookFlight() {
                                                 <Grid item sx={4}>
                                                     {
                                                         change ?
-                                                        departure 
-                                                        ? 
-                                                            <></> 
-                                                        : 
-                                                        <>
-                                                            <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                                <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
-                                                                <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
-                                                                    Change this flight
-                                                                </Button>
-                                                            </Box>
-                                                        </>
-                                                        :
-                                                        <>
-                                                        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                                                <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
-                                                                <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
-                                                                    Change this flight
-                                                                </Button>
-                                                            </Box>
-                                                        </>
-                                                        }
+                                                            departure
+                                                                ?
+                                                                <></>
+                                                                :
+                                                                <>
+                                                                    <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                        <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                                        <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
+                                                                            Change this flight
+                                                                        </Button>
+                                                                    </Box>
+                                                                </>
+                                                            :
+                                                            <>
+                                                                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <Typography variant="h6" component="h6" color="primary">EGP {(cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats)}</Typography>
+                                                                    <Button variant="outlined" onClick={handleChangeRetFlight} disabled={change}>
+                                                                        Change this flight
+                                                                    </Button>
+                                                                </Box>
+                                                            </>
+                                                    }
                                                 </Grid>
                                             </Grid>
                                         </Paper>
@@ -1383,8 +1509,8 @@ function BookFlight() {
                                             <Box style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Typography variant="h4" component="h4" color="secondary">
                                                     Total Price: {change ? departure ? ((cabin === "economy" ? selectedDepFlight.economyPrice - flight2.economyPrice : selectedDepFlight.businessPrice - flight2.returnPrice) * (seats))
-                                                     : ((cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats))
-                                                    : ((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice  : selectedDepFlight.businessPrice) * (seats))
+                                                        : ((cabin === "economy" ? selectedRetFlight.economyPrice - flight2.economyPrice : selectedRetFlight.businessPrice - flight2.businessPrice) * (seats))
+                                                        : ((cabin === "economy" ? selectedRetFlight.economyPrice : selectedRetFlight.businessPrice) * (seats)) + ((cabin === "economy" ? selectedDepFlight.economyPrice : selectedDepFlight.businessPrice) * (seats))
                                                     } EGP
                                                 </Typography>
                                                 <br />
@@ -1671,7 +1797,7 @@ function BookFlight() {
                                                 {isFetchingUser ? <CircularProgress color="primary" /> : "Login"}
                                             </Button>
                                             <br />
-                                            <Link href="/Register" color="secondary">
+                                            <Link color="secondary" onClick={() => setSignUpOpen(true)}>
                                                 <Typography variant="subtitle1">Don't Have an Account, Sign Up</Typography>
                                             </Link>
                                         </Box>
@@ -1680,6 +1806,174 @@ function BookFlight() {
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={handleLoginClose} color="error" variant="contained">Cancel</Button>
+                            </DialogActions>
+                        </Dialog>
+                        <Dialog open={signUpOpen} onClose={handleSignUpClose} maxWidth="md">
+                            <DialogContent>
+                                <Grid item xs={12} sm={12} md={12} component={Paper} elevation={0} square>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            padding: '30px',
+                                            boxShadow: '0px 0px 0px 0px'
+                                        }}
+                                    >
+                                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                                            <LockOutlinedIcon />
+                                        </Avatar>
+                                        <Typography component="h1" variant="h5">
+                                            Sign Up
+                                        </Typography>
+                                        <Box component="form" noValidate sx={{ mt: 1 }}>
+                                            <Grid container spacing={3}>
+                                                {/* Username */}
+                                                <Grid item lg={6}>
+                                                    <TextField
+                                                        margin="normal"
+                                                        required
+                                                        fullWidth
+                                                        id="username"
+                                                        label="Username"
+                                                        name="username"
+                                                        onChange={usernameChange}
+                                                        autoFocus
+                                                    />
+                                                </Grid>
+                                                <Grid item lg={6}></Grid>
+                                                {/* Email */}
+                                                <Grid item lg={12}>
+                                                    <TextField
+                                                        margin="normal"
+                                                        required
+                                                        fullWidth
+                                                        id="email"
+                                                        label="Email"
+                                                        name="email"
+                                                        onChange={emailChange}
+                                                        autoFocus
+                                                    />
+                                                </Grid>
+                                                {/* Title */}
+                                                <Grid item lg={4}>
+                                                    <FormControl sm={{ m: 1 }} fullWidth style={{marginTop: '15px'}}>
+                                                        <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-helper-label"
+                                                            id="demo-simple-select-helper"
+                                                            value={title}
+                                                            label="Title"
+                                                            onChange={handleTitleChange}
+                                                        >
+                                                            <MenuItem value="">
+                                                                <em>None</em>
+                                                            </MenuItem>
+                                                            <MenuItem value="MR">MR</MenuItem>
+                                                            <MenuItem value="MISS">MISS</MenuItem>
+                                                            <MenuItem value="MRS">MRS</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                {/* First Name */}
+                                                <Grid item lg={4}>
+                                                    <TextField
+                                                        margin="normal"
+                                                        required
+                                                        fullWidth
+                                                        id="firstName"
+                                                        label="First Name"
+                                                        name="firstName"
+                                                        onChange={firstNameChange}
+                                                        autoFocus
+                                                    />
+                                                </Grid>
+                                                {/* Last Name */}
+                                                <Grid item lg={4}>
+                                                    <TextField
+                                                        margin="normal"
+                                                        required
+                                                        fullWidth
+                                                        id="lastName"
+                                                        label="Last Name"
+                                                        name="lastName"
+                                                        onChange={lastNameChange}
+                                                        autoFocus
+                                                    />
+                                                </Grid>
+                                                {/* Password */}
+                                                <Grid item lg={6}>
+                                                    <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                        <InputLabel htmlFor="outlined-adornment-password" error={passwordVal.error}>Password</InputLabel>
+                                                        <OutlinedInput
+                                                            id="outlined-adornment-password"
+                                                            type={signUpPassword.showPassword ? 'text' : 'password'}
+                                                            fullWidth
+                                                            value={signUpPassword.password}
+                                                            onChange={handleSignUpPasswordChange('password')}
+                                                            endAdornment={
+                                                                <InputAdornment position="end">
+                                                                    <IconButton
+                                                                        aria-label="toggle password visibility"
+                                                                        onClick={handleClickShowPassword}
+                                                                        onMouseDown={handleMouseDownPassword}
+                                                                        edge="end"
+                                                                    >
+                                                                        {signUpPassword.showPassword ? <VisibilityOff /> : <Visibility />}
+                                                                    </IconButton>
+                                                                </InputAdornment>
+                                                            }
+                                                            label="Password"
+                                                            error={passwordVal.error}
+                                                        />
+                                                        <FormHelperText error={passwordVal.error}>{passwordVal.message}</FormHelperText>
+                                                    </FormControl>
+                                                </Grid>
+                                                {/* Re-Type Password */}
+                                                <Grid item lg={6}>
+                                                    <FormControl sm={{ m: 1 }} variant="outlined" fullWidth>
+                                                        <InputLabel htmlFor="outlined-adornment-password" error={rePasswordVal.error}>Retype Password</InputLabel>
+                                                        <OutlinedInput
+                                                            id="outlined-adornment-password"
+                                                            type={signUpPassword.showRetypePassword ? 'text' : 'password'}
+                                                            fullWidth
+                                                            value={signUpPassword.retypePassword}
+                                                            onChange={handleRetypeSignUpPasswordChange('retypePassword')}
+                                                            endAdornment={
+                                                                <InputAdornment position="end">
+                                                                    <IconButton
+                                                                        aria-label="toggle password visibility"
+                                                                        onClick={handleClickShowRetypePassword}
+                                                                        onMouseDown={handleMouseDownRetypePassword}
+                                                                        edge="end"
+                                                                    >
+                                                                        {signUpPassword.showRetypePassword ? <VisibilityOff /> : <Visibility />}
+                                                                    </IconButton>
+                                                                </InputAdornment>
+                                                            }
+                                                            label="Retype Password"
+                                                            error={rePasswordVal.error}
+                                                        />
+                                                        <FormHelperText error={rePasswordVal.error}>{rePasswordVal.message}</FormHelperText>
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+                                            <Button
+                                                type="submit"
+                                                fullWidth
+                                                variant="contained"
+                                                sx={{ mt: 3, mb: 2 }}
+                                                color="secondary"
+                                                onClick={handleSignUp}
+                                            >
+                                                {isFetchingUser ? <CircularProgress color="primary" /> : "Sign Up"}
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleSignUpClose} color="error" variant="contained">Cancel</Button>
                             </DialogActions>
                         </Dialog>
                     </Box>

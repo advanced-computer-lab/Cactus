@@ -1,16 +1,32 @@
-import React, { useContext } from 'react'
-import { Button, Grid, Paper, Typography } from '@mui/material'
+import React, { useContext, useState, useEffect } from 'react'
+import { Button, Grid, Paper, Typography, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from '@mui/material'
 import { Box } from '@mui/system'
 import MasksIcon from '@mui/icons-material/Masks';
 import './UserHomepage.css'
 import WifiIcon from '@mui/icons-material/Wifi';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom'
+import { useHistory } from "react-router";
 import suitcase from '../../Images/whiteSuitcase.png'
 import { UserContext } from '../../Context/UserContext';
 
 function UserHomepage() {
+    const [open, setOpen] = useState(false);
+    const location = useLocation()
     const history = useHistory()
+    useEffect(() => {
+        const checker = () => {
+            if (location.state) {
+                setOpen(location.state.finished)
+            }
+        }
+        checker()
+        console.log(location.state.finished)
+    }, [location.state])
+    
+    const handleClose = () => {
+        setOpen(false);
+    };
     const {loggedUser } = useContext(UserContext)
 
     const handleRegisterProfile = (e) =>{
@@ -107,6 +123,28 @@ function UserHomepage() {
                     </Grid>
                 </Grid>
             </Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Registeration Process Incomplete"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        It looks like there's some information missing about you.
+                        Please finish your registeration process by filling them out.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}color="warning">Later</Button>
+                    <Button onClick={()=>history.push("/UserInfo")} autoFocus color="success">
+                       Proceed
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }
