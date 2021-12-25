@@ -185,7 +185,16 @@ UserRouter.post('/reserveFlight', (req, res) => {
                             from: 'Cactusairlinesguc@gmail.com',
                             to: req.body.email,//Insert User Email Here
                             subject: 'Booking Confirmation',
-                            text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + '\r\n' + JSON.stringify(reserve) +'. \r\n Cactus Airlines Team.'
+                            text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + 
+                            '\r\n' + reserve.destination + ' to ' + reserve.return + '\r\n' +
+                            "Departure Date: " + reserve.departureDate + " " + reserve.departureTime + '\r\n' + 
+                            "Seat Numbers: " + reserve.depSeatNumbers + '\r\n' +
+                            "EGP " + reserve.departurePrice + '\r\n' +
+                            "____________________________________________________________________" + '\r\n' +
+                            "Return Date: " + reserve.returnDate + " " + reserve.returnTime + '\r\n' + 
+                            "Seat Numbers: " + reserve.retSeatNumbers + '\r\n' +
+                            "EGP " + reserve.returnPrice + '\r\n' +
+                            'Cactus Airlines Team.'
                         };
                     
                         transporter.sendMail(mailOptions, function (error, info) {
