@@ -50,6 +50,7 @@
     <img src="https://github.com/advanced-computer-lab/Cactus/blob/866c1e61bfd1be510949de72280898f91b9bac0b/Cactus%20Airlines%20-%20Google%20Chrome%2025_12_2021%2011_45_29%20AM.png" alt="Homepage">
   </a>
 </div>
+Our Project is based on Creating an Airplane Reservation System "Cactus Airlines" .This System is a web application through which individuals can reserve for them and their families and pay for flights in order to travel to different countries and/or domestic Cities.Also, Individuals are able to change/cancel flights according to their needs and schedule .In this project we have implemented the Agile Methodology with Sprints lasting about 2-3 weeks.
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -83,7 +84,7 @@ The Reason we have come up with this idea is that we felt that most of the avail
 satisfy All the needs of the Customers interms of (Prices,Flight Availability,comfortability ..etc )and there is a gap that we decided to Fill. Thats where we decided to step in !!.
 
 ## Build Status
-Till now there aren't any reported issues from any Customers. However, We appreciate your opinion and any improvements you suggest on cactusairlines@gmail.com
+Till no there is no any reported issues from any Customer.However, We appreciate your opinion and any improvements you suggest on cactusairlines@gmail.com
 
 ## Code Style 
 Our Coding Style was one of the Key Factors that made this project possible. We have used a Convention that we all agreed on to make the project scalable in the future 
@@ -93,8 +94,13 @@ Our Coding Style was one of the Key Factors that made this project possible. We 
 * CamelCase in Naming Functions and Variables
 * Exception Handling Convention(Error Return Values)
 
+## ScreenShots
+
+
 ## Features
 We are all very pleased to announce Our Cactus Airlines System that gives a whole new experience in the World of travelling. No Need to stand in line to see flights availability and compare prices like in the Past. Now you are able to do all this from your space .Also ,you will be able to Pay Online So No More Queueing  .Moreover , in Case of any Emergencies you will be able to reschedule the flights booked with Zero to minimum charges . So we Could Say .Welcome on Board ! 
+
+## Code Examples
 
 
 ### Installation
@@ -119,15 +125,29 @@ We are all very pleased to announce Our Cactus Airlines System that gives a whol
    EMAIL_PASS='************'
    ACCESS_TOKEN_SECRET="your_secret_access_token"
    ```
+5.In the Server Directory ,Type
+    ```
+    node index
+    ```
+    
+    
+6.In Another Terminal Window .In the Client Directory,Type
+    ```
+    npm start
+    ```
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## How to Use ?
-The Website will be hosted and be made available on 1/1/2022 , with a 20% Discount on All Our Flights !!. You can start by Logging (Or SignUp ) to our website ,Choose the Your Location and Destination along with the Dates , and leave the rest on us . All Available flights will be displayed and you will be able choose the flight that you want.After that you are able to choose the Payment Method that suits you (MasterCard or Visa) . In Case you would to change any flight or any Personal Data , you will be able to do so in your Profile Page.
-
+## API Reference
+The API References that helped Us alot in this project was the Nodejs Documentation (https://nodejs.org/docs/latest-v15.x/api/), React Documentation (https://reactjs.org/docs/getting-started.html),Axios Doucmentation(https://axios-http.com/docs/intro).MaterialUI Documentation (https://mui.com/getting-started/usage/)
 
 ## Tests
 We have used up-to-date Testing Techniques to ensure that quality we give to our Customers is up to their expectations.Such as Jest and Super Test (For Automated Testing) and Postman for Testing APIs 
+
+
+## How to Use ?
+The Website will be hosted and be made available on 1/1/2021 , with a 20% Discount on All Our Flights !!. You can start by Logging (Or SignUp ) to our website ,Choose the Your Location and Destination along with the Dates , and leave the rest on us . All Available flights will be displayed and you will be able choose the flight that you want.After that you are able to choose the Payment Method that suits you (MasterCard or Visa) . In Case you would to change any flight or any Personal Data , you will be able to do so in your Profile Page.
 
 
 <!-- CONTRIBUTING -->
