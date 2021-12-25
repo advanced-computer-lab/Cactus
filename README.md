@@ -83,7 +83,7 @@ The Reason we have come up with this idea is that we felt that most of the avail
 satisfy All the needs of the Customers interms of (Prices,Flight Availability,comfortability ..etc )and there is a gap that we decided to Fill. Thats where we decided to step in !!.
 
 ## Build Status
-Till no there is no any reported issues from any Customer.However, We appreciate your opinion and any improvements you suggest on cactusairlines@gmail.com
+Till now there aren't any reported issues from any Customers. However, We appreciate your opinion and any improvements you suggest on cactusairlines@gmail.com
 
 ## Code Style 
 Our Coding Style was one of the Key Factors that made this project possible. We have used a Convention that we all agreed on to make the project scalable in the future 
@@ -123,7 +123,7 @@ We are all very pleased to announce Our Cactus Airlines System that gives a whol
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## How to Use ?
-The Website will be hosted and be made available on 1/1/2021 , with a 20% Discount on All Our Flights !!. You can start by Logging (Or SignUp ) to our website ,Choose the Your Location and Destination along with the Dates , and leave the rest on us . All Available flights will be displayed and you will be able choose the flight that you want.After that you are able to choose the Payment Method that suits you (MasterCard or Visa) . In Case you would to change any flight or any Personal Data , you will be able to do so in your Profile Page.
+The Website will be hosted and be made available on 1/1/2022 , with a 20% Discount on All Our Flights !!. You can start by Logging (Or SignUp ) to our website ,Choose the Your Location and Destination along with the Dates , and leave the rest on us . All Available flights will be displayed and you will be able choose the flight that you want.After that you are able to choose the Payment Method that suits you (MasterCard or Visa) . In Case you would to change any flight or any Personal Data , you will be able to do so in your Profile Page.
 
 
 ## Tests
