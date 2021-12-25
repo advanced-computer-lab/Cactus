@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 const Reservation = require('../Schemas/Reservation').schema
 
 const UserSchema = new Schema({
+    title:{
+        type:String
+    },
     firstName:{
         type:String,
         required: true,
@@ -17,7 +20,6 @@ const UserSchema = new Schema({
     },
     dateOfBirth: {
         type:String,
-        required: true,
     },
     email: {
         type:String,
@@ -41,13 +43,11 @@ const UserSchema = new Schema({
     isAdmin: {
         type: Boolean
     },
-
     passportNumber:{
         type:Number   
     },
     gender: {
-        type:String,
-        required: true,
+        type:String
     },
 
 	telephones:{

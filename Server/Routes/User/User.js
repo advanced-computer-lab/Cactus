@@ -12,7 +12,6 @@ const Reservation = require('../../Schemas/Reservation')
 //___________Flight Router___________
 UserRouter.use(express.json())
 
-//////USER DATA (HIMSELF)/////
 
 UserRouter.get('/getallusers', (req, res) => {
     User.find()
@@ -81,8 +80,6 @@ UserRouter.post('/addUser', (req, res) => {
 });
 
 
-///USER FLIGHTS////
-
 UserRouter.post('/getFlights', (req, res) => {
     var flights = []
     Flight.find()
@@ -91,9 +88,9 @@ UserRouter.post('/getFlights', (req, res) => {
                 var Flag = true
                 if (result[i].departureDate !== req.body.departureDate)
                     Flag = false
-                if (result[i].departureAirport !== req.body.departureAirport)
+                if (result[i].depCountry !== req.body.departureAirport)
                     Flag = false
-                if (result[i].destinationAirport !== req.body.destinationAirport)
+                if (result[i].destCountry !== req.body.destinationAirport)
                     Flag = false
                 if (req.body.cabin === 'business' && result[i].availableBusiness < req.body.seats)
                     Flag = false
@@ -120,10 +117,7 @@ UserRouter.post('/reserveFlight', (req, res) => {
     var returnDate = ""
     var departureTime = ""
     var returnTime = ""
-    console.log(req.body.depSeats)
-    console.log(req.body.retSeats)
-    console.log(req.body.depFlightMap)
-    console.log(req.body.retFlightMap)
+    console.log("Sending Mail Here");
     Flight.findById(req.body.departureId)
         .then((flight) => {
             if (req.body.cabin === 'business') {
@@ -179,6 +173,37 @@ UserRouter.post('/reserveFlight', (req, res) => {
                         reserve.depSeatNumbers = req.body.depSeats
                         reserve.retSeatNumbers = req.body.retSeats
                         users[0].reservations.push(reserve)
+                        var transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'Cactusairlinesguc@gmail.com',
+                                pass: 'w0BNWlUcVIqx'
+                            }
+                        });
+                    
+                        var mailOptions = {
+                            from: 'Cactusairlinesguc@gmail.com',
+                            to: req.body.email,//Insert User Email Here
+                            subject: 'Booking Confirmation',
+                            text: 'Dear ' + req.body.title + ' ' + req.body.firstName + ': \r\n' +' Your Trip has been booked successfully' + 
+                            '\r\n' + reserve.destination + ' to ' + reserve.return + '\r\n' +
+                            "Departure Date: " + reserve.departureDate + " " + reserve.departureTime + '\r\n' + 
+                            "Seat Numbers: " + reserve.depSeatNumbers + '\r\n' +
+                            "EGP " + reserve.departurePrice + '\r\n' +
+                            "____________________________________________________________________" + '\r\n' +
+                            "Return Date: " + reserve.returnDate + " " + reserve.returnTime + '\r\n' + 
+                            "Seat Numbers: " + reserve.retSeatNumbers + '\r\n' +
+                            "EGP " + reserve.returnPrice + '\r\n' +
+                            'Cactus Airlines Team.'
+                        };
+                    
+                        transporter.sendMail(mailOptions, function (error, info) {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
                         reserve.save()
                         users[0].save().then(() => res.send(reserve))
                             .catch(er => console.log(er))
@@ -186,7 +211,6 @@ UserRouter.post('/reserveFlight', (req, res) => {
             })
                 .catch(er => console.log(er))
         })
-
 })
 
 
@@ -230,7 +254,6 @@ UserRouter.post('/cancelReservation', (req, res) => {
                     }
                     reserve.remove()
                     //Mail Cancelation
-                    //////////////////////////
                     console.log("Sending Mail Here");
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -288,7 +311,7 @@ UserRouter.post('/cancelReservation', (req, res) => {
         })
 })
 
-UserRouter.post('/updateReservation', (req, res) => {
+UserRouter.post('/updateReservation',  (req, res) => {
     Reservation.findById(req.body.reservationId)
         .then((reserve) => {
             reserve.depSeatNumbers = req.body.depSeats
@@ -305,22 +328,18 @@ UserRouter.post('/updateReservation', (req, res) => {
                         Flight.findById(reserve.departureId)
                             .then((flight) => {
                                 if (reserve.cabin === 'business') {
-                                    flight.availableBusiness += reserve.seats
                                     flight.businessMap = req.body.depFlightMap
                                 }
                                 else {
-                                    flight.availableEconomy += reserve.seats
                                     flight.economyMap = req.body.depFlightMap
                                 }
                                 flight.save().then(() => {
                                     Flight.findById(reserve.returnId)
                                         .then((flight2) => {
                                             if (reserve.cabin === 'business') {
-                                                flight2.availableBusiness += reserve.seats
                                                 flight2.businessMap = req.body.retFlightMap
                                             }
                                             else {
-                                                flight2.availableEconomy += reserve.seats
                                                 flight2.economyMap = req.body.retFlightMap
                                             }
                                             flight2.save().then(() => { res.send({ success: true }) })
@@ -375,4 +394,92 @@ UserRouter.post('/getUserInfo', (req,res)=>{
         })
 })
 
+UserRouter.put('/changeDep',  async (req,res)=>{
+    const reserve = await Reservation.findById(req.body.reservationId) 
+    const flight1 = await Flight.findById(reserve.departureId) 
+    if(reserve.cabin === "business"){
+        editFlightMap(flight1.businessMap,reserve.depSeatNumbers)
+        flight1.availableBusiness += reserve.seats
+    }
+    else{
+        editFlightMap(flight1.economyMap,reserve.depSeatNumbers)
+        flight1.availableEconomy += reserve.seats
+    }
+    flight1.save()
+    const flight2 = await Flight.findById(req.body.newFlightId)
+    reserve.departureId = req.body.newFlightId
+    reserve.departureDate = flight2.departureDate
+    reserve.departureTime = flight2.departureTime
+    if(reserve.cabin === "business"){
+        reserve.departurePrice = flight2.businessPrice
+        fillMap(flight2.businessMap,req.body.newSeats)
+        flight2.availableBusiness -= reserve.seats
+    }
+    else{
+        reserve.departurePrice = flight2.economyPrice
+        fillMap(flight2.economyMap,req.body.newSeats)
+        flight2.availableEconomy -= reserve.seats
+    }
+    reserve.depSeatNumbers = req.body.newSeats
+    reserve.save()
+    flight2.save()
+    const user = await User.findById(req.body.userId)
+    for (i = 0; i < user.reservations.length; i++) {
+        if (reserve._id.equals(user.reservations[i]._id)) {
+            user.reservations.splice(i, 1, reserve)
+        }
+    }
+    user.save()
+    .then(() => {res.send(reserve)})
+})
+
+UserRouter.put('/changeRet', async (req,res)=>{
+    const reserve = await Reservation.findById(req.body.reservationId) 
+    const flight1 = await Flight.findById(reserve.returnId) 
+    if(reserve.cabin === "business"){
+        editFlightMap(flight1.businessMap,reserve.retSeatNumbers)
+        flight1.availableBusiness += reserve.seats
+    }
+    else{
+        editFlightMap(flight1.economyMap,reserve.retSeatNumbers)
+        flight1.availableEconomy += reserve.seats
+    }
+    flight1.save()
+    const flight2 = await Flight.findById(req.body.newFlightId)
+    reserve.returnId = req.body.newFlightId
+    reserve.returnDate = flight2.departureDate
+    reserve.returnTime = flight2.departureTime
+    if(reserve.cabin === "business"){
+        reserve.returnPrice = flight2.businessPrice
+        fillMap(flight2.businessMap,req.body.newSeats)
+        flight2.availableBusiness -= reserve.seats
+    }
+    else{
+        reserve.returnPrice = flight2.economyPrice
+        fillMap(flight2.economyMap,req.body.newSeats)
+        flight2.availableEconomy -= reserve.seats
+    }
+    reserve.retSeatNumbers = req.body.newSeats
+    reserve.save()
+    flight2.save()
+    const user = await User.findById(req.body.userId)
+    for (i = 0; i < user.reservations.length; i++) {
+        if (reserve._id.equals(user.reservations[i]._id)) {
+            user.reservations.splice(i, 1, reserve)
+        }
+    }
+    user.save()
+    .then(() => {res.send(reserve)})
+})
+
+const fillMap = (map, arr) => {
+    for (i = 0; i < arr.length; i++) {
+        for (j = 0; j < map.length; j++) {
+            if (map[j].number === arr[i]) {
+                map[j].reserved = true
+                break
+            }
+        }
+    }
+}
 module.exports = UserRouter;

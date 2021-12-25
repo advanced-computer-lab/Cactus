@@ -104,7 +104,9 @@ function EditFlight() {
         depCountry: depCountry,
         economyPrice: priceEco,
         businessPrice: priceBus,
-        planeType: planeType
+        planeType: planeType,
+        economyMap: flightData.economyMap,
+        businessMap: flightData.businessMap
     }
     const handleClick = (e) => {
         e.preventDefault()

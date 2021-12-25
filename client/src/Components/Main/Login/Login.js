@@ -20,6 +20,7 @@ import logo from '../../../logo4.png'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom'
 import { UserContext } from '../../../Context/UserContext';
+import { setAuthentication } from '../../../Authentication/Authentication';
 
 
 function Copyright(props) {
@@ -44,6 +45,8 @@ export default function SignInSide() {
   const history = useHistory()
   const { setLoggedUser } = React.useContext(UserContext)
 
+
+
   const usernameChange = (e) => {
     setUsername(e.target.value)
   }
@@ -55,23 +58,28 @@ export default function SignInSide() {
     "username": username,
     "password": userPass
   }
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     setFetching(true)
     axios.post('/Authentication/Login', user)
       .then((res) => {
-        if(res.data.username === undefined || res.data.password === undefined){
+        console.log("User: ",res)
+        if(res.data === ""){
           setFetching(false)
           setOpen(true)
         }
         else
-        {  if (res.data.isAdmin) {
+        {  if (res.data.user.isAdmin) {
             setFetching(false)
+            setAuthentication(res.data.token, res.data.user)
+            setLoggedUser({user: res.data.user, token: res.data.token})
             history.push("/adminHome")
           }
           else{
             setFetching(false)
-            setLoggedUser(res.data)
+            setAuthentication(res.data.token, res.data.user)
+            setLoggedUser({user: res.data.user, token: res.data.token})
             history.push("/")
           }
         }
@@ -80,7 +88,6 @@ export default function SignInSide() {
         setOpen(true)
         console.log(err)
       })
-    console.log(user)
   }
 
 
