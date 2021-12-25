@@ -63,6 +63,7 @@
 * [React.js](https://reactjs.org/)
 * [NodeJS](https://nodejs.com)
 * [Material UI](https://mui.com)
+* [Stripe](https://stripe.com)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -116,7 +117,8 @@ If you have a suggestion that would make this better, please fork the repo and c
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
+<!-- GETTING STARTED ON THE SITE -->
+## Getting Started on the Website
 
 <!-- CONTACT -->
 ## Contact
