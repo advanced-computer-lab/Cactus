@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from 'axios'
 import { useHistory } from 'react-router'
+import { UserContext } from "../../../Context/UserContext"
+
 
 var recentlyReservedDepB = []
 var recentlyReservedDepE = []
@@ -45,6 +47,7 @@ const Search = () => {
     const [economyRetSeats, setEconomyRetSeats] = useState([])
     const [businessRetSeats, setBusinessRetSeats] = useState([])
     const [numberOfSeats, setNumberOfSeats] = useState(0);
+    const { loggedUser, setLoggedUser } = useContext(UserContext)
     const [depSeat, setDepSeat] = useState([])
     const [retSeat, setRetSeat] = useState([])
     const [depFlightMaps, setDepFlightMaps] = useState([])
@@ -234,6 +237,7 @@ const Search = () => {
             setFetching(false)
             return
         }
+        console.log("data: ",data)
         axios.post('/Users/getFlights', data)
             .then((response) => {
                 setSearch(true)
@@ -526,7 +530,20 @@ const Search = () => {
 
     const handleCloseConfirm = () => {
         setConfirmDialog(false)
-        history.push("/")
+        if(loggedUser.user.homeAddress){
+            history.push("/")
+        }
+        else{
+        history.push(
+            {
+                pathname: "/",
+                search: '?query=abc',
+                state: {
+                    finished: true
+                }
+            }
+        )
+        }
     }
     const [success, setSuccess] = useState(false)
     const [loading, setLoading] = useState(false)

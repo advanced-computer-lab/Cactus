@@ -21,7 +21,6 @@ function UserHomepage() {
             }
         }
         checker()
-        console.log(location.state.finished)
     }, [location.state])
     
     const handleClose = () => {

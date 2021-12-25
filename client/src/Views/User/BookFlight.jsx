@@ -5,6 +5,7 @@ import axios from 'axios'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useHistory } from "react-router";
 import { useLocation } from 'react-router-dom'
+import { setAuthentication } from '../../Authentication/Authentication'
 
 
 
@@ -14,7 +15,7 @@ import {
     DialogContent, Button, ButtonGroup, CircularProgress, Divider, Grid, Typography,
     Paper, TextField, FormControl, FormControlLabel, Autocomplete, LinearProgress, Card, CardActions, CardContent,
     List, ListItem, ListItemText, ListItemIcon, Avatar, Collapse, Alert, IconButton, DialogTitle, Tooltip, Accordion,
-    AccordionSummary, AccordionDetails, Link, InputLabel, Select, MenuItem, OutlinedInput, InputAdornment, FormHelperText
+    AccordionSummary, AccordionDetails, Link, InputLabel, Select, MenuItem, OutlinedInput, InputAdornment, FormHelperText, FormLabel
 } from '@mui/material';
 
 
@@ -35,6 +36,8 @@ import CoffeeIcon from '@mui/icons-material/Coffee';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AirplanemodeInactiveIcon from '@mui/icons-material/AirplanemodeInactive';
 import AirlineSeatReclineNormalIcon from "@mui/icons-material/AirlineSeatReclineNormal";
+import FemaleIcon from "@mui/icons-material/Female";
+import MaleIcon from "@mui/icons-material/Male";
 
 // ____________MATERIAL UI LAB COMPONENTS_________________
 import Timeline from '@mui/lab/Timeline';
@@ -75,22 +78,31 @@ function BookFlight() {
     const [progress, setProgress] = React.useState(0);
     const [username, setUsername] = React.useState('');
     const [userPass, setPassword] = React.useState('');
+    const [titleVal, setTitleVal] = React.useState({ error: false, message: "" }) 
+    const [firstNVal, setFirstNVal] = React.useState({ error: false, message: "" })
+    const [usernameVal, setUsernameVal] = React.useState({ error: false, message: "" });
+    const [lastNVal, setLastNVal] = React.useState({ error: false, message: "" })
+    const [passportVal, setPassportVal] = React.useState({ error: false, message: "" });
     const [isFetchingUser, setFetchingUser] = React.useState(false)
     const [alertOpen, setAlertOpen] = React.useState(false)
-    const [depEditDate, setDepEditDate] = React.useState()
-    const [retEditDate, setRetEditDate] = React.useState()
     const { loggedUser, setLoggedUser } = React.useContext(UserContext)
-    const [title, setTitle] = React.useState()
-    const [signUpUsername, setSignUpUsername] = React.useState()
-    const [email, setEmail] = React.useState()
-    const [firstName, setFirstName] = React.useState()
-    const [lastName, setLastName] = React.useState()
+    const [title, setTitle] = React.useState("")
+    const [signUpUsername, setSignUpUsername] = React.useState("")
+    const [email, setEmail] = React.useState("")
+    const [emailVal, setEmailVal] = React.useState({error: false, message: ""})
+    const [firstName, setFirstName] = React.useState("")
+    const [lastName, setLastName] = React.useState("")
+    const [gender, setGender] = React.useState("Male");
+    const [genderVal, setGenderVal] = React.useState({ error: false, message: "" })
+    const [dateOfBirth, setDoB] = React.useState("");
+    const [dobVal, setDobVal] = React.useState({ error: false, message: "" })
     const [signUpPassword, setSignUpPassword] = React.useState({
         password: "",
         showPassword: false,
         retypePassword: "",
         showRetypePassword: false
     });
+    const [passport, setPassport] = React.useState("")
 
     const history = useHistory();
     const location = useLocation();
@@ -117,6 +129,9 @@ function BookFlight() {
 
     const stripe = useStripe()
     const elements = useElements()
+
+    const [depEditDate, setDepEditDate] = React.useState(reservation ? new Date(reservation.departureDate) : "")
+    const [retEditDate, setRetEditDate] = React.useState(reservation ? new Date(reservation.returnDate) : "")
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -227,21 +242,47 @@ function BookFlight() {
     const passwordChange = (e) => {
         setPassword(e.target.value)
     }
-
+    const checkPassport = (passport) => {
+        axios.post('/Authentication/checkPassport', { passport: passport })
+            .then((res) => {
+                if (res.data === "good") {
+                    setPassportVal({ error: false, message: "" })
+                    setError(false)
+                }
+                else {
+                    setPassportVal({ error: true, message: "Passport Number already exists" })
+                    setError(true)
+                }
+            })
+    }
     const user = {
         "username": username,
         "password": userPass
+    }
+    const checkEmail = (email) => {
+        axios.post('/Authentication/checkEmail', { email: email })
+            .then((res) => {
+                if (res.data === "good") {
+                    setEmailVal({ error: false, message: "" })
+                    setError(false)
+                }
+                else {
+                    setEmailVal({ error: true, message: "Email already exists" })
+                    setError(true)
+                }
+            })
     }
     const handleLogin = (e) => {
         e.preventDefault()
         setFetchingUser(true)
         axios.post('/Authentication/Login', user)
             .then((res) => {
-                if (res.data.user.username === undefined || res.data.user.password === undefined) {
+                if (res.data.user === "") {
                     setFetchingUser(false)
                     setAlertOpen(true)
                 } else {
                     setLoggedUser({ user: res.data.user, token: res.data.token })
+                    setAuthentication(res.data.token, res.data.user)
                     setLoginOpen(false)
                     setFetchingUser(false)
                 }
@@ -364,31 +405,167 @@ function BookFlight() {
     const handleTitleChange = (event) => {
         setTitle(event.target.value);
     };
-    const [signUpOpen, setSignUpOpen] = React.useState(true)
+    const [signUpOpen, setSignUpOpen] = React.useState(false)
     const handleSignUpClose = (e) => {
         setSignUpOpen(false)
     }
     const emailChange = (e) => {
         setEmail(e.target.value)
+        if ((e.target.value).length === 0) {
+            setEmailVal({ error: true, message: "This Field is Required" })
+            setError(true)
+        }
+        else {
+            checkEmail(e.target.value)
+        }
+    }
+    const checkUsername = (user) => {
+        axios.post('/Authentication/checkUsername', { username: user })
+            .then((res) => {
+                if (res.data === "good") {
+                    setUsernameVal({ error: false, message: "" })
+                    setError(false)
+                }
+                else {
+                    setUsernameVal({ error: true, message: "Username already exists" })
+                    setError(true)
+                }
+            })
+    }
+    const signUpUsernameChange= (e) => {
+        setSignUpUsername(e.target.value)
+        if ((e.target.value).length === 0) {
+            setUsernameVal({ error: true, message: "This Field is Required" })
+            setError(true)
+        }
+        else {
+            checkUsername(e.target.value)
+        }
+        
+    }
+    const passportChange = (e) =>{
+        setPassport(e.target.value)
     }
     const firstNameChange = (e) => {
         setFirstName(e.target.value)
+        if ((e.target.value).length === 0) {
+            setFirstNVal({ error: true, message: 'This Field is Required' })
+            setError(true)
+        }
+        else {
+            setFirstNVal({ error: false, message: "" })
+        }
     }
     const lastNameChange = (e) => {
         setLastName(e.target.value)
+        if ((e.target.value).length === 0) {
+            setLastNVal({ error: true, message: 'This Field is Required' })
+            setError(true)
+        }
+        else { setLastNVal({ error: false, message: "" }) }
+    }
+    const [loadingSign, setLoadingSign] = React.useState(false)
+    function checkCredValidation(signUpUsername, email, signUpPassword, firstName, lastName, passport) {
+        let error = false
+        if (signUpUsername === "") {
+            setUsernameVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setUsernameVal({ error: false, message: "" })
+        }
+        if(email === ""){
+            setEmailVal({error:true, message: "This Field is Required"})
+            error = true
+        }
+        else{
+            setEmailVal({error: false, message: ""})
+        }
+        if (signUpPassword.password === "") {
+            setPasswordVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setPasswordVal({ error: false, message: "" })
+        }
+        if (signUpPassword.retypePassword === "") {
+            setRePasswordVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setRePasswordVal({ error: false, message: "" })
+        }
+        if (dateOfBirth === ""){
+            setDobVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else{
+            setDobVal({ error: false, message: "" })
+        }
+        if (title === ""){
+            setTitleVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else{
+            setTitleVal({ error: false, message: "" })
+        }
+        if (firstName === "") {
+            setFirstNVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setFirstNVal({ error: false, message: "" })
+        }
+        if (lastName === "") {
+            setLastNVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setLastNVal({ error: false, message: "" })
+        }
+        if (passport === "") {
+            setPassportVal({ error: true, message: "This Field is Required" })
+            error = true
+        }
+        else {
+            setPassportVal({ error: false, message: "" })
+        }
+        if (error) return true
+        return false
     }
     const handleSignUp = (e) => {
         e.preventDefault()
-        history.push(
-            {
-                pathname: "/",
-                search: '?query=abc',
-                state: {
-                    finished: true
-                }
-            }
-        )
-        setSignUpOpen(false)
+        const data ={
+            username: signUpUsername,
+            password: signUpPassword.password,
+            firstName : firstName,
+            lastName: lastName,
+            title: title,
+            email: email,
+            passportNumber: passport
+        }
+        setLoadingSign(true)
+        const error = checkCredValidation(signUpUsername,email,signUpPassword,firstName,lastName,passport)
+        if(error){
+            setLoading(false)
+        }
+        else{
+        axios.post('/Authentication/Register',data)
+        .then(() => {
+            axios.post('/Authentication/Login',{username: signUpUsername,password: signUpPassword.password})
+            .then((res) => {
+                if(res.data !== ""){
+                    setLoggedUser({ user: res.data.user, token: res.data.token })
+                    setAuthentication(res.data.token, res.data.user)
+                    setLoadingSign(false)
+                    setSignUpOpen(false)
+                }})
+            
+        })
+        .catch((err)=>{
+            console.log("Reg Error: ", err)
+        })
+        }
     }
 
     return (
@@ -460,12 +637,10 @@ function BookFlight() {
                                                         focused
                                                         sx={{ input: { color: '#fff' } }}
                                                         value={depEditDate}
-                                                        // defaultValue={new Date(reservation.departureDate)}
                                                         inputFormat="yyyy/MM/dd"
                                                         disabled={!departure}
                                                         readOnly={!departure}
-                                                        minDate={new Date(reservation.departureDate)}
-                                                        maxDate={new Date(reservation.rerturnDate)}
+                                                        maxDate={retEditDate}
                                                         disablePast
                                                         error={depDateValidation.error}
                                                         helperText={depDateValidation.label}
@@ -486,9 +661,8 @@ function BookFlight() {
                                                     <DatePicker
                                                         label="Return Date"
                                                         value={retEditDate}
-                                                        minDate={new Date(reservation.departureDate)}
-                                                        defaultValue={new Date(reservation.rerturnDate)}
-                                                        formatDate="yyyy/MM/dd"
+                                                        minDate={depEditDate}
+                                                        inputFormat="yyyy/MM/dd"
                                                         error={retDateValidation.error}
                                                         helperText={retDateValidation.label}
                                                         disabled={departure}
@@ -545,6 +719,7 @@ function BookFlight() {
                                                     id="country-select-demo"
                                                     options={countries}
                                                     autoHighlight
+                                                    onSelect={handleFromChange}
                                                     getOptionLabel={(option) => option.label}
                                                     color="white"
                                                     renderOption={(props, option) => (
@@ -571,7 +746,6 @@ function BookFlight() {
                                                             sx={{ input: { color: '#fff' } }}
                                                             helperText={fromValidation.label}
                                                             required
-                                                            onChange={handleFromChange}
                                                             inputProps={{
                                                                 ...params.inputProps,
                                                                 autoComplete: 'off', // disable autocomplete and autofill
@@ -589,6 +763,7 @@ function BookFlight() {
                                                     id="country-select-demo"
                                                     options={countries}
                                                     autoHighlight
+                                                    onSelect={handleToChange}
                                                     getOptionLabel={(option) => option.label}
                                                     renderOption={(props, option) => (
                                                         <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
@@ -614,7 +789,6 @@ function BookFlight() {
                                                             helperText={toValidation.label}
                                                             fullWidth
                                                             required
-                                                            onChange={handleToChange}
                                                             inputProps={{
                                                                 ...params.inputProps,
                                                                 autoComplete: 'off', // disable autocomplete and autofill
@@ -1785,7 +1959,6 @@ function BookFlight() {
                                                 onChange={passwordChange}
                                                 autoComplete="current-password"
                                             />
-
                                             <Button
                                                 type="submit"
                                                 fullWidth
@@ -1797,7 +1970,9 @@ function BookFlight() {
                                                 {isFetchingUser ? <CircularProgress color="primary" /> : "Login"}
                                             </Button>
                                             <br />
-                                            <Link color="secondary" onClick={() => setSignUpOpen(true)}>
+                                            <Link color="secondary" onClick={() => {
+                                                setLoginOpen(false)
+                                                setSignUpOpen(true)}}>
                                                 <Typography variant="subtitle1">Don't Have an Account, Sign Up</Typography>
                                             </Link>
                                         </Box>
@@ -1824,7 +1999,7 @@ function BookFlight() {
                                             <LockOutlinedIcon />
                                         </Avatar>
                                         <Typography component="h1" variant="h5">
-                                            Sign Up
+                                            {loadingSign ? <CircularProgress color="white"/> : "Sign Up"}
                                         </Typography>
                                         <Box component="form" noValidate sx={{ mt: 1 }}>
                                             <Grid container spacing={3}>
@@ -1837,8 +2012,10 @@ function BookFlight() {
                                                         id="username"
                                                         label="Username"
                                                         name="username"
-                                                        onChange={usernameChange}
+                                                        onChange={signUpUsernameChange}
                                                         autoFocus
+                                                        error={usernameVal.error}
+                                                        helperText={usernameVal.message}
                                                     />
                                                 </Grid>
                                                 <Grid item lg={6}></Grid>
@@ -1853,12 +2030,51 @@ function BookFlight() {
                                                         name="email"
                                                         onChange={emailChange}
                                                         autoFocus
+                                                        error={emailVal.error}
+                                                        helperText={emailVal.message}
                                                     />
+                                                </Grid>
+                                                <Grid item lg={7}>
+                                                    <TextField
+                                                        id="outlined-textarea"
+                                                        label="Date of Birth"
+                                                        fullWidth
+                                                        type="date"
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                        required
+                                                        onChange={(e)=>{
+                                                            e.preventDefault();
+                                                            setDoB(e.target.value)
+                                                        }}
+                                                        helperText={dobVal.message}
+                                                        error={dobVal.error}
+                                                    />
+                                                </Grid>
+                                                {/* Gender */}
+                                                <Grid item lg={4}>
+                                                    <FormControl component="fieldset">
+                                                        <FormLabel component="legend" style={{ textAlign: 'start' }} error={genderVal.error}>Gender</FormLabel>
+                                                        <RadioGroup
+                                                            row-aria-label="gender"
+                                                            name="row-radio-button-group"
+                                                            row
+                                                            defaultValue={gender}
+                                                            onChange={(e) => {
+                                                                setGender(e.target.value)
+                                                            }}
+                                                        >
+                                                            <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                                                            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                                                        </RadioGroup>
+                                                        <FormHelperText>{genderVal.message}</FormHelperText>
+                                                    </FormControl>
                                                 </Grid>
                                                 {/* Title */}
                                                 <Grid item lg={4}>
                                                     <FormControl sm={{ m: 1 }} fullWidth style={{marginTop: '15px'}}>
-                                                        <InputLabel id="demo-simple-select-helper-label">Title</InputLabel>
+                                                        <InputLabel id="demo-simple-select-helper-label" error={titleVal.error}>Title</InputLabel>
                                                         <Select
                                                             labelId="demo-simple-select-helper-label"
                                                             id="demo-simple-select-helper"
@@ -1873,6 +2089,7 @@ function BookFlight() {
                                                             <MenuItem value="MISS">MISS</MenuItem>
                                                             <MenuItem value="MRS">MRS</MenuItem>
                                                         </Select>
+                                                        <FormHelperText error={titleVal.error}>{titleVal.message}</FormHelperText>
                                                     </FormControl>
                                                 </Grid>
                                                 {/* First Name */}
@@ -1886,6 +2103,8 @@ function BookFlight() {
                                                         name="firstName"
                                                         onChange={firstNameChange}
                                                         autoFocus
+                                                        error={firstNVal.error}
+                                                        helperText={firstNVal.message}
                                                     />
                                                 </Grid>
                                                 {/* Last Name */}
@@ -1899,6 +2118,23 @@ function BookFlight() {
                                                         name="lastName"
                                                         onChange={lastNameChange}
                                                         autoFocus
+                                                        error={lastNVal.error}
+                                                        helperText={lastNVal.message}
+                                                    />
+                                                </Grid>
+                                                {/* Passport Number */}
+                                                <Grid item lg={12}>
+                                                    <TextField
+                                                        margin="normal"
+                                                        required
+                                                        fullWidth
+                                                        id="passport"
+                                                        label="Passport Number"
+                                                        name="passport"
+                                                        onChange={passportChange}
+                                                        autoFocus
+                                                        error={passportVal.error}
+                                                        helperText={passportVal.message}
                                                     />
                                                 </Grid>
                                                 {/* Password */}
